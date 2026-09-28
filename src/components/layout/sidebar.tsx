@@ -18,7 +18,12 @@ export function Sidebar({ className }: SidebarProps) {
   ];
 
   return (
-    <aside className={cn('flex flex-col w-64 h-screen bg-gray-900 text-white border-r border-gray-800', className)}>
+    <aside
+      className={cn(
+        'flex flex-col w-64 h-screen bg-gray-900 text-white border-r border-gray-800',
+        className
+      )}
+    >
       <div className="flex items-center justify-center h-16 border-b border-gray-800">
         <span className="text-lg font-bold">Metro CRM</span>
       </div>

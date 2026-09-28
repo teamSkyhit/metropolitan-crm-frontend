@@ -6,9 +6,7 @@ export default function LoginPage() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to Metro CRM
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Auth Module to be implemented
-          </p>
+          <p className="mt-2 text-center text-sm text-gray-600">Auth Module to be implemented</p>
         </div>
         {/* Placeholder for Login Form */}
         <div className="bg-white p-8 rounded-lg shadow">

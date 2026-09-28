@@ -5,18 +5,14 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  loginPlaceholder: () => void;
-  logoutPlaceholder: () => void;
+  setUser: (user: User | null) => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  loginPlaceholder: () => {
-    // Placeholder logic for login
-  },
-  logoutPlaceholder: () => {
-    // Placeholder logic for logout
-  },
+  setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
+  logout: () => set({ user: null, isAuthenticated: false, isLoading: false }),
 }));
