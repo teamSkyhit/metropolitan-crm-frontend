@@ -1,13 +1,15 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { QueryProvider } from './query-provider';
+import { useAuthStore } from '@/features/auth/auth.store';
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  return (
-    <QueryProvider>
-      {/* Additional global providers can go here, like ThemeProvider, ToastProvider, etc. */}
-      {children}
-    </QueryProvider>
-  );
+  const initialize = useAuthStore((state) => state.initialize);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  return <QueryProvider>{children}</QueryProvider>;
 }
