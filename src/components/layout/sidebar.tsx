@@ -33,7 +33,7 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
 
   const handleLogout = async () => {
     await logout();
-    router.replace('/login');
+    router.replace(ROUTES.LOGIN);
   };
 
   return (

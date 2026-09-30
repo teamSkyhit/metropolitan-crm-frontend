@@ -37,7 +37,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await authService.logout();
     } catch (e) {
-      console.error('Logout API failed, continuing local cleanup', e);
+      console.error(
+        'Logout API failed, continuing local cleanup:',
+        e instanceof Error ? e.message : 'Unknown error'
+      );
     } finally {
       tokenStorage.clearToken();
       getQueryClient().clear();

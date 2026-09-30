@@ -144,7 +144,7 @@ function LoginForm() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="��������"
+                  placeholder="••••••••"
                   disabled={isLoading}
                 />
                 <button

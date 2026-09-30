@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/constants/routes';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -28,7 +29,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const handleLogout = async () => {
     await logout();
-    router.replace('/login');
+    router.replace(ROUTES.LOGIN);
   };
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
