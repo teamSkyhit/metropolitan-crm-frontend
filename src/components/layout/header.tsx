@@ -39,16 +39,18 @@ export function Header({ onMenuClick }: HeaderProps) {
         <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden">
           <Menu className="w-5 h-5" />
         </Button>
-        <h2 className="text-xl font-semibold text-gray-800 hidden md:block">Metro Industrial CRM</h2>
+        <h2 className="text-xl font-semibold text-gray-800 hidden md:block">
+          Metro Industrial CRM
+        </h2>
       </div>
-      
+
       <div className="flex items-center gap-4 relative">
         <Button variant="ghost" size="icon">
           <Bell className="w-5 h-5 text-gray-600" />
         </Button>
-        
+
         <div className="relative" ref={menuRef}>
-          <button 
+          <button
             className="flex items-center gap-2 hover:bg-gray-100 p-1 pr-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-expanded={isMenuOpen}
@@ -72,7 +74,9 @@ export function Header({ onMenuClick }: HeaderProps) {
               <div className="px-4 py-3 border-b border-gray-100 md:hidden">
                 <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                <p className="text-xs font-semibold text-[var(--color-metro-navy)] mt-1">{user?.role?.replace('_', ' ')}</p>
+                <p className="text-xs font-semibold text-[var(--color-metro-navy)] mt-1">
+                  {user?.role?.replace('_', ' ')}
+                </p>
               </div>
               <button
                 onClick={handleLogout}

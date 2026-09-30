@@ -36,7 +36,12 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
   };
 
   return (
-    <aside className={cn('flex flex-col w-64 h-screen bg-[var(--color-metro-navy)] text-white border-r border-gray-800', className)}>
+    <aside
+      className={cn(
+        'flex flex-col w-64 h-screen bg-[var(--color-metro-navy)] text-white border-r border-gray-800',
+        className
+      )}
+    >
       <div className="flex items-center justify-center h-16 bg-white border-b border-gray-200 px-4 shrink-0">
         <img src="/logo.png" alt="Metro Logo" className="h-10 w-auto" />
       </div>
@@ -50,10 +55,10 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
                   href={item.href}
                   onClick={onNavigate}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                    isActive 
-                      ? "bg-[var(--color-metro-gold)] text-[var(--color-metro-navy)] font-bold" 
-                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                    'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
+                    isActive
+                      ? 'bg-[var(--color-metro-gold)] text-[var(--color-metro-navy)] font-bold'
+                      : 'text-gray-300 hover:bg-white/10 hover:text-white'
                   )}
                 >
                   <item.icon className="w-5 h-5" />

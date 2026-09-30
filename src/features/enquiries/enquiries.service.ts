@@ -21,8 +21,8 @@ export interface PaginationMeta {
 export const enquiriesService = {
   async getEnquiries(page = 1, limit = 20) {
     const response = await apiClient.get<ApiResponse<EnquirySummary[]>>('/enquiries', {
-      params: { page, limit }
+      params: { page, limit },
     });
     return { data: response.data.data, meta: response.data.meta };
-  }
+  },
 };

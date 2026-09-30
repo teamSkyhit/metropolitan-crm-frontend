@@ -11,9 +11,5 @@ export function AppProvider({ children }: { children: ReactNode }) {
     initialize();
   }, [initialize]);
 
-  return (
-    <QueryProvider>
-      {children}
-    </QueryProvider>
-  );
+  return <QueryProvider>{children}</QueryProvider>;
 }

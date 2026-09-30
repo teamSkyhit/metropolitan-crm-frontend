@@ -45,7 +45,10 @@ apiClient.interceptors.response.use(
     // Handle 401 Unauthorized
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       // Prevent refreshing on the refresh or login endpoints themselves
-      if (originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/refresh')) {
+      if (
+        originalRequest.url?.includes('/auth/login') ||
+        originalRequest.url?.includes('/auth/refresh')
+      ) {
         return Promise.reject(error);
       }
 
@@ -71,11 +74,11 @@ apiClient.interceptors.response.use(
         // Attempt to refresh
         const tokens = await authService.refresh();
         tokenStorage.setToken(tokens.accessToken, tokens.refreshToken);
-        
+
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = 'Bearer ' + tokens.accessToken;
         }
-        
+
         processQueue(null, tokens.accessToken);
         return apiClient(originalRequest);
       } catch (refreshError) {

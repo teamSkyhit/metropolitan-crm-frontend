@@ -12,7 +12,9 @@ export const authService = {
   async refresh(): Promise<AuthTokens> {
     const refreshToken = tokenStorage.getRefreshToken();
     if (!refreshToken) throw new Error('No refresh token');
-    const response = await apiClient.post<ApiResponse<AuthTokens>>('/auth/refresh', { refreshToken });
+    const response = await apiClient.post<ApiResponse<AuthTokens>>('/auth/refresh', {
+      refreshToken,
+    });
     return response.data.data;
   },
 
@@ -26,5 +28,5 @@ export const authService = {
     if (refreshToken) {
       await apiClient.post('/auth/logout', { refreshToken });
     }
-  }
+  },
 };

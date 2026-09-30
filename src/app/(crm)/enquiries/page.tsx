@@ -3,19 +3,26 @@
 import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/ui/page-header';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { enquiriesService } from '@/features/enquiries/enquiries.service';
 
 export default function EnquiriesPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['enquiries'],
-    queryFn: () => enquiriesService.getEnquiries(1, 20)
+    queryFn: () => enquiriesService.getEnquiries(1, 20),
   });
 
   return (
     <div className="space-y-6">
       <PageHeader title="Enquiries" description="Manage your enquiries here." />
-      
+
       {isLoading ? (
         <div className="flex h-32 items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>

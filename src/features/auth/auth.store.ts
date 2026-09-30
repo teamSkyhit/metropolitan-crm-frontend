@@ -9,7 +9,7 @@ interface AuthState {
   role: Role | null;
   isAuthenticated: boolean;
   isInitializing: boolean;
-  
+
   // Actions
   setAuth: (user: User, tokens: AuthTokens) => void;
   logout: () => void;
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   initialize: async () => {
     const token = tokenStorage.getToken();
-    
+
     if (!token) {
       set({ isInitializing: false, isAuthenticated: false });
       return;

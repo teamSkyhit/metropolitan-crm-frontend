@@ -10,12 +10,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
+
   --color-metro-navy: #0b2e59;
   --color-metro-gold: #d4a017;
 }
-
-
 
 body {
   background: var(--background);
