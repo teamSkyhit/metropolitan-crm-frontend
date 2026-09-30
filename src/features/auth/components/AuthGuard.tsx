@@ -14,11 +14,14 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isInitializing) {
       if (!isAuthenticated) {
-        // Not logged in, go to login
-        router.replace(ROUTES.LOGIN);
+        // Redirect to login with original destination
+        const redirectUrl = pathname
+          ? `${ROUTES.LOGIN}?redirect=${encodeURIComponent(pathname)}`
+          : ROUTES.LOGIN;
+        router.replace(redirectUrl);
       } else if (!canAccessRoute(role, pathname)) {
         // Logged in but no permission
-        router.replace('/forbidden');
+        router.replace(ROUTES.FORBIDDEN);
       }
     }
   }, [isAuthenticated, isInitializing, router, pathname, role]);
@@ -26,7 +29,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   if (isInitializing) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[var(--color-metro-navy)]"></div>
       </div>
     );
   }

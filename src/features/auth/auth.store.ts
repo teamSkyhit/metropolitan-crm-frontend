@@ -3,6 +3,7 @@ import { User, Role } from '@/types/auth';
 import { authService } from './auth.service';
 import { tokenStorage } from '@/lib/auth/token';
 import { AuthTokens } from './types';
+import { getQueryClient } from '@/lib/api/query-client';
 
 interface AuthState {
   user: User | null;
@@ -39,6 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       console.error('Logout API failed, continuing local cleanup', e);
     } finally {
       tokenStorage.clearToken();
+      getQueryClient().clear();
       set({
         user: null,
         role: null,
@@ -65,7 +67,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         isInitializing: false,
       });
     } catch {
-      set({ isInitializing: false });
+      tokenStorage.clearToken();
+      getQueryClient().clear();
+      set({
+        user: null,
+        role: null,
+        isAuthenticated: false,
+        isInitializing: false,
+      });
     }
   },
 }));

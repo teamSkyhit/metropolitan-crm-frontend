@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes';
 import { Home, Users, Settings, Package, Inbox, Layers, LogOut } from 'lucide-react';
@@ -43,7 +44,14 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
       )}
     >
       <div className="flex items-center justify-center h-16 bg-white border-b border-gray-200 px-4 shrink-0">
-        <img src="/logo.png" alt="Metro Logo" className="h-10 w-auto" />
+        <Image
+          src="/logo.png"
+          alt="Metro Logo"
+          width={150}
+          height={40}
+          className="h-10 w-auto"
+          priority
+        />
       </div>
       <div className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1 px-3">

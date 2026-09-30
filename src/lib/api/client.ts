@@ -9,7 +9,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Important if backend uses HttpOnly cookies for refresh token
+  withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -44,10 +44,11 @@ apiClient.interceptors.response.use(
 
     // Handle 401 Unauthorized
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-      // Prevent refreshing on the refresh or login endpoints themselves
+      // Exclude auth routes from retry/refresh loop
       if (
         originalRequest.url?.includes('/auth/login') ||
-        originalRequest.url?.includes('/auth/refresh')
+        originalRequest.url?.includes('/auth/refresh') ||
+        originalRequest.url?.includes('/auth/logout')
       ) {
         return Promise.reject(error);
       }
@@ -57,6 +58,7 @@ apiClient.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
+            originalRequest._retry = true;
             if (originalRequest.headers) {
               originalRequest.headers.Authorization = 'Bearer ' + token;
             }
@@ -71,7 +73,6 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Attempt to refresh
         const tokens = await authService.refresh();
         tokenStorage.setToken(tokens.accessToken, tokens.refreshToken);
 
@@ -83,7 +84,8 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        // If refresh fails, forcefully log out
+        // Clean logout without calling /auth/logout API to avoid loop
+        tokenStorage.clearToken();
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       } finally {

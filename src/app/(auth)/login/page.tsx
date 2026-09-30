@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { authService } from '@/features/auth/auth.service';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { ROUTES } from '@/lib/constants/routes';
 import { Eye, EyeOff } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,14 +18,20 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated, isInitializing, setAuth } = useAuthStore();
 
   // Redirect if already authenticated
   useEffect(() => {
     if (!isInitializing && isAuthenticated) {
-      router.replace(ROUTES.DASHBOARD);
+      const redirect = searchParams.get('redirect');
+      if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+        router.replace(redirect);
+      } else {
+        router.replace(ROUTES.DASHBOARD);
+      }
     }
-  }, [isAuthenticated, isInitializing, router]);
+  }, [isAuthenticated, isInitializing, router, searchParams]);
 
   const validate = () => {
     if (!email) return 'Email is required';
@@ -47,7 +54,12 @@ export default function LoginPage() {
     try {
       const response = await authService.login({ email, password });
       setAuth(response.user, response.tokens);
-      router.replace(ROUTES.DASHBOARD);
+      const redirect = searchParams.get('redirect');
+      if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+        router.replace(redirect);
+      } else {
+        router.replace(ROUTES.DASHBOARD);
+      }
     } catch (err: unknown) {
       const error = err as import('axios').AxiosError<import('@/features/auth/types').ApiAuthError>;
 
@@ -80,10 +92,13 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
         <div className="flex flex-col items-center">
-          <img
+          <Image
             src="/logo.png"
             alt="Metropolitan Industrial Supplies"
+            width={300}
+            height={64}
             className="h-16 w-auto mb-4"
+            priority
           />
           <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">Sign in to CRM</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -166,5 +181,19 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen w-full items-center justify-center bg-gray-50">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[var(--color-metro-navy)]"></div>
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

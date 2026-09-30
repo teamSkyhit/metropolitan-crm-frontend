@@ -11,4 +11,5 @@ export const ROUTES = {
   NOTIFICATIONS: '/notifications',
   USERS: '/users',
   SETTINGS: '/settings',
+  FORBIDDEN: '/forbidden',
 };
