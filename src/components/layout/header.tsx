@@ -4,14 +4,16 @@ import { Menu, Bell, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes';
+import { NAVIGATION_CONFIG } from '@/config/navigation';
 
 interface HeaderProps {
   onMenuClick?: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
+  const pathname = usePathname();
   const { user, logout } = useAuthStore();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,15 +36,27 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
 
+  const currentPage = NAVIGATION_CONFIG.find(
+    (item) => pathname === item.href || pathname.startsWith(item.href + '/')
+  );
+  const pageTitle = currentPage ? currentPage.name : 'Metro Industrial CRM';
+
   return (
     <header className="flex items-center justify-between h-16 px-4 border-b bg-white">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onMenuClick}
+          className="md:hidden"
+          aria-label="Open sidebar menu"
+          aria-expanded="false"
+        >
           <Menu className="w-5 h-5" />
         </Button>
-        <h2 className="text-xl font-semibold text-gray-800 hidden md:block">
-          Metro Industrial CRM
-        </h2>
+        <h1 className="text-lg md:text-xl font-semibold text-gray-800 truncate max-w-[150px] sm:max-w-xs md:max-w-md">
+          {pageTitle}
+        </h1>
       </div>
 
       <div className="flex items-center gap-4 relative">
