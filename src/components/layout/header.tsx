@@ -54,7 +54,9 @@ export function Header({ onMenuClick }: HeaderProps) {
         >
           <Menu className="w-5 h-5" />
         </Button>
-        <h1 className="text-lg md:text-xl font-semibold text-gray-800 truncate max-w-[150px] sm:max-w-xs md:max-w-md">{pageTitle}</h1>
+        <h1 className="text-lg md:text-xl font-semibold text-gray-800 truncate max-w-[150px] sm:max-w-xs md:max-w-md">
+          {pageTitle}
+        </h1>
       </div>
 
       <div className="flex items-center gap-4 relative">
