@@ -38,7 +38,7 @@ export function EnquiryDetailClient({ id }: { id: string }) {
     return (
       <div className="space-y-4">
         <div className="flex justify-start">
-          <Link 
+          <Link
             href={ROUTES.ENQUIRIES}
             className="inline-flex h-9 items-center justify-center rounded-md border border-gray-300 px-3 text-sm font-medium transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-metro-gold)] focus-visible:ring-offset-2"
           >
