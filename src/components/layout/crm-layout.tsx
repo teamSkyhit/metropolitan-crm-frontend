@@ -45,7 +45,10 @@ export function CrmLayout({ children }: CrmLayoutProps) {
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <Sidebar onNavigate={() => setIsMobileMenuOpen(false)} />
+        <Sidebar
+          onNavigate={() => setIsMobileMenuOpen(false)}
+          onClose={() => setIsMobileMenuOpen(false)}
+        />
       </div>
 
       <div className="flex flex-col flex-1 overflow-hidden">

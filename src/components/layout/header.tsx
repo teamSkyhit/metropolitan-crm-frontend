@@ -36,9 +36,10 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
 
-  const currentPage = NAVIGATION_CONFIG.find(
-    (item) => pathname === item.href || pathname.startsWith(item.href + '/')
-  );
+  const currentPage = NAVIGATION_CONFIG.find((item) => {
+    const safePathname = pathname || '';
+    return safePathname === item.href || safePathname.startsWith(item.href + '/');
+  });
   const pageTitle = currentPage ? currentPage.name : 'Metro Industrial CRM';
 
   return (
