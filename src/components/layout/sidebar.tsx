@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes';
-import { LogOut } from 'lucide-react';
+import { LogOut, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { canAccessRoute } from '@/features/auth/permissions';
@@ -14,9 +14,10 @@ import { NAVIGATION_CONFIG } from '@/config/navigation';
 interface SidebarProps {
   className?: string;
   onNavigate?: () => void;
+  onClose?: () => void;
 }
 
-export function Sidebar({ className, onNavigate }: SidebarProps) {
+export function Sidebar({ className, onNavigate, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { role, logout } = useAuthStore();
@@ -36,7 +37,7 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
         className
       )}
     >
-      <div className="flex items-center justify-center h-16 bg-white border-b border-gray-200 px-4 shrink-0">
+      <div className="flex items-center justify-center h-16 bg-white border-b border-gray-200 px-4 shrink-0 relative">
         <Image
           src="/logo.png"
           alt="Metro Logo"
@@ -45,6 +46,15 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
           className="h-10 w-auto"
           priority
         />
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute right-3 p-1.5 text-gray-500 hover:bg-gray-100 rounded-md md:hidden"
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
       <nav className="flex-1 overflow-y-auto py-4" aria-label="Sidebar Navigation">
         <ul className="space-y-1 px-3">

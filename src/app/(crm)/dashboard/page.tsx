@@ -65,7 +65,11 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Dashboard" description="Overview of CRM operational activity." />
+        <PageHeader
+          title="Dashboard"
+          description="Overview of CRM operational activity."
+          className="items-center sm:items-start text-center sm:text-left"
+        />
         <DashboardSkeleton />
       </div>
     );
@@ -74,7 +78,11 @@ export default function DashboardPage() {
   if (isError) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Dashboard" description="Overview of CRM operational activity." />
+        <PageHeader
+          title="Dashboard"
+          description="Overview of CRM operational activity."
+          className="items-center sm:items-start text-center sm:text-left"
+        />
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center justify-center text-center">
           <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
           <h3 className="text-lg font-medium text-red-800">Failed to load dashboard</h3>
@@ -93,10 +101,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <PageHeader title="Dashboard" description="Overview of CRM operational activity." />
-        <Link href={ROUTES.ENQUIRIES}>
-          <Button>View All Enquiries</Button>
+      <div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:items-center sm:justify-between gap-4">
+        <PageHeader
+          title="Dashboard"
+          description="Overview of CRM operational activity."
+          className="items-center sm:items-start"
+        />
+        <Link href={ROUTES.ENQUIRIES} className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto">View All Enquiries</Button>
         </Link>
       </div>
 
