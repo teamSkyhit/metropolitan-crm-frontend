@@ -1,7 +1,6 @@
 import { PageHeader } from '@/components/ui/page-header';
 import { ROUTES } from '@/lib/constants/routes';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export default async function EnquiryDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
