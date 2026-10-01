@@ -112,7 +112,7 @@ function EnquiriesList() {
     <div className="space-y-4">
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             <Input
@@ -154,24 +154,22 @@ function EnquiriesList() {
             ))}
           </select>
 
-          <div className="flex gap-2">
-            <Input
-              type="date"
-              value={from}
-              onChange={(e) => handleFilterChange('from', e.target.value)}
-              onClick={(e) => 'showPicker' in e.currentTarget && e.currentTarget.showPicker()}
-              aria-label="From Date"
-              title="From Date"
-            />
-            <Input
-              type="date"
-              value={to}
-              onChange={(e) => handleFilterChange('to', e.target.value)}
-              onClick={(e) => 'showPicker' in e.currentTarget && e.currentTarget.showPicker()}
-              aria-label="To Date"
-              title="To Date"
-            />
-          </div>
+          <Input
+            type="date"
+            value={from}
+            onChange={(e) => handleFilterChange('from', e.target.value)}
+            onClick={(e) => 'showPicker' in e.currentTarget && e.currentTarget.showPicker()}
+            aria-label="From Date"
+            title="From Date"
+          />
+          <Input
+            type="date"
+            value={to}
+            onChange={(e) => handleFilterChange('to', e.target.value)}
+            onClick={(e) => 'showPicker' in e.currentTarget && e.currentTarget.showPicker()}
+            aria-label="To Date"
+            title="To Date"
+          />
         </div>
 
         {(search || status || assignedTo || from || to) && (
