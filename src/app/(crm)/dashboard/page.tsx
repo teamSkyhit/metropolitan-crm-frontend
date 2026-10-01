@@ -14,6 +14,7 @@ import {
 import { StatusBadge } from '@/components/ui/status-badge';
 import { formatDate } from '@/lib/utils/format';
 import { AlertCircle, Users, Inbox, Package, CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
@@ -60,6 +61,7 @@ function DashboardSkeleton() {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { data, isLoading, isError, refetch } = useDashboardQuery(10);
 
   if (isLoading) {
@@ -107,9 +109,9 @@ export default function DashboardPage() {
           description="Overview of CRM operational activity."
           className="items-center sm:items-start"
         />
-        <Link href={ROUTES.ENQUIRIES} className="w-full sm:w-auto">
-          <Button className="w-full sm:w-auto">View All Enquiries</Button>
-        </Link>
+        <Button className="w-full sm:w-auto" onClick={() => router.push(ROUTES.ENQUIRIES)}>
+          View All Enquiries
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
