@@ -26,3 +26,21 @@ export function canAccessRoute(userRole: Role | undefined | null, route: string)
 
   return false;
 }
+
+export type Permission = 'enquiries:update' | 'enquiries:assign' | 'enquiries:follow-up';
+
+export function hasPermission(
+  user: { role: Role } | undefined | null,
+  permission: Permission
+): boolean {
+  if (!user || !user.role) return false;
+  if (user.role === ROLES.SUPER_ADMIN) return true;
+
+  if (user.role === ROLES.SALES_MANAGER) {
+    // Sales Managers can do these actions
+    if (['enquiries:update', 'enquiries:follow-up', 'enquiries:assign'].includes(permission))
+      return true;
+  }
+
+  return false;
+}
