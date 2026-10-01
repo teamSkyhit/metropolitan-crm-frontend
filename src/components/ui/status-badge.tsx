@@ -1,13 +1,6 @@
 import { cn } from '@/lib/utils/cn';
 
-export type EnquiryStatus =
-  | 'NEW'
-  | 'ASSIGNED'
-  | 'CONTACTED'
-  | 'QUOTATION_SENT'
-  | 'NEGOTIATION'
-  | 'CLOSED_WON'
-  | 'CLOSED_LOST';
+import { EnquiryStatus } from '@/features/enquiries/types';
 
 interface StatusBadgeProps {
   status: EnquiryStatus;
