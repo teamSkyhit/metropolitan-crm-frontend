@@ -161,6 +161,7 @@ function EnquiriesList() {
               type="date"
               value={from}
               onChange={(e) => handleFilterChange('from', e.target.value)}
+              onClick={(e) => 'showPicker' in e.currentTarget && e.currentTarget.showPicker()}
               aria-label="From Date"
               title="From Date"
             />
@@ -168,6 +169,7 @@ function EnquiriesList() {
               type="date"
               value={to}
               onChange={(e) => handleFilterChange('to', e.target.value)}
+              onClick={(e) => 'showPicker' in e.currentTarget && e.currentTarget.showPicker()}
               aria-label="To Date"
               title="To Date"
             />
