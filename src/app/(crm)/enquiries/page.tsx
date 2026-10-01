@@ -4,6 +4,8 @@ import React, { Suspense, useCallback, useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/ui/page-header';
 import { useEnquiries } from '@/features/enquiries/hooks/useEnquiries';
+import { useDebounce } from '@/lib/hooks/useDebounce';
+import { ENQUIRY_STATUSES } from '@/features/enquiries/types';
 import { useUserLookup } from '@/features/users/hooks/useUserLookup';
 import {
   Table,
@@ -20,17 +22,6 @@ import { Input } from '@/components/ui/input';
 import { Search, AlertCircle, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ROUTES } from '@/lib/constants/routes';
 
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-}
-
 function EnquiriesList() {
   const router = useRouter();
   const pathname = usePathname();
@@ -45,7 +36,10 @@ function EnquiriesList() {
   const to = searchParams.get('to') || '';
 
   const updateUrl = useCallback(
-    (updates: Record<string, string | number | undefined>) => {
+    (
+      updates: Record<string, string | number | undefined>,
+      action: 'push' | 'replace' = 'replace'
+    ) => {
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(updates).forEach(([key, value]) => {
         if (value === undefined || value === '') {
@@ -54,7 +48,12 @@ function EnquiriesList() {
           params.set(key, String(value));
         }
       });
-      router.push(`${pathname}?${params.toString()}`);
+      const newUrl = `${pathname}?${params.toString()}`;
+      if (action === 'push') {
+        router.push(newUrl);
+      } else {
+        router.replace(newUrl);
+      }
     },
     [searchParams, pathname, router]
   );
@@ -63,12 +62,19 @@ function EnquiriesList() {
   const [localSearch, setLocalSearch] = useState(search);
   const debouncedSearch = useDebounce(localSearch, 500);
 
+  // Sync local state when URL search changes (e.g. back/forward navigation)
+  const [prevSearchProp, setPrevSearchProp] = useState(search);
+  if (search !== prevSearchProp) {
+    setPrevSearchProp(search);
+    setLocalSearch(search);
+  }
+
   // Sync debounced search to URL
   useEffect(() => {
-    if (debouncedSearch !== search) {
+    if (debouncedSearch !== search && debouncedSearch === localSearch) {
       updateUrl({ search: debouncedSearch, page: 1 });
     }
-  }, [debouncedSearch, search, updateUrl]);
+  }, [debouncedSearch, search, localSearch, updateUrl]);
 
   const { data: usersData } = useUserLookup();
   const { data, isLoading, isError, refetch } = useEnquiries({
@@ -87,7 +93,7 @@ function EnquiriesList() {
 
   const handleClearFilters = () => {
     setLocalSearch('');
-    router.push(pathname);
+    router.replace(pathname);
   };
 
   const selectClasses =
@@ -130,13 +136,11 @@ function EnquiriesList() {
             aria-label="Filter by status"
           >
             <option value="">All Statuses</option>
-            <option value="NEW">New</option>
-            <option value="ASSIGNED">Assigned</option>
-            <option value="CONTACTED">Contacted</option>
-            <option value="QUOTATION_SENT">Quotation Sent</option>
-            <option value="NEGOTIATION">Negotiation</option>
-            <option value="CLOSED_WON">Closed Won</option>
-            <option value="CLOSED_LOST">Closed Lost</option>
+            {ENQUIRY_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s.replace('_', ' ')}
+              </option>
+            ))}
           </select>
 
           <select
@@ -169,6 +173,7 @@ function EnquiriesList() {
             onClick={(e) => 'showPicker' in e.currentTarget && e.currentTarget.showPicker()}
             aria-label="To Date"
             title="To Date"
+            min={from}
           />
         </div>
 
@@ -259,14 +264,14 @@ function EnquiriesList() {
           <div className="flex justify-between flex-1 sm:hidden">
             <Button
               variant="outline"
-              onClick={() => updateUrl({ page: data.meta.pagination.page - 1 })}
+              onClick={() => updateUrl({ page: data.meta.pagination.page - 1 }, 'push')}
               disabled={!data.meta.pagination.hasPrevPage}
             >
               Previous
             </Button>
             <Button
               variant="outline"
-              onClick={() => updateUrl({ page: data.meta.pagination.page + 1 })}
+              onClick={() => updateUrl({ page: data.meta.pagination.page + 1 }, 'push')}
               disabled={!data.meta.pagination.hasNextPage}
             >
               Next
@@ -286,7 +291,7 @@ function EnquiriesList() {
                 aria-label="Pagination"
               >
                 <button
-                  onClick={() => updateUrl({ page: data.meta.pagination.page - 1 })}
+                  onClick={() => updateUrl({ page: data.meta.pagination.page - 1 }, 'push')}
                   disabled={!data.meta.pagination.hasPrevPage}
                   className="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -294,7 +299,7 @@ function EnquiriesList() {
                   <ChevronLeft className="w-5 h-5" aria-hidden="true" />
                 </button>
                 <button
-                  onClick={() => updateUrl({ page: data.meta.pagination.page + 1 })}
+                  onClick={() => updateUrl({ page: data.meta.pagination.page + 1 }, 'push')}
                   disabled={!data.meta.pagination.hasNextPage}
                   className="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

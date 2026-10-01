@@ -1,4 +1,14 @@
-import { EnquiryStatus } from '@/features/dashboard/types';
+export const ENQUIRY_STATUSES = [
+  'NEW',
+  'ASSIGNED',
+  'CONTACTED',
+  'QUOTATION_SENT',
+  'NEGOTIATION',
+  'CLOSED_WON',
+  'CLOSED_LOST',
+] as const;
+
+export type EnquiryStatus = (typeof ENQUIRY_STATUSES)[number];
 
 export interface PersonRef {
   id: string;

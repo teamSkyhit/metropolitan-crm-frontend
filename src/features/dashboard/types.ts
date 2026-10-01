@@ -1,11 +1,4 @@
-export type EnquiryStatus =
-  | 'NEW'
-  | 'ASSIGNED'
-  | 'CONTACTED'
-  | 'QUOTATION_SENT'
-  | 'NEGOTIATION'
-  | 'CLOSED_WON'
-  | 'CLOSED_LOST';
+import { EnquiryStatus } from '@/features/enquiries/types';
 
 export interface EnquiryDashboardCounts {
   total: number;
