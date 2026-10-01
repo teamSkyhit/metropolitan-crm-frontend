@@ -9,7 +9,7 @@ export default async function EnquiryDetailPage(props: { params: Promise<{ id: s
       <div className="flex items-center gap-4">
         <Link
           href={ROUTES.ENQUIRIES}
-          className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-metro-gold)] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none border border-gray-300 bg-transparent hover:bg-gray-100 h-9 px-3"
+          className="inline-flex h-9 items-center rounded-md border border-gray-300 px-3 text-sm hover:bg-gray-100"
         >
           Back
         </Link>
