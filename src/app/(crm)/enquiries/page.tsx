@@ -81,8 +81,6 @@ function EnquiriesList() {
     to: to || undefined,
   });
 
-  
-
   const handleFilterChange = (key: string, value: string) => {
     updateUrl({ [key]: value, page: 1 });
   };
