@@ -57,3 +57,73 @@ export interface GetEnquiriesQuery {
   sortBy?: 'createdAt' | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
 }
+
+export interface EnquiryLineItem {
+  id: string;
+  productId: string;
+  sku: string;
+  productName: string | null;
+  quantity: number;
+}
+
+export interface EnquiryStatusChange {
+  id: string;
+  fromStatus: EnquiryStatus | null;
+  toStatus: EnquiryStatus;
+  note: string | null;
+  changedBy: PersonRef;
+  createdAt: string;
+}
+
+export interface EnquiryFollowUp {
+  id: string;
+  note: string;
+  author: PersonRef;
+  createdAt: string;
+}
+
+export interface EnquiryDetail {
+  id: string;
+  name: string;
+  company: string | null;
+  email: string;
+  mobile: string;
+  city: string | null;
+  status: EnquiryStatus;
+  assignedTo: PersonRef | null;
+  lineItemCount: number;
+  createdAt: string;
+  updatedAt: string;
+  state: string | null;
+  country: string | null;
+  message: string | null;
+  salesNotes: string | null;
+  assignedAt: string | null;
+  closedAt: string | null;
+  allowedStatusTransitions: EnquiryStatus[];
+  lineItems: EnquiryLineItem[];
+  followUps: EnquiryFollowUp[];
+  statusHistory: EnquiryStatusChange[];
+}
+
+export interface EnquiryDetailResponse {
+  success: boolean;
+  data: EnquiryDetail;
+}
+
+export interface ChangeEnquiryStatusRequest {
+  status: EnquiryStatus;
+  note?: string;
+}
+
+export interface AssignEnquiryRequest {
+  assignedToId: string | null;
+}
+
+export interface AddFollowUpRequest {
+  note: string;
+}
+
+export interface UpdateEnquiryRequest {
+  salesNotes: string | null;
+}
