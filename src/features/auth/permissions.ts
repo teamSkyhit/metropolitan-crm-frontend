@@ -27,7 +27,14 @@ export function canAccessRoute(userRole: Role | undefined | null, route: string)
   return false;
 }
 
-export type Permission = 'enquiries:update' | 'enquiries:assign' | 'enquiries:follow-up';
+export type Permission =
+  | 'enquiries:update'
+  | 'enquiries:assign'
+  | 'enquiries:follow-up'
+  | 'products:read'
+  | 'products:create'
+  | 'products:update'
+  | 'products:delete';
 
 export function hasPermission(
   user: { role: Role } | undefined | null,
@@ -38,8 +45,16 @@ export function hasPermission(
 
   if (user.role === ROLES.SALES_MANAGER) {
     // Sales Managers can do these actions
-    if (['enquiries:update', 'enquiries:follow-up', 'enquiries:assign'].includes(permission))
-      return true;
+    const allowed = [
+      'enquiries:update',
+      'enquiries:follow-up',
+      'enquiries:assign',
+      'products:read',
+      'products:create',
+      'products:update',
+      'products:delete',
+    ];
+    if (allowed.includes(permission)) return true;
   }
 
   return false;
