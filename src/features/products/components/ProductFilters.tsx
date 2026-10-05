@@ -117,7 +117,7 @@ export function ProductFilters() {
           value={`${searchParams.get('sortBy') || 'createdAt'}-${searchParams.get('sortOrder') || 'desc'}`}
           onChange={(e) => {
             const [sortBy, sortOrder] = e.target.value.split('-');
-            let newParams = createQueryString('sortBy', sortBy);
+            const newParams = createQueryString('sortBy', sortBy);
             // manually modify the string since createQueryString works off searchParams
             const urlParams = new URLSearchParams(newParams);
             urlParams.set('sortOrder', sortOrder);

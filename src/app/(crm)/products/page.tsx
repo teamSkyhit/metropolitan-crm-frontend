@@ -24,8 +24,8 @@ export default function ProductsPage() {
     categoryId: searchParams.get('categoryId') || undefined,
     status: searchParams.get('status') ? searchParams.get('status') as import('@/features/products/types').ProductStatus : undefined,
     hotDeal: searchParams.get('hotDeal') || undefined,
-    sortBy: (searchParams.get('sortBy') as any) || undefined,
-    sortOrder: (searchParams.get('sortOrder') as any) || undefined,
+    sortBy: (searchParams.get('sortBy') as import('@/features/products/types').GetProductsQuery['sortBy']) || undefined,
+    sortOrder: (searchParams.get('sortOrder') as import('@/features/products/types').GetProductsQuery['sortOrder']) || undefined,
   };
 
   const { data, isLoading } = useProducts(query);

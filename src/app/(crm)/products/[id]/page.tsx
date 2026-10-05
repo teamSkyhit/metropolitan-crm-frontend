@@ -49,7 +49,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setErrorMsg(null);
     setSuccessMsg(null);
     updateProduct.mutate(payload, {
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+       
       onSuccess: () => {
         setSuccessMsg('Product updated successfully.');
         setTimeout(() => setSuccessMsg(null), 3000);
