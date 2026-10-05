@@ -49,7 +49,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setErrorMsg(null);
     setSuccessMsg(null);
     updateProduct.mutate(payload, {
-       
       onSuccess: () => {
         setSuccessMsg('Product updated successfully.');
         setTimeout(() => setSuccessMsg(null), 3000);

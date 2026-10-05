@@ -70,10 +70,10 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
         onError: (err: any) =>
           setErrorMsg(err?.response?.data?.message || 'Failed to save specifications.'),
         onSuccess: () => {
-        setErrorMsg(null);
-        setSuccessMsg('Specifications saved successfully.');
-        setTimeout(() => setSuccessMsg(null), 3000);
-      },
+          setErrorMsg(null);
+          setSuccessMsg('Specifications saved successfully.');
+          setTimeout(() => setSuccessMsg(null), 3000);
+        },
       }
     );
   };

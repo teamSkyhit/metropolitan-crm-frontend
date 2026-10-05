@@ -22,10 +22,18 @@ export default function ProductsPage() {
     search: searchParams.get('search') || undefined,
     brandId: searchParams.get('brandId') || undefined,
     categoryId: searchParams.get('categoryId') || undefined,
-    status: searchParams.get('status') ? searchParams.get('status') as import('@/features/products/types').ProductStatus : undefined,
+    status: searchParams.get('status')
+      ? (searchParams.get('status') as import('@/features/products/types').ProductStatus)
+      : undefined,
     hotDeal: searchParams.get('hotDeal') || undefined,
-    sortBy: (searchParams.get('sortBy') as import('@/features/products/types').GetProductsQuery['sortBy']) || undefined,
-    sortOrder: (searchParams.get('sortOrder') as import('@/features/products/types').GetProductsQuery['sortOrder']) || undefined,
+    sortBy:
+      (searchParams.get(
+        'sortBy'
+      ) as import('@/features/products/types').GetProductsQuery['sortBy']) || undefined,
+    sortOrder:
+      (searchParams.get(
+        'sortOrder'
+      ) as import('@/features/products/types').GetProductsQuery['sortOrder']) || undefined,
   };
 
   const { data, isLoading } = useProducts(query);
