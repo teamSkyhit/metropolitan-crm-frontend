@@ -8,7 +8,7 @@ import { ChevronLeft, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 export default function EditPage({ params }: { params: Promise<{ id: string }> }) {
-    const resolvedParams = use(params);
+  const resolvedParams = use(params);
   const { data: brand, isLoading, error } = useBrand(resolvedParams.id);
   const deleteBrand = useDeleteBrand();
   const restoreBrand = useRestoreBrand();

@@ -40,7 +40,9 @@ export const categoriesService = {
   async uploadBanner(id: string, image: File): Promise<Category> {
     const formData = new FormData();
     formData.append('banner', image);
-    const { data } = await apiClient.put<{ data: Category }>(`/categories/${id}/banner`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+    const { data } = await apiClient.put<{ data: Category }>(`/categories/${id}/banner`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return data.data;
   },
 

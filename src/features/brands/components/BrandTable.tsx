@@ -36,7 +36,9 @@ export function BrandTable() {
       <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center justify-center text-center my-6">
         <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
         <h3 className="text-lg font-medium text-red-800">Failed to load brands</h3>
-        <p className="text-sm text-red-600 mt-2 mb-4">There was an error communicating with the server.</p>
+        <p className="text-sm text-red-600 mt-2 mb-4">
+          There was an error communicating with the server.
+        </p>
         <button
           onClick={() => refetch()}
           className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none"

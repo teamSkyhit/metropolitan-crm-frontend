@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import Link from 'next/link';
-import { Edit, Image as ImageIcon, Trash2, RotateCcw  } from 'lucide-react';
+import { Edit, Image as ImageIcon, Trash2, RotateCcw } from 'lucide-react';
 import { Category } from '../types';
 import { useDeleteCategory, useRestoreCategory } from '../hooks/useCategories';
 
