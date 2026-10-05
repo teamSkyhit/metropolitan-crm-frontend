@@ -1,0 +1,8 @@
+{
+  "brandPost": {
+    "$ref": "#/components/schemas/CreateBrandRequest"
+  },
+  "catPost": {
+    "$ref": "#/components/schemas/CreateCategoryRequest"
+  }
+}

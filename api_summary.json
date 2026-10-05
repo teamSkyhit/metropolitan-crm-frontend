@@ -1,0 +1,143 @@
+{
+  "relevantPaths": {
+    "/public/brands": ["GET - List active brands (params: undefined)"],
+    "/public/brands/{slug}": ["GET - Get public brand by slug (params: slug)"],
+    "/brands": [
+      "GET - List brands (params: page, limit, search, isActive, sortBy, sortOrder)",
+      "POST - Create a brand (params: undefined)"
+    ],
+    "/brands/{id}": [
+      "GET - Get brand by ID (params: id)",
+      "PATCH - Update brand (params: id)",
+      "DELETE - Soft delete brand (params: id)"
+    ],
+    "/brands/{id}/restore": ["POST - Restore a deleted brand (params: id)"],
+    "/brands/{id}/logo": [
+      "PUT - Upload brand logo (params: id)",
+      "DELETE - Remove brand logo (params: id)"
+    ],
+    "/brands/{id}/banner": [
+      "PUT - Upload brand banner (params: id)",
+      "DELETE - Remove brand banner (params: id)"
+    ],
+    "/public/categories": ["GET - List active categories (params: undefined)"],
+    "/public/categories/{slug}": ["GET - Get public category by slug (params: slug)"],
+    "/categories": [
+      "GET - List categories (params: page, limit, search, isActive, parentId, sortBy, sortOrder)",
+      "POST - Create a category (params: undefined)"
+    ],
+    "/categories/{id}": [
+      "GET - Get category by ID (params: id)",
+      "PATCH - Update category (params: id)",
+      "DELETE - Soft delete category (params: id)"
+    ],
+    "/categories/{id}/restore": ["POST - Restore a deleted category (params: id)"],
+    "/categories/{id}/banner": [
+      "PUT - Upload category banner (params: id)",
+      "DELETE - Remove category banner (params: id)"
+    ]
+  },
+  "schemas": {
+    "Brand": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "logoUrl": {
+          "type": ["string", "null"]
+        },
+        "bannerUrl": {
+          "type": ["string", "null"]
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "sortOrder": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "logoUrl",
+        "bannerUrl",
+        "isActive",
+        "sortOrder",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "bannerUrl": {
+          "type": ["string", "null"]
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "sortOrder": {
+          "type": "integer"
+        },
+        "parentId": {
+          "type": ["string", "null"],
+          "format": "uuid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug",
+        "bannerUrl",
+        "description",
+        "isActive",
+        "sortOrder",
+        "parentId",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  }
+}
