@@ -55,7 +55,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       },
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       onError: (err: any) => {
-        setErrorMsg(err?.response?.data?.message || 'Failed to update product.');
+        setErrorMsg(
+          err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            'Failed to update product.'
+        );
       },
     });
   };
@@ -70,7 +74,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         },
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         onError: (err: any) => {
-          setErrorMsg(err?.response?.data?.message || 'Failed to delete product.');
+          setErrorMsg(
+            err?.response?.data?.error?.message ||
+              err?.response?.data?.message ||
+              'Failed to delete product.'
+          );
         },
       });
     }

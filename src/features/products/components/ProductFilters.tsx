@@ -9,8 +9,15 @@ export function ProductFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(searchParams.get('search') || '');
-  const debouncedSearch = useDebounce(search, 500);
+  const searchParam = searchParams.get('search') || '';
+  const [localSearch, setLocalSearch] = useState(searchParam);
+  const debouncedSearch = useDebounce(localSearch, 500);
+
+  const [prevSearchParam, setPrevSearchParam] = useState(searchParam);
+  if (searchParam !== prevSearchParam) {
+    setPrevSearchParam(searchParam);
+    setLocalSearch(searchParam);
+  }
 
   const { data: brandsData } = useBrands();
   const { data: categoriesData } = useCategories();
@@ -33,10 +40,10 @@ export function ProductFilters() {
   );
 
   useEffect(() => {
-    if (debouncedSearch !== (searchParams.get('search') || '')) {
+    if (debouncedSearch !== searchParam && debouncedSearch === localSearch) {
       router.push(pathname + '?' + createQueryString('search', debouncedSearch));
     }
-  }, [debouncedSearch, router, pathname, createQueryString, searchParams]);
+  }, [debouncedSearch, localSearch, searchParam, router, pathname, createQueryString]);
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm space-y-4 md:space-y-0 md:flex md:items-center md:gap-4">
@@ -49,8 +56,8 @@ export function ProductFilters() {
           type="text"
           placeholder="Search products by name or SKU..."
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
         />
       </div>
 

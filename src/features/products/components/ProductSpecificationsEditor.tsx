@@ -7,13 +7,16 @@ import { Input } from '@/components/ui/input';
 export function ProductSpecificationsEditor({ product }: { product: Product }) {
   const updateSpecs = useUpdateProductSpecifications(product.id);
   const [specs, setSpecs] = useState<ProductSpecification[]>(product.specifications || []);
+  const [isDirty, setIsDirty] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [prevSpecs, setPrevSpecs] = useState(product.specifications);
   if (product.specifications !== prevSpecs) {
     setPrevSpecs(product.specifications);
-    setSpecs(product.specifications || []);
+    if (!isDirty) {
+      setSpecs(product.specifications || []);
+    }
   }
 
   const handleAdd = () => {
@@ -22,6 +25,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
       return;
     }
     setSpecs([...specs, { key: '', value: '', unit: '' }]);
+    setIsDirty(true);
     setErrorMsg(null);
     setSuccessMsg(null);
   };
@@ -30,6 +34,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
     const newSpecs = [...specs];
     newSpecs.splice(index, 1);
     setSpecs(newSpecs);
+    setIsDirty(true);
     setErrorMsg(null);
   };
 
@@ -37,6 +42,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
     const newSpecs = [...specs];
     newSpecs[index] = { ...newSpecs[index], [field]: value };
     setSpecs(newSpecs);
+    setIsDirty(true);
     setErrorMsg(null);
   };
 
@@ -68,10 +74,15 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
       {
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         onError: (err: any) =>
-          setErrorMsg(err?.response?.data?.message || 'Failed to save specifications.'),
+          setErrorMsg(
+            err?.response?.data?.error?.message ||
+              err?.response?.data?.message ||
+              'Failed to save specifications.'
+          ),
         onSuccess: () => {
           setErrorMsg(null);
           setSuccessMsg('Specifications saved successfully.');
+          setIsDirty(false);
           setTimeout(() => setSuccessMsg(null), 3000);
         },
       }

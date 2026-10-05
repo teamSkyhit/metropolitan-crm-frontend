@@ -36,7 +36,11 @@ export function ProductImageManager({ product }: { product: Product }) {
       },
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       onError: (err: any) => {
-        setErrorMsg(err?.response?.data?.message || 'Failed to upload image.');
+        setErrorMsg(
+          err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            'Failed to upload image.'
+        );
         if (fileInputRef.current) fileInputRef.current.value = '';
       },
     });
@@ -47,7 +51,11 @@ export function ProductImageManager({ product }: { product: Product }) {
       deleteImage.mutate(undefined, {
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         onError: (err: any) =>
-          setErrorMsg(err?.response?.data?.message || 'Failed to delete image.'),
+          setErrorMsg(
+            err?.response?.data?.error?.message ||
+              err?.response?.data?.message ||
+              'Failed to delete image.'
+          ),
       });
     }
   };

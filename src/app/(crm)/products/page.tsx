@@ -1,4 +1,5 @@
 'use client';
+import React, { Suspense } from 'react';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
@@ -7,8 +8,9 @@ import { ProductFilters } from '@/features/products/components/ProductFilters';
 import { useProducts } from '@/features/products/hooks/useProducts';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
 
-export default function ProductsPage() {
+function ProductsList() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -36,7 +38,7 @@ export default function ProductsPage() {
       ) as import('@/features/products/types').GetProductsQuery['sortOrder']) || undefined,
   };
 
-  const { data, isLoading } = useProducts(query);
+  const { data, isLoading, isError, refetch } = useProducts(query);
 
   const totalPages = data?.meta?.pagination?.totalPages || 1;
 
@@ -46,18 +48,23 @@ export default function ProductsPage() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader title="Products" description="Manage your product catalog." />
-        <Link
-          href={ROUTES.PRODUCTS + '/new'}
-          className="inline-flex items-center justify-center rounded-md bg-[var(--color-metro-navy)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-metro-navy)]/90"
-        >
-          Add Product
-        </Link>
+  if (isError) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center justify-center text-center">
+        <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
+        <h3 className="text-lg font-medium text-red-800">Failed to load products</h3>
+        <p className="text-sm text-red-600 mt-2 mb-4">
+          There was an error communicating with the server.
+        </p>
+        <Button onClick={() => refetch()} variant="outline">
+          Try Again
+        </Button>
       </div>
+    );
+  }
 
+  return (
+    <>
       <ProductFilters />
 
       <ProductTable products={data?.data || []} isLoading={isLoading} />
@@ -113,6 +120,26 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
+    </>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <PageHeader title="Products" description="Manage your product catalog." />
+        <Link
+          href={ROUTES.PRODUCTS + '/new'}
+          className="inline-flex items-center justify-center rounded-md bg-[var(--color-metro-navy)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-metro-navy)]/90"
+        >
+          Add Product
+        </Link>
+      </div>
+
+      <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100 rounded-lg" />}>
+        <ProductsList />
+      </Suspense>
     </div>
   );
 }

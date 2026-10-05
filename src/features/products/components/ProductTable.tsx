@@ -80,7 +80,7 @@ export function ProductTable({ products, isLoading }: { products: Product[]; isL
                   {product.price !== null ? (
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        $${Number(product.price).toFixed(2)}
+                        ${Number(product.price).toFixed(2)}
                       </p>
                       <p className="text-xs text-gray-500">
                         {product.priceVisibility ? 'Visible' : 'Hidden'}

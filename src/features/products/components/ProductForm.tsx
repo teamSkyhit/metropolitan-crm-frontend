@@ -26,10 +26,10 @@ export function ProductForm({
     brandId: initialData?.brandId || '',
     categoryId: initialData?.categoryId || '',
     description: initialData?.description || '',
-    price: initialData?.price || null,
+    price: initialData?.price ?? null,
     priceVisibility: initialData?.priceVisibility ?? true,
     status: initialData?.status || 'DRAFT',
-    hotDeal: initialData?.hotDeal || false,
+    hotDeal: initialData?.hotDeal ?? false,
   });
 
   const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
