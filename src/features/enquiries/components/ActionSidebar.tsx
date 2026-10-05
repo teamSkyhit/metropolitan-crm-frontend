@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { EnquiryDetail, EnquiryStatus } from '../types';
 import {
   useUpdateEnquiryStatus,
@@ -76,6 +76,9 @@ export function ActionSidebar({
                 </option>
               ))}
             </select>
+            {updateStatus.isError && (
+              <p className="mt-1 text-sm text-red-600">Failed to update status.</p>
+            )}
           </div>
         )}
 
@@ -101,6 +104,9 @@ export function ActionSidebar({
           ) : (
             <p className="text-sm text-gray-900">{enquiry.assignedTo?.name || 'Unassigned'}</p>
           )}
+          {assignEnquiry.isError && (
+            <p className="mt-1 text-sm text-red-600">Failed to reassign.</p>
+          )}
         </div>
       </div>
 
@@ -110,6 +116,7 @@ export function ActionSidebar({
         {canEdit ? (
           <div className="space-y-3">
             <textarea
+              aria-label="Internal Sales Notes"
               rows={4}
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
               placeholder="Private notes..."
@@ -125,6 +132,7 @@ export function ActionSidebar({
             >
               {updateNotes.isPending ? 'Saving...' : 'Save Notes'}
             </Button>
+            {updateNotes.isError && <p className="text-sm text-red-600">Failed to save notes.</p>}
           </div>
         ) : (
           <p className="text-sm text-gray-700 whitespace-pre-wrap">

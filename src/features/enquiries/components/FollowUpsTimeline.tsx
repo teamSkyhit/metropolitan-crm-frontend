@@ -47,7 +47,12 @@ export function FollowUpsTimeline({
               disabled={addFollowUp.isPending}
             />
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
+            <div>
+              {addFollowUp.isError && (
+                <p className="text-sm text-red-600">Failed to add follow-up.</p>
+              )}
+            </div>
             <Button type="submit" disabled={!note.trim() || addFollowUp.isPending}>
               {addFollowUp.isPending ? 'Saving...' : 'Add Note'}
             </Button>
@@ -56,41 +61,42 @@ export function FollowUpsTimeline({
       )}
 
       <div className="flow-root">
-        <ul role="list" className="-mb-8">
-          {followUps.map((item, itemIdx) => (
-            <li key={item.id}>
-              <div className="relative pb-8">
-                {itemIdx !== followUps.length - 1 ? (
-                  <span
-                    className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
-                    aria-hidden="true"
-                  />
-                ) : null}
-                <div className="relative flex space-x-3">
-                  <div>
-                    <span className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center ring-8 ring-white">
-                      <span className="text-xs font-medium text-gray-500">
-                        {item.author.name.substring(0, 2).toUpperCase()}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+        {followUps.length === 0 ? (
+          <p className="text-sm text-gray-500 italic pb-2">No follow-ups recorded yet.</p>
+        ) : (
+          <ul role="list" className="-mb-8">
+            {followUps.map((item, itemIdx) => (
+              <li key={item.id}>
+                <div className="relative pb-8">
+                  {itemIdx !== followUps.length - 1 ? (
+                    <span
+                      className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  <div className="relative flex space-x-3">
                     <div>
-                      <p className="text-sm text-gray-500 whitespace-pre-wrap">{item.note}</p>
+                      <span className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center ring-8 ring-white">
+                        <span className="text-xs font-medium text-gray-500">
+                          {item.author.name.substring(0, 2).toUpperCase()}
+                        </span>
+                      </span>
                     </div>
-                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                      <time dateTime={item.createdAt}>{formatDate(item.createdAt)}</time>
-                      <p className="mt-1">{item.author.name}</p>
+                    <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                      <div>
+                        <p className="text-sm text-gray-500 whitespace-pre-wrap">{item.note}</p>
+                      </div>
+                      <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                        <time dateTime={item.createdAt}>{formatDate(item.createdAt)}</time>
+                        <p className="mt-1">{item.author.name}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          ))}
-          {followUps.length === 0 && (
-            <p className="text-sm text-gray-500 italic pb-8">No follow-ups recorded yet.</p>
-          )}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

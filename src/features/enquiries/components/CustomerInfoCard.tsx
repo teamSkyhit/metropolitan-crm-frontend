@@ -36,8 +36,8 @@ export function CustomerInfoCard({ enquiry }: { enquiry: EnquiryDetail }) {
       </dl>
       {enquiry.message && (
         <div className="pt-4 border-t border-gray-100">
-          <dt className="text-sm font-medium text-gray-500 mb-2">Message</dt>
-          <dd className="text-sm text-gray-900 whitespace-pre-wrap">{enquiry.message}</dd>
+          <h3 className="text-sm font-medium text-gray-500 mb-2">Message</h3>
+          <p className="text-sm text-gray-900 whitespace-pre-wrap">{enquiry.message}</p>
         </div>
       )}
     </div>
