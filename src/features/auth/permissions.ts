@@ -34,7 +34,11 @@ export type Permission =
   | 'products:read'
   | 'products:create'
   | 'products:update'
-  | 'products:delete';
+  | 'products:delete'
+  | 'homepage:read'
+  | 'homepage:create'
+  | 'homepage:update'
+  | 'homepage:delete';
 
 export function hasPermission(
   user: { role: Role } | undefined | null,
