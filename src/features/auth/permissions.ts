@@ -18,7 +18,7 @@ export function canAccessRoute(userRole: Role | undefined | null, route: string)
   if (userRole === ROLES.SUPER_ADMIN) return true;
 
   // Sales Manager restricted routes
-  const restrictedForSalesManager = [ROUTES.USERS, ROUTES.SETTINGS];
+  const restrictedForSalesManager = [ROUTES.USERS, ROUTES.SETTINGS, ROUTES.HOMEPAGE];
 
   if (userRole === ROLES.SALES_MANAGER) {
     return !restrictedForSalesManager.some((r) => route.startsWith(r));
@@ -34,7 +34,11 @@ export type Permission =
   | 'products:read'
   | 'products:create'
   | 'products:update'
-  | 'products:delete';
+  | 'products:delete'
+  | 'homepage:read'
+  | 'homepage:create'
+  | 'homepage:update'
+  | 'homepage:delete';
 
 export function hasPermission(
   user: { role: Role } | undefined | null,
