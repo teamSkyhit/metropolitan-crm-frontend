@@ -26,7 +26,8 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
       setUploadError(null);
       try {
         await uploadMutation.mutateAsync(file);
-      } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        // eslint-disable-line @typescript-eslint/no-explicit-any
         console.error('Failed to upload media', error);
         setUploadError(error?.response?.data?.error?.message || 'Failed to upload media');
       }
