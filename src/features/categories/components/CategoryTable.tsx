@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import Link from 'next/link';
-import { Edit, Image as ImageIcon, Trash2, RotateCcw } from 'lucide-react';
+import { Edit, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { Category } from '../types';
-import { useDeleteCategory, useRestoreCategory } from '../hooks/useCategories';
+import { useDeleteCategory } from '../hooks/useCategories';
 
 interface CategoryTableProps {
   categories: Category[];
@@ -12,7 +12,6 @@ interface CategoryTableProps {
 
 export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
   const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
-  const { mutate: restoreCategory, isPending: isRestoring } = useRestoreCategory();
 
   if (isLoading) {
     return <div className="p-4 text-center text-gray-500">Loading categories...</div>;
@@ -25,12 +24,6 @@ export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       deleteCategory(id);
-    }
-  };
-
-  const handleRestore = (id: string) => {
-    if (window.confirm('Are you sure you want to restore this category?')) {
-      restoreCategory(id);
     }
   };
 
@@ -97,25 +90,14 @@ export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
                   >
                     <Edit size={18} />
                   </Link>
-                  {category.isActive ? (
-                    <button
-                      onClick={() => handleDelete(category.id)}
-                      disabled={isDeleting}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
-                      title="Delete"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleRestore(category.id)}
-                      disabled={isRestoring}
-                      className="p-1.5 text-green-600 hover:bg-green-50 rounded disabled:opacity-50"
-                      title="Restore"
-                    >
-                      <RotateCcw size={18} />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleDelete(category.id)}
+                    disabled={isDeleting}
+                    className="p-1.5 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
+                    title="Delete"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </td>
             </tr>

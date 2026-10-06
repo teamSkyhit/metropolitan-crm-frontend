@@ -32,8 +32,8 @@ export function ProductForm({
     hotDeal: initialData?.hotDeal ?? false,
   });
 
-  const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
-  const { data: categoriesData, isLoading: isLoadingCategories } = useCategories();
+  const { data: brandsData, isLoading: isLoadingBrands } = useBrands({ limit: 100 });
+  const { data: categoriesData, isLoading: isLoadingCategories } = useCategories({ limit: 100 });
 
   const brands = brandsData?.data || [];
   const categories = categoriesData?.data || [];

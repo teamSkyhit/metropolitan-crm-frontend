@@ -2,7 +2,7 @@
 
 import React, { Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Plus, AlertCircle, RefreshCcw } from 'lucide-react';
 import { useCategories } from '@/features/categories/hooks/useCategories';
 import { CategoryTable } from '@/features/categories/components/CategoryTable';
@@ -10,6 +10,8 @@ import { CategoryFilters } from '@/features/categories/components/CategoryFilter
 
 function CategoriesPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const page = Number(searchParams.get('page')) || 1;
   const search = searchParams.get('search') || undefined;
   const isActiveParam = searchParams.get('isActive');
@@ -17,6 +19,12 @@ function CategoriesPageContent() {
   let isActive: boolean | undefined = undefined;
   if (isActiveParam === 'true') isActive = true;
   if (isActiveParam === 'false') isActive = false;
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newPage.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   const { data, isLoading, isError, refetch } = useCategories({
     page,
@@ -63,7 +71,49 @@ function CategoriesPageContent() {
 
       <CategoryTable categories={data?.data || []} isLoading={isLoading} />
 
-      {/* Basic Pagination logic can be placed here if needed */}
+      {data && data.meta.pagination.totalPages > 1 && (
+        <div className="bg-white px-4 py-3 flex items-center justify-between border border-t-0 border-gray-200 rounded-b-lg sm:px-6">
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing{' '}
+                <span className="font-medium">
+                  {(data.meta.pagination.page - 1) * data.meta.pagination.limit + 1}
+                </span>{' '}
+                to{' '}
+                <span className="font-medium">
+                  {Math.min(
+                    data.meta.pagination.page * data.meta.pagination.limit,
+                    data.meta.pagination.total
+                  )}
+                </span>{' '}
+                of <span className="font-medium">{data.meta.pagination.total}</span> results
+              </p>
+            </div>
+            <div>
+              <nav
+                className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                aria-label="Pagination"
+              >
+                <button
+                  onClick={() => handlePageChange(data.meta.pagination.page - 1)}
+                  disabled={data.meta.pagination.page === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(data.meta.pagination.page + 1)}
+                  disabled={data.meta.pagination.page === data.meta.pagination.totalPages}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

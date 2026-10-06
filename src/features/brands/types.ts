@@ -23,10 +23,12 @@ export interface BrandQuery {
 export interface PaginatedResponse<T> {
   data: T[];
   meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
   };
 }
 

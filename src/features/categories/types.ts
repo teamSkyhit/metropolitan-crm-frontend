@@ -24,10 +24,12 @@ export interface CategoryQuery {
 export interface CategoriesResponse {
   data: Category[];
   meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
   };
 }
 
