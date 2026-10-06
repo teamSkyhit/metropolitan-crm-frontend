@@ -14,6 +14,7 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const create = useCreateUser();
 
@@ -28,7 +29,7 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
       });
       onClose();
     } catch (error: any) {
-      alert(
+      setErrorMsg(
         error?.response?.data?.error?.message ||
           error?.response?.data?.message ||
           'Failed to create user'
@@ -39,6 +40,11 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create Sales Manager">
       <form onSubmit={handleSubmit} className="space-y-4">
+        {errorMsg && (
+          <div className="p-3 bg-red-50 text-red-600 text-sm rounded-md border border-red-200">
+            {errorMsg}
+          </div>
+        )}
         <div className="space-y-2">
           <label className="text-sm font-medium">Name</label>
           <Input required value={name} onChange={(e) => setName(e.target.value)} />
