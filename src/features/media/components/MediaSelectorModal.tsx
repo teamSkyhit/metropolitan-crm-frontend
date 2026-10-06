@@ -26,10 +26,10 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
       setUploadError(null);
       try {
         await uploadMutation.mutateAsync(file);
-      } catch (error: any) {
-        // eslint-disable-line @typescript-eslint/no-explicit-any
-        console.error('Failed to upload media', error);
-        setUploadError(error?.response?.data?.error?.message || 'Failed to upload media');
+      } catch (error: unknown) {
+        const err = error as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+        console.error('Failed to upload media', err);
+        setUploadError(err?.response?.data?.error?.message || 'Failed to upload media');
       }
     }
     if (fileInputRef.current) {
@@ -41,6 +41,11 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
     <Modal isOpen={isOpen} onClose={onClose} title="Select Media">
       <div className="flex flex-col space-y-4 h-[60vh]">
         {/* Header Actions */}
+        {uploadError && (
+          <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-md">
+            {uploadError}
+          </div>
+        )}
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-medium text-gray-900">Media Library</h2>
           <div>
