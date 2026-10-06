@@ -53,11 +53,15 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
     setError(null);
 
     // Frontend Validation
-    if (
-      type === HomepageSectionType.HERO &&
-      (!(content as any).slides || (content as any).slides.length === 0)
-    ) {
-      return setError('Hero section must contain at least 1 slide.');
+    if (type === HomepageSectionType.HERO) {
+      if (!(content as any).slides || (content as any).slides.length === 0) {
+        return setError('Hero section must contain at least 1 slide.');
+      }
+      for (const slide of (content as any).slides) {
+        if (!slide.mediaId) {
+          return setError('Every Hero slide must have an image selected.');
+        }
+      }
     }
     if (
       type === HomepageSectionType.FEATURED_PRODUCTS &&

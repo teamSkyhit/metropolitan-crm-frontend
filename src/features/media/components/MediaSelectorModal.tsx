@@ -15,6 +15,7 @@ interface MediaSelectorModalProps {
 
 export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorModalProps) {
   const [page, setPage] = useState(1);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const { data, isLoading, isError } = useMedia({ page, limit: 20 });
   const uploadMutation = useUploadMedia();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -22,10 +23,12 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setUploadError(null);
       try {
         await uploadMutation.mutateAsync(file);
-      } catch (error) {
+      } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
         console.error('Failed to upload media', error);
+        setUploadError(error?.response?.data?.error?.message || 'Failed to upload media');
       }
     }
     if (fileInputRef.current) {
