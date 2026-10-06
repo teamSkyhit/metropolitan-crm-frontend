@@ -19,8 +19,8 @@ export function ProductFilters() {
     setLocalSearch(searchParam);
   }
 
-  const { data: brandsData } = useBrands();
-  const { data: categoriesData } = useCategories();
+  const { data: brandsData } = useBrands({ limit: 100 });
+  const { data: categoriesData } = useCategories({ limit: 100 });
 
   const brands = brandsData?.data || [];
   const categories = categoriesData?.data || [];

@@ -1,0 +1,97 @@
+'use client';
+
+import React, { use } from 'react';
+import { useBrand, useDeleteBrand, useRestoreBrand } from '@/features/brands/hooks/useBrands';
+import { BrandForm } from '@/features/brands/components/BrandForm';
+import { BrandImageManager } from '@/features/brands/components/BrandImageManager';
+import { ChevronLeft, Trash2, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+
+export default function EditPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const { data: brand, isLoading, error } = useBrand(resolvedParams.id);
+  const deleteBrand = useDeleteBrand();
+  const restoreBrand = useRestoreBrand();
+
+  if (isLoading) {
+    return <div className="p-6 text-gray-500">Loading brand details...</div>;
+  }
+
+  if (error || !brand) {
+    return <div className="p-6 text-red-500">Failed to load brand.</div>;
+  }
+
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this brand?')) {
+      try {
+        await deleteBrand.mutateAsync(brand.id);
+      } catch (
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        err: any
+      ) {
+        alert(
+          err?.response?.data?.error?.message ??
+            err?.response?.data?.message ??
+            'Failed to delete brand.'
+        );
+      }
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      await restoreBrand.mutateAsync(brand.id);
+    } catch (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      err: any
+    ) {
+      alert(
+        err?.response?.data?.error?.message ??
+          err?.response?.data?.message ??
+          'Failed to restore brand.'
+      );
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto w-full">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <Link
+            href="/brands"
+            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4"
+          >
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Back to Brands
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">Edit Brand</h1>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={handleRestore}
+            disabled={restoreBrand.isPending}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Restore
+          </button>
+
+          <button
+            onClick={handleDelete}
+            disabled={deleteBrand.isPending}
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <BrandForm initialData={brand} />
+        <BrandImageManager brand={brand} />
+      </div>
+    </div>
+  );
+}
