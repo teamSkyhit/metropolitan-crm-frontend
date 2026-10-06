@@ -18,7 +18,7 @@ export function canAccessRoute(userRole: Role | undefined | null, route: string)
   if (userRole === ROLES.SUPER_ADMIN) return true;
 
   // Sales Manager restricted routes
-  const restrictedForSalesManager = [ROUTES.USERS, ROUTES.SETTINGS];
+  const restrictedForSalesManager = [ROUTES.USERS, ROUTES.SETTINGS, ROUTES.HOMEPAGE];
 
   if (userRole === ROLES.SALES_MANAGER) {
     return !restrictedForSalesManager.some((r) => route.startsWith(r));

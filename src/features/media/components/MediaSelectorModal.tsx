@@ -48,6 +48,7 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
               accept="image/*"
             />
             <button
+              type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadMutation.isPending}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
@@ -104,6 +105,7 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
         {data?.meta?.pagination && data.meta.pagination.totalPages > 1 && (
           <div className="flex justify-center items-center space-x-4 pt-2">
             <button
+              type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
               className="px-3 py-1 text-sm bg-gray-100 rounded-md disabled:opacity-50 hover:bg-gray-200"
@@ -114,6 +116,7 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
               Page {page} of {data.meta.pagination.totalPages}
             </span>
             <button
+              type="button"
               onClick={() => setPage((p) => p + 1)}
               disabled={page >= data.meta.pagination.totalPages}
               className="px-3 py-1 text-sm bg-gray-100 rounded-md disabled:opacity-50 hover:bg-gray-200"

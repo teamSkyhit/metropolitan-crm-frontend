@@ -20,13 +20,11 @@ export function HomepageSectionList() {
   const [isOrderChanged, setIsOrderChanged] = useState(false);
 
   useEffect(() => {
-    if (sections) {
+    if (sections && !isOrderChanged) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocalSections([...sections].sort((a, b) => a.sortOrder - b.sortOrder));
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsOrderChanged(false);
     }
-  }, [sections]);
+  }, [sections, isOrderChanged]);
 
   if (isLoading) return <div className="text-center py-10">Loading sections...</div>;
   if (isError)
