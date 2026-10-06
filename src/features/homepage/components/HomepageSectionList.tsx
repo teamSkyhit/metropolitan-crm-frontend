@@ -1,9 +1,12 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useHomepageSections, useReorderHomepageSections, useDeleteHomepageSection } from '../hooks/useHomepage';
+import {
+  useHomepageSections,
+  useReorderHomepageSections,
+  useDeleteHomepageSection,
+} from '../hooks/useHomepage';
 import { HomepageSectionType } from '../types';
 import { Edit, Trash2, ArrowUp, ArrowDown, LayoutTemplate } from 'lucide-react';
 import Link from 'next/link';
@@ -12,7 +15,7 @@ export function HomepageSectionList() {
   const { data: sections, isLoading, isError } = useHomepageSections();
   const reorderMutation = useReorderHomepageSections();
   const deleteMutation = useDeleteHomepageSection();
-  
+
   const [localSections, setLocalSections] = useState<any[]>([]);
   const [isOrderChanged, setIsOrderChanged] = useState(false);
 
@@ -26,7 +29,8 @@ export function HomepageSectionList() {
   }, [sections]);
 
   if (isLoading) return <div className="text-center py-10">Loading sections...</div>;
-  if (isError) return <div className="text-center py-10 text-red-500">Failed to load homepage sections.</div>;
+  if (isError)
+    return <div className="text-center py-10 text-red-500">Failed to load homepage sections.</div>;
 
   if (!sections || sections.length === 0) {
     return (
@@ -50,7 +54,7 @@ export function HomepageSectionList() {
 
     const newSections = [...localSections];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    
+
     const temp = newSections[index];
     newSections[index] = newSections[targetIndex];
     newSections[targetIndex] = temp;
@@ -58,7 +62,7 @@ export function HomepageSectionList() {
     setLocalSections(newSections);
     setIsOrderChanged(true);
   };
-  
+
   const handleSaveOrder = async () => {
     const items = localSections.map((sec, i) => ({ id: sec.id, sortOrder: i }));
     try {
@@ -70,7 +74,11 @@ export function HomepageSectionList() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Delete this homepage section? It will no longer be available on the public homepage.')) {
+    if (
+      confirm(
+        'Delete this homepage section? It will no longer be available on the public homepage.'
+      )
+    ) {
       try {
         await deleteMutation.mutateAsync(id);
       } catch (err: any) {
@@ -97,7 +105,9 @@ export function HomepageSectionList() {
   };
 
   const formatType = (type: string) => {
-    return type.replace(/_/g, ' ').replace(/\w\S*/g, (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase());
+    return type
+      .replace(/_/g, ' ')
+      .replace(/\w\S*/g, (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase());
   };
 
   return (
@@ -106,15 +116,30 @@ export function HomepageSectionList() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center justify-between mb-6">
           <p className="text-sm text-yellow-800 font-medium">You have unsaved order changes.</p>
           <div className="flex gap-2">
-            <button onClick={() => { setLocalSections([...(sections || [])].sort((a, b) => a.sortOrder - b.sortOrder)); setIsOrderChanged(false); }} className="px-3 py-1.5 text-sm font-medium text-yellow-800 bg-yellow-100 hover:bg-yellow-200 rounded-md">Cancel</button>
-            <button onClick={handleSaveOrder} disabled={reorderMutation.isPending} className="px-3 py-1.5 text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 rounded-md disabled:opacity-50">
+            <button
+              onClick={() => {
+                setLocalSections([...(sections || [])].sort((a, b) => a.sortOrder - b.sortOrder));
+                setIsOrderChanged(false);
+              }}
+              className="px-3 py-1.5 text-sm font-medium text-yellow-800 bg-yellow-100 hover:bg-yellow-200 rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveOrder}
+              disabled={reorderMutation.isPending}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 rounded-md disabled:opacity-50"
+            >
               {reorderMutation.isPending ? 'Saving...' : 'Save Order'}
             </button>
           </div>
         </div>
       )}
       {localSections.map((section, index) => (
-        <div key={section.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex items-center justify-between gap-6 transition-all hover:shadow-md">
+        <div
+          key={section.id}
+          className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex items-center justify-between gap-6 transition-all hover:shadow-md"
+        >
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-1">
               <button
@@ -134,16 +159,28 @@ export function HomepageSectionList() {
                 <ArrowDown className="w-4 h-4" />
               </button>
             </div>
-            
+
             <div>
               <div className="flex items-center gap-3 mb-1">
                 <span className="text-xs font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-700">
                   {formatType(section.type)}
                 </span>
-                {section.isActive ? (<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Active</span>) : (<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>)}
+                {section.isActive ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                    Inactive
+                  </span>
+                )}
               </div>
-              <h4 className="text-lg font-semibold text-gray-900">{section.title || formatType(section.type)}</h4>
-              {section.subtitle && <p className="text-sm text-gray-500 line-clamp-1">{section.subtitle}</p>}
+              <h4 className="text-lg font-semibold text-gray-900">
+                {section.title || formatType(section.type)}
+              </h4>
+              {section.subtitle && (
+                <p className="text-sm text-gray-500 line-clamp-1">{section.subtitle}</p>
+              )}
               <p className="text-sm text-gray-600 mt-1 font-medium">{getSectionSummary(section)}</p>
             </div>
           </div>

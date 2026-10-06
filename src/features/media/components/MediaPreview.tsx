@@ -1,10 +1,15 @@
-
 'use client';
 import React from 'react';
 import { useMediaById } from '../hooks/useMedia';
 import { Image as ImageIcon } from 'lucide-react';
 
-export function MediaPreview({ mediaId, className }: { mediaId?: string | null, className?: string }) {
+export function MediaPreview({
+  mediaId,
+  className,
+}: {
+  mediaId?: string | null;
+  className?: string;
+}) {
   const { data: media, isLoading, isError } = useMediaById(mediaId);
 
   if (!mediaId) {
@@ -16,9 +21,19 @@ export function MediaPreview({ mediaId, className }: { mediaId?: string | null, 
   }
 
   if (isError || !media?.publicUrl) {
-    return <span className="text-[10px] text-gray-500 font-mono break-all px-2 leading-tight">{mediaId}</span>;
+    return (
+      <span className="text-[10px] text-gray-500 font-mono break-all px-2 leading-tight">
+        {mediaId}
+      </span>
+    );
   }
 
   /* eslint-disable-next-line @next/next/no-img-element */
-  return <img src={media.thumbnailUrl || media.publicUrl} alt="Preview" className={`object-cover w-full h-full ${className || ''}`} />;
+  return (
+    <img
+      src={media.thumbnailUrl || media.publicUrl}
+      alt="Preview"
+      className={`object-cover w-full h-full ${className || ''}`}
+    />
+  );
 }

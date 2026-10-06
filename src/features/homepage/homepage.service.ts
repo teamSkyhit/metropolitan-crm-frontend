@@ -1,4 +1,3 @@
-
 import { apiClient } from '@/lib/api/client';
 import { ApiResponse } from '@/types/api';
 import {
@@ -20,12 +19,18 @@ export const homepageService = {
   },
 
   async createSection(payload: CreateHomepageSectionRequest): Promise<HomepageSection> {
-    const response = await apiClient.post<ApiResponse<HomepageSection>>('/homepage/sections', payload);
+    const response = await apiClient.post<ApiResponse<HomepageSection>>(
+      '/homepage/sections',
+      payload
+    );
     return response.data.data;
   },
 
   async updateSection(id: string, payload: UpdateHomepageSectionRequest): Promise<HomepageSection> {
-    const response = await apiClient.patch<ApiResponse<HomepageSection>>(`/homepage/sections/${id}`, payload);
+    const response = await apiClient.patch<ApiResponse<HomepageSection>>(
+      `/homepage/sections/${id}`,
+      payload
+    );
     return response.data.data;
   },
 

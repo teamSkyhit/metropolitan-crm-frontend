@@ -4,7 +4,13 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { HomepageSection, HomepageSectionType, CreateHomepageSectionRequest, UpdateHomepageSectionRequest, HomepageContent } from '../types';
+import {
+  HomepageSection,
+  HomepageSectionType,
+  CreateHomepageSectionRequest,
+  UpdateHomepageSectionRequest,
+  HomepageContent,
+} from '../types';
 import { useCreateHomepageSection, useUpdateHomepageSection } from '../hooks/useHomepage';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -24,13 +30,17 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
   const updateMutation = useUpdateHomepageSection();
 
   const isEdit = !!initialData;
-  const [type, setType] = useState<HomepageSectionType>(initialData?.type ?? HomepageSectionType.HERO);
+  const [type, setType] = useState<HomepageSectionType>(
+    initialData?.type ?? HomepageSectionType.HERO
+  );
   const [title, setTitle] = useState(initialData?.title ?? '');
   const [subtitle, setSubtitle] = useState(initialData?.subtitle ?? '');
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
-  
+
   // Content state (type-specific)
-  const [content, setContent] = useState<HomepageContent>(initialData?.content ?? getDefaultContent(type));
+  const [content, setContent] = useState<HomepageContent>(
+    initialData?.content ?? getDefaultContent(type)
+  );
   const [error, setError] = useState<string | null>(null);
 
   const handleTypeChange = (newType: HomepageSectionType) => {
@@ -38,40 +48,50 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
     setContent(getDefaultContent(newType));
   };
 
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
+
     // Frontend Validation
-    if (type === HomepageSectionType.HERO && (!(content as any).slides || (content as any).slides.length === 0)) {
+    if (
+      type === HomepageSectionType.HERO &&
+      (!(content as any).slides || (content as any).slides.length === 0)
+    ) {
       return setError('Hero section must contain at least 1 slide.');
     }
-    if (type === HomepageSectionType.FEATURED_PRODUCTS && (!(content as any).productIds || (content as any).productIds.length === 0)) {
+    if (
+      type === HomepageSectionType.FEATURED_PRODUCTS &&
+      (!(content as any).productIds || (content as any).productIds.length === 0)
+    ) {
       return setError('Featured products section must specify at least 1 product.');
     }
-    if (type === HomepageSectionType.FEATURED_CATEGORIES && (!(content as any).categoryIds || (content as any).categoryIds.length === 0)) {
+    if (
+      type === HomepageSectionType.FEATURED_CATEGORIES &&
+      (!(content as any).categoryIds || (content as any).categoryIds.length === 0)
+    ) {
       return setError('Featured categories section must specify at least 1 category.');
     }
-    if (type === HomepageSectionType.FEATURED_BRANDS && (!(content as any).brandIds || (content as any).brandIds.length === 0)) {
+    if (
+      type === HomepageSectionType.FEATURED_BRANDS &&
+      (!(content as any).brandIds || (content as any).brandIds.length === 0)
+    ) {
       return setError('Featured brands section must specify at least 1 brand.');
     }
     if (type === HomepageSectionType.PROMO_BANNER && !(content as any).mediaId) {
       return setError('Promo banner requires an image.');
     }
 
-
     try {
       if (isEdit) {
         // PATCH partial update: only send what changed if we wanted to be strictly minimal,
         // but since we keep full form state, we can send it all or minimal.
-        // The instructions: "CRITICAL PATCH RULE: The backend supports partial PATCH semantics. 
+        // The instructions: "CRITICAL PATCH RULE: The backend supports partial PATCH semantics.
         // Only send fields the user actually changed where practical."
         const payload: UpdateHomepageSectionRequest = {};
         if (title !== (initialData.title ?? '')) payload.title = title || null;
         if (subtitle !== (initialData.subtitle ?? '')) payload.subtitle = subtitle || null;
         if (isActive !== initialData.isActive) payload.isActive = isActive;
-        
+
         // For simplicity of editing content, we just send the current content.
         // Comparing deeply is complex, so we just send the content.
         payload.content = content;
@@ -89,21 +109,25 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
       }
       router.push('/homepage');
     } catch (err: any) {
-      
-      let errMsg = err?.response?.data?.error?.message || err?.response?.data?.message || 'Failed to save section';
+      let errMsg =
+        err?.response?.data?.error?.message ||
+        err?.response?.data?.message ||
+        'Failed to save section';
       if (err?.response?.data?.error?.details && Array.isArray(err.response.data.error.details)) {
         const details = err.response.data.error.details.map((d: any) => d.message).join(', ');
         if (details) errMsg += ': ' + details;
       }
       setError(errMsg);
-
     }
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100"
+    >
       {error && (
         <div className="p-4 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm">
           {error}
@@ -140,11 +164,21 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Title (Optional)</label>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Featured Products" />
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Featured Products"
+          />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle (Optional)</label>
-          <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="e.g. Check out our latest products" />
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Subtitle (Optional)
+          </label>
+          <Input
+            value={subtitle}
+            onChange={(e) => setSubtitle(e.target.value)}
+            placeholder="e.g. Check out our latest products"
+          />
         </div>
       </div>
 
@@ -163,11 +197,21 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
 
       <div className="border-t border-gray-200 pt-8">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Content Configuration</h3>
-        {type === HomepageSectionType.HERO && <HeroForm content={content as any} onChange={setContent} />}
-        {type === HomepageSectionType.FEATURED_PRODUCTS && <FeaturedProductsForm content={content as any} onChange={setContent} />}
-        {type === HomepageSectionType.FEATURED_CATEGORIES && <FeaturedCategoriesForm content={content as any} onChange={setContent} />}
-        {type === HomepageSectionType.FEATURED_BRANDS && <FeaturedBrandsForm content={content as any} onChange={setContent} />}
-        {type === HomepageSectionType.PROMO_BANNER && <PromoBannerForm content={content as any} onChange={setContent} />}
+        {type === HomepageSectionType.HERO && (
+          <HeroForm content={content as any} onChange={setContent} />
+        )}
+        {type === HomepageSectionType.FEATURED_PRODUCTS && (
+          <FeaturedProductsForm content={content as any} onChange={setContent} />
+        )}
+        {type === HomepageSectionType.FEATURED_CATEGORIES && (
+          <FeaturedCategoriesForm content={content as any} onChange={setContent} />
+        )}
+        {type === HomepageSectionType.FEATURED_BRANDS && (
+          <FeaturedBrandsForm content={content as any} onChange={setContent} />
+        )}
+        {type === HomepageSectionType.PROMO_BANNER && (
+          <PromoBannerForm content={content as any} onChange={setContent} />
+        )}
       </div>
 
       <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
@@ -184,7 +228,7 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
           className="bg-[var(--color-metro-navy)] hover:bg-[var(--color-metro-gold)]"
           disabled={isPending}
         >
-          {isPending ? 'Saving...' : (isEdit ? 'Update Section' : 'Create Section')}
+          {isPending ? 'Saving...' : isEdit ? 'Update Section' : 'Create Section'}
         </Button>
       </div>
     </form>
@@ -193,11 +237,17 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
 
 function getDefaultContent(type: HomepageSectionType): any {
   switch (type) {
-    case HomepageSectionType.HERO: return { slides: [] };
-    case HomepageSectionType.FEATURED_PRODUCTS: return { productIds: [] };
-    case HomepageSectionType.FEATURED_CATEGORIES: return { categoryIds: [] };
-    case HomepageSectionType.FEATURED_BRANDS: return { brandIds: [] };
-    case HomepageSectionType.PROMO_BANNER: return { heading: '', mediaId: '' };
-    default: return {} as any;
+    case HomepageSectionType.HERO:
+      return { slides: [] };
+    case HomepageSectionType.FEATURED_PRODUCTS:
+      return { productIds: [] };
+    case HomepageSectionType.FEATURED_CATEGORIES:
+      return { categoryIds: [] };
+    case HomepageSectionType.FEATURED_BRANDS:
+      return { brandIds: [] };
+    case HomepageSectionType.PROMO_BANNER:
+      return { heading: '', mediaId: '' };
+    default:
+      return {} as any;
   }
 }

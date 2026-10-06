@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import { HomepageSectionList } from '@/features/homepage/components/HomepageSectionList';
 import { PageHeader } from '@/components/ui/page-header';
@@ -21,7 +20,7 @@ export default function HomepageCMSPage() {
           Add Section
         </Link>
       </div>
-      
+
       <Suspense fallback={<div className="py-10 text-center text-gray-500">Loading...</div>}>
         <HomepageSectionList />
       </Suspense>

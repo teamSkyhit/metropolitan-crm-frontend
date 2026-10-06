@@ -17,7 +17,7 @@ export function useMedia(query: MediaQuery = {}) {
 
 export function useUploadMedia() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (file: File) => mediaService.uploadMedia(file),
     onSuccess: () => {

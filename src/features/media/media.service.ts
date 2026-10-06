@@ -10,8 +10,8 @@ export interface PaginatedMediaResponse {
       limit: number;
       total: number;
       totalPages: number;
-    }
-  }
+    };
+  };
 }
 
 export const mediaService = {
@@ -20,7 +20,7 @@ export const mediaService = {
     return response.data;
   },
 
-    getMediaById: async (id: string): Promise<Media> => {
+  getMediaById: async (id: string): Promise<Media> => {
     const response = await apiClient.get<ApiResponse<Media>>(`/media/${id}`);
     return response.data.data ?? (response.data as unknown as Media);
   },
@@ -28,7 +28,7 @@ export const mediaService = {
   uploadMedia: async (file: File): Promise<Media> => {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     const response = await apiClient.post<ApiResponse<Media>>('/media/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',

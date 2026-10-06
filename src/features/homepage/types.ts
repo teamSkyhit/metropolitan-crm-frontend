@@ -1,4 +1,3 @@
-
 export const HomepageSectionType = {
   HERO: 'HERO',
   FEATURED_PRODUCTS: 'FEATURED_PRODUCTS',
@@ -7,7 +6,7 @@ export const HomepageSectionType = {
   PROMO_BANNER: 'PROMO_BANNER',
 } as const;
 
-export type HomepageSectionType = typeof HomepageSectionType[keyof typeof HomepageSectionType];
+export type HomepageSectionType = (typeof HomepageSectionType)[keyof typeof HomepageSectionType];
 
 export interface HeroSlide {
   id?: string;
@@ -44,11 +43,11 @@ export interface PromoBannerContent {
   ctaUrl?: string | null;
 }
 
-export type HomepageContent = 
-  | HeroContent 
-  | FeaturedProductsContent 
-  | FeaturedCategoriesContent 
-  | FeaturedBrandsContent 
+export type HomepageContent =
+  | HeroContent
+  | FeaturedProductsContent
+  | FeaturedCategoriesContent
+  | FeaturedBrandsContent
   | PromoBannerContent;
 
 export interface HomepageSection {

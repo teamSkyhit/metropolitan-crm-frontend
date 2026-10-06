@@ -1,7 +1,10 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { homepageService } from '../homepage.service';
-import { CreateHomepageSectionRequest, UpdateHomepageSectionRequest, ReorderHomepageSectionsRequest } from '../types';
+import {
+  CreateHomepageSectionRequest,
+  UpdateHomepageSectionRequest,
+  ReorderHomepageSectionsRequest,
+} from '../types';
 
 export const homepageKeys = {
   all: ['homepage-sections'] as const,
