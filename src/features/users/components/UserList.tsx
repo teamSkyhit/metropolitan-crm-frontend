@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 import { User } from '@/features/users/types';
-import { Pencil, Trash2, KeyRound, Power, PowerOff } from 'lucide-react';
+import { Pencil, Trash2, KeyRound, Power, PowerOff, AlertCircle, RefreshCcw } from 'lucide-react';
 import { CreateUserModal } from './CreateUserModal';
 import { EditUserModal } from './EditUserModal';
 import { ResetPasswordModal } from './ResetPasswordModal';
@@ -29,7 +29,7 @@ export function UserList() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
 
-  const { data, isLoading, error } = useUsers({
+  const { data, isLoading, isError, refetch } = useUsers({
     page,
     limit: 10,
     search: debouncedSearch || undefined,
@@ -76,9 +76,6 @@ export function UserList() {
     }
   };
 
-  if (isLoading) return <div>Loading users...</div>;
-  if (error) return <div>Error loading users</div>;
-
   const users = data?.data || [];
   const meta = data?.meta?.pagination;
 
@@ -104,8 +101,35 @@ export function UserList() {
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          {users.length === 0 ? (
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                Loading users...
+              </TableCell>
+            </TableRow>
+          ) : isError ? (
+            <TableRow>
+              <TableCell colSpan={5} className="py-8">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center justify-center text-center">
+                  <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
+                  <h3 className="text-lg font-medium text-red-800">Failed to load users</h3>
+                  <p className="text-sm text-red-600 mt-2 mb-4">
+                    There was an error communicating with the server.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => refetch()}
+                    className="border-red-200 text-red-700 hover:bg-red-100"
+                  >
+                    <RefreshCcw className="w-4 h-4 mr-2" />
+                    Try Again
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : users.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8 text-gray-500">
                 No users found.
@@ -125,42 +149,46 @@ export function UserList() {
                   </span>
                 </TableCell>
                 <TableCell className="text-right space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleToggleStatus(user)}
-                    title={user.isActive ? 'Deactivate' : 'Activate'}
-                  >
-                    {user.isActive ? (
-                      <PowerOff className="h-4 w-4 text-red-500" />
-                    ) : (
-                      <Power className="h-4 w-4 text-green-500" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setResetPasswordUser(user)}
-                    title="Reset Password"
-                  >
-                    <KeyRound className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditingUser(user)}
-                    title="Edit User"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(user.id)}
-                    title="Delete User"
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                  {user.role === 'SALES_MANAGER' && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleToggleStatus(user)}
+                        title={user.isActive ? 'Deactivate' : 'Activate'}
+                      >
+                        {user.isActive ? (
+                          <PowerOff className="h-4 w-4 text-red-500" />
+                        ) : (
+                          <Power className="h-4 w-4 text-green-500" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setResetPasswordUser(user)}
+                        title="Reset Password"
+                      >
+                        <KeyRound className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setEditingUser(user)}
+                        title="Edit User"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(user.id)}
+                        title="Delete User"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
             ))

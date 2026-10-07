@@ -87,6 +87,7 @@ export function useSetUserStatus() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: USERS_KEYS.lists() });
       queryClient.invalidateQueries({ queryKey: USERS_KEYS.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: USERS_KEYS.lookups() });
     },
   });
 }
