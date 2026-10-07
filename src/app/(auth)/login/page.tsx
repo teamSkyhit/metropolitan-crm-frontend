@@ -67,12 +67,18 @@ function LoginForm() {
         setError('Invalid email or password');
       } else if (error.response?.status === 429) {
         setError('Too many attempts. Please try again later.');
+      } else if (error.response?.status === 423) {
+        setError('Account temporarily locked due to too many failed attempts.');
       } else if (error.response?.data?.error?.message) {
         setError(error.response.data.error.message);
+      } else if (error.response?.status === 500) {
+        setError('Internal Server Error (500). Please check the backend logs.');
+      } else if ((error.response?.data as { message?: string })?.message) {
+        setError((error.response?.data as { message?: string }).message as string);
       } else if (error.message === 'Network Error') {
         setError('Network Error: Could not connect to the server (Check CORS or server status).');
       } else {
-        setError('An unexpected error occurred. Please try again.');
+        setError(error.message || 'An unexpected error occurred. Please try again.');
       }
     } finally {
       setIsLoading(false);
