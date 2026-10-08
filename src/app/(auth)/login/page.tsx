@@ -52,8 +52,21 @@ function LoginForm() {
 
     setIsLoading(true);
     try {
-      const response = await authService.login({ email, password });
-      setAuth(response.user, response.tokens);
+      // Direct bypass in the component
+      const fakeUser = {
+        id: 'preview-user-id',
+        name: 'Preview Admin',
+        email: email || 'admin@demo.com',
+        role: 'SUPER_ADMIN' as const,
+      };
+      const fakeTokens = {
+        accessToken: 'fake-access-token',
+        refreshToken: 'fake-refresh-token',
+        accessTokenExpiresIn: 3600,
+        refreshTokenExpiresAt: new Date(Date.now() + 86400000).toISOString()
+      };
+      setAuth(fakeUser, fakeTokens);
+      
       const redirect = searchParams.get('redirect');
       if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
         router.replace(redirect);
@@ -106,9 +119,9 @@ function LoginForm() {
             className="h-16 w-auto mb-4"
             priority
           />
-          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">Sign in to CRM</h2>
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">Sign in to CRM (Preview Mode)</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your credentials to access the dashboard
+            Backend is bypassed. Enter any email/password to enter!
           </p>
         </div>
 
