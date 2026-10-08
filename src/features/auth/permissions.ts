@@ -28,9 +28,6 @@ export function canAccessRoute(userRole: Role | undefined | null, route: string)
 }
 
 export type Permission =
-  | 'contacts:read'
-  | 'contacts:update'
-  | 'contacts:delete'
   | 'enquiries:update'
   | 'enquiries:assign'
   | 'enquiries:follow-up'
@@ -60,9 +57,6 @@ export function hasPermission(
       'products:create',
       'products:update',
       'products:delete',
-      'contacts:read',
-      'contacts:update',
-      'contacts:delete',
     ];
     if (allowed.includes(permission)) return true;
   }

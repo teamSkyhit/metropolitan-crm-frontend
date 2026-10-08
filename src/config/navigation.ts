@@ -14,7 +14,6 @@ export const NAVIGATION_CONFIG: NavItem[] = [
   { name: 'Categories', href: ROUTES.CATEGORIES, icon: Layers },
   { name: 'Brands', href: ROUTES.BRANDS, icon: Tag },
   { name: 'Homepage CMS', href: ROUTES.HOMEPAGE, icon: Layout },
-  { name: 'Contacts', href: ROUTES.CONTACTS, icon: Contact },
   { name: 'Users', href: ROUTES.USERS, icon: Users },
   { name: 'Settings', href: ROUTES.SETTINGS, icon: Settings },
 ];

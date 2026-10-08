@@ -1,10 +1,9 @@
 import { cn } from '@/lib/utils/cn';
 
 import { EnquiryStatus } from '@/features/enquiries/types';
-import { ContactStatus } from '@/features/contacts/types';
 
 interface StatusBadgeProps {
-  status: EnquiryStatus | ContactStatus | string;
+  status: EnquiryStatus | string;
   className?: string;
 }
 
