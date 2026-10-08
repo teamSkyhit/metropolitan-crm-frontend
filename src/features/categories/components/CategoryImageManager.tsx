@@ -32,7 +32,10 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      const errorMessage = err?.response?.data?.error?.message ?? err?.response?.data?.message ?? 'Failed to upload banner';
+      const errorMessage =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to upload banner';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -51,7 +54,10 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      const errorMessage = err?.response?.data?.error?.message ?? err?.response?.data?.message ?? 'Failed to delete banner';
+      const errorMessage =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to delete banner';
       setError(errorMessage);
       toast.error(errorMessage);
     }

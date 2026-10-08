@@ -19,7 +19,11 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
   const [email, setEmail] = useState(user.email);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [confirmConfig, setConfirmConfig] = useState({ title: '', message: '', onConfirm: () => {} });
+  const [confirmConfig, setConfirmConfig] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const update = useUpdateUser();
 

@@ -31,9 +31,10 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      const errorMsg = err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to upload logo.';
+      const errorMsg =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to upload logo.';
       setLogoError(errorMsg);
       toast.error(errorMsg);
     }
@@ -48,9 +49,10 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      const errorMsg = err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to delete logo.';
+      const errorMsg =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to delete logo.';
       setLogoError(errorMsg);
       toast.error(errorMsg);
     }
@@ -67,9 +69,10 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      const errorMsg = err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to upload banner.';
+      const errorMsg =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to upload banner.';
       setBannerError(errorMsg);
       toast.error(errorMsg);
     }
@@ -84,9 +87,10 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      const errorMsg = err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to delete banner.';
+      const errorMsg =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to delete banner.';
       setBannerError(errorMsg);
       toast.error(errorMsg);
     }

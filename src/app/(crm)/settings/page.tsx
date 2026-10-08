@@ -1,6 +1,5 @@
 import { PageHeader } from '@/components/ui/page-header';
 
-
 export default function SettingsPage() {
   return (
     <div className="space-y-6">

@@ -1,6 +1,5 @@
 import { PageHeader } from '@/components/ui/page-header';
 
-
 export default function NotificationsPage() {
   return (
     <div className="space-y-6">
