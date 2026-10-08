@@ -8,4 +8,5 @@
 [build.environment]
   NODE_VERSION = "20"
   NEXT_TELEMETRY_DISABLED = "1"
+  BACKEND_INTERNAL_URL = "https://metropolitan-staging-1d6f.up.railway.app"
 
