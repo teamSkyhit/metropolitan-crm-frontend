@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useAuthStore } from '@/features/auth/auth.store';
-import { authService } from '@/features/auth/auth.service';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ROUTES } from '@/lib/constants/routes';
@@ -63,10 +63,10 @@ function LoginForm() {
         accessToken: 'fake-access-token',
         refreshToken: 'fake-refresh-token',
         accessTokenExpiresIn: 3600,
-        refreshTokenExpiresAt: new Date(Date.now() + 86400000).toISOString()
+        refreshTokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
       };
       setAuth(fakeUser, fakeTokens);
-      
+
       const redirect = searchParams.get('redirect');
       if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
         router.replace(redirect);
@@ -119,7 +119,9 @@ function LoginForm() {
             className="h-16 w-auto mb-4"
             priority
           />
-          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">Sign in to CRM (Preview Mode)</h2>
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to CRM (Preview Mode)
+          </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Backend is bypassed. Enter any email/password to enter!
           </p>

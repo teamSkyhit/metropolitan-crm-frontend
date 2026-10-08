@@ -6,7 +6,11 @@ import { tokenStorage } from '@/lib/auth/token';
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthSession> {
     // [PREVIEW MODE BYPASS] If no backend is running, simulate a successful login
-    if (credentials.email === 'admin@demo.com' || process.env.NEXT_PUBLIC_IS_STATIC_PREVIEW === 'true' || true) {
+    if (
+      credentials.email === 'admin@demo.com' ||
+      process.env.NEXT_PUBLIC_IS_STATIC_PREVIEW === 'true' ||
+      true
+    ) {
       return {
         user: {
           id: 'preview-user-id',
@@ -18,8 +22,8 @@ export const authService = {
           accessToken: 'fake-access-token',
           refreshToken: 'fake-refresh-token',
           accessTokenExpiresIn: 3600,
-          refreshTokenExpiresAt: new Date(Date.now() + 86400000).toISOString()
-        }
+          refreshTokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        },
       };
     }
     const response = await apiClient.post<ApiResponse<AuthSession>>('/auth/login', credentials);
@@ -30,7 +34,12 @@ export const authService = {
     const refreshToken = tokenStorage.getRefreshToken();
     if (!refreshToken) throw new Error('No refresh token');
     if (refreshToken === 'fake-refresh-token') {
-      return { accessToken: 'fake-access-token', refreshToken: 'fake-refresh-token', accessTokenExpiresIn: 3600, refreshTokenExpiresAt: new Date(Date.now() + 86400000).toISOString() };
+      return {
+        accessToken: 'fake-access-token',
+        refreshToken: 'fake-refresh-token',
+        accessTokenExpiresIn: 3600,
+        refreshTokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+      };
     }
     const response = await apiClient.post<ApiResponse<AuthTokens>>('/auth/refresh', {
       refreshToken,
