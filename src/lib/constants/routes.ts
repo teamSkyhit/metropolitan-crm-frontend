@@ -7,7 +7,6 @@ export const ROUTES = {
   CATEGORIES: '/categories',
   BRANDS: '/brands',
   HOMEPAGE: '/homepage',
-  CONTACTS: '/contacts',
   NOTIFICATIONS: '/notifications',
   USERS: '/users',
   SETTINGS: '/settings',
