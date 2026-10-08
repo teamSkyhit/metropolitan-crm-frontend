@@ -29,22 +29,9 @@ export interface EnquirySummary {
   updatedAt: string;
 }
 
-export interface PaginationMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
+import { PaginatedResponse } from '@/types/api';
 
-export interface EnquiryListResponse {
-  success: boolean;
-  data: EnquirySummary[];
-  meta: {
-    pagination: PaginationMeta;
-  };
-}
+export type EnquiryListResponse = PaginatedResponse<EnquirySummary>;
 
 export interface GetEnquiriesQuery {
   page?: number;

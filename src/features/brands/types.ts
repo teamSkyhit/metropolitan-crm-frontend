@@ -20,17 +20,8 @@ export interface BrandQuery {
   sortOrder?: 'asc' | 'desc';
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    };
-  };
-}
+import { PaginatedResponse } from '@/types/api';
+export type { PaginatedResponse };
 
 export interface CreateBrandRequest {
   name: string;

@@ -19,6 +19,8 @@ import { Pencil, Trash2, KeyRound, Power, PowerOff, AlertCircle, RefreshCcw } fr
 import { CreateUserModal } from './CreateUserModal';
 import { EditUserModal } from './EditUserModal';
 import { ResetPasswordModal } from './ResetPasswordModal';
+import toast from 'react-hot-toast';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export function UserList() {
   const [page, setPage] = useState(1);
@@ -28,6 +30,18 @@ export function UserList() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
+
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const { data, isLoading, isError, refetch } = useUsers({
     page,
@@ -48,17 +62,23 @@ export function UserList() {
   }, [search]);
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to soft delete this user?')) {
-      try {
-        await deleteUser.mutateAsync(id);
-      } catch (err: any) {
-        alert(
-          err?.response?.data?.error?.message ||
-            err?.response?.data?.message ||
-            'Failed to delete user'
-        );
-      }
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete User',
+      message: 'Are you sure you want to soft delete this user?',
+      onConfirm: async () => {
+        try {
+          await deleteUser.mutateAsync(id);
+          toast.success('User deleted successfully');
+        } catch (err: any) {
+          toast.error(
+            err?.response?.data?.error?.message ||
+              err?.response?.data?.message ||
+              'Failed to delete user'
+          );
+        }
+      },
+    });
   };
 
   const handleToggleStatus = async (user: User) => {
@@ -67,8 +87,9 @@ export function UserList() {
         id: user.id,
         payload: { isActive: !user.isActive },
       });
+      toast.success(`User ${user.isActive ? 'deactivated' : 'activated'} successfully`);
     } catch (err: any) {
-      alert(
+      toast.error(
         err?.response?.data?.error?.message ||
           err?.response?.data?.message ||
           'Failed to toggle status'
@@ -239,6 +260,15 @@ export function UserList() {
           onClose={() => setResetPasswordUser(null)}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmDialog.title.includes('Delete')}
+      />
     </div>
   );
 }

@@ -75,6 +75,7 @@ export function useUpdateProductSpecifications(id: string) {
       productsService.updateProductSpecifications(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['product', id] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 }

@@ -3,40 +3,38 @@ import { useState, useRef } from 'react';
 import { useUpdateProductImage, useDeleteProductImage } from '../hooks/useProduct';
 import { Product } from '../types';
 import { Button } from '@/components/ui/button';
+import toast from 'react-hot-toast';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export function ProductImageManager({ product }: { product: Product }) {
   const updateImage = useUpdateProductImage(product.id);
   const deleteImage = useDeleteProductImage(product.id);
 
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setErrorMsg(null);
-    setSuccessMsg(null);
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      setErrorMsg('File exceeds 5MB maximum size limit.');
+      toast.error('File exceeds 5MB maximum size limit.');
       return;
     }
 
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setErrorMsg('Invalid file type. Only JPEG, PNG, and WebP are allowed.');
+      toast.error('Invalid file type. Only JPEG, PNG, and WebP are allowed.');
       return;
     }
 
     updateImage.mutate(file, {
       onSuccess: () => {
-        setSuccessMsg('Image updated successfully.');
-        setTimeout(() => setSuccessMsg(null), 3000);
+        toast.success('Image updated successfully.');
         if (fileInputRef.current) fileInputRef.current.value = '';
       },
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       onError: (err: any) => {
-        setErrorMsg(
+        toast.error(
           err?.response?.data?.error?.message ||
             err?.response?.data?.message ||
             'Failed to upload image.'
@@ -47,17 +45,22 @@ export function ProductImageManager({ product }: { product: Product }) {
   };
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to remove the product image?')) {
-      deleteImage.mutate(undefined, {
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        onError: (err: any) =>
-          setErrorMsg(
-            err?.response?.data?.error?.message ||
-              err?.response?.data?.message ||
-              'Failed to delete image.'
-          ),
-      });
-    }
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteImage.mutate(undefined, {
+      onSuccess: () => {
+        toast.success('Image deleted successfully.');
+      },
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      onError: (err: any) =>
+        toast.error(
+          err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            'Failed to delete image.'
+        ),
+    });
   };
 
   const isPending = updateImage.isPending || deleteImage.isPending;
@@ -65,18 +68,6 @@ export function ProductImageManager({ product }: { product: Product }) {
   return (
     <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm space-y-4">
       <h3 className="text-lg font-medium text-gray-900">Primary Image</h3>
-
-      {successMsg && (
-        <div className="p-3 bg-green-50 text-green-700 rounded-md border border-green-200 text-sm">
-          {successMsg}
-        </div>
-      )}
-
-      {errorMsg && (
-        <div className="p-3 bg-red-50 text-red-700 rounded-md border border-red-200 text-sm">
-          {errorMsg}
-        </div>
-      )}
 
       <div className="flex flex-col sm:flex-row items-start gap-6">
         <div className="flex-shrink-0">
@@ -129,6 +120,16 @@ export function ProductImageManager({ product }: { product: Product }) {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Remove Image"
+        message="Are you sure you want to remove the product image?"
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setIsConfirmOpen(false)}
+        isDestructive={true}
+      />
     </div>
   );
 }

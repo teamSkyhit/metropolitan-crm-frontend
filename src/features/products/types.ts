@@ -61,15 +61,5 @@ export interface GetProductsQuery {
   sortOrder?: 'asc' | 'desc';
 }
 
-export interface ProductListResponse {
-  success: boolean;
-  data: Product[];
-  meta: {
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  };
-}
+import { PaginatedResponse } from '@/types/api';
+export type ProductListResponse = PaginatedResponse<Product>;

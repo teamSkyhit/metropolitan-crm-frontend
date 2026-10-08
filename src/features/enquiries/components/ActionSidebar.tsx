@@ -5,7 +5,8 @@ import {
   useAssignEnquiry,
   useUpdateEnquiryNotes,
 } from '../hooks/useEnquiry';
-import { useUserLookup } from '@/features/users/hooks/useUserLookup';
+import { useUsers } from '@/features/users/hooks/useUsers';
+import { ROLES } from '@/lib/constants/roles';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/utils/format';
@@ -23,8 +24,7 @@ export function ActionSidebar({
   const updateStatus = useUpdateEnquiryStatus(enquiry.id);
   const assignEnquiry = useAssignEnquiry(enquiry.id);
   const updateNotes = useUpdateEnquiryNotes(enquiry.id);
-  const { data: usersData } = useUserLookup();
-
+  const { data: usersData } = useUsers({ limit: 100, role: ROLES.SALES_MANAGER });
   // Sync internal state if enquiry changes (e.g., successful save)
   const [prevNotesProp, setPrevNotesProp] = useState(enquiry.salesNotes || '');
   if ((enquiry.salesNotes || '') !== prevNotesProp) {

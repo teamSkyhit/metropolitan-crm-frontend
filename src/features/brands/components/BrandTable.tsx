@@ -152,23 +152,23 @@ export function BrandTable() {
         </div>
 
         {/* Pagination */}
-        {data && data.meta.pagination.totalPages > 1 && (
+        {data && data?.meta?.pagination.totalPages > 1 && (
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
                   Showing{' '}
                   <span className="font-medium">
-                    {(data.meta.pagination.page - 1) * data.meta.pagination.limit + 1}
+                    {(data?.meta?.pagination.page - 1) * data?.meta?.pagination.limit + 1}
                   </span>{' '}
                   to{' '}
                   <span className="font-medium">
                     {Math.min(
-                      data.meta.pagination.page * data.meta.pagination.limit,
-                      data.meta.pagination.total
+                      data?.meta?.pagination.page * data?.meta?.pagination.limit,
+                      data?.meta?.pagination.total
                     )}
                   </span>{' '}
-                  of <span className="font-medium">{data.meta.pagination.total}</span> results
+                  of <span className="font-medium">{data?.meta?.pagination.total}</span> results
                 </p>
               </div>
               <div>
@@ -177,15 +177,15 @@ export function BrandTable() {
                   aria-label="Pagination"
                 >
                   <button
-                    onClick={() => handlePageChange(data.meta.pagination.page - 1)}
-                    disabled={data.meta.pagination.page === 1}
+                    onClick={() => handlePageChange(data?.meta?.pagination.page - 1)}
+                    disabled={data?.meta?.pagination.page === 1}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
                     Previous
                   </button>
                   <button
-                    onClick={() => handlePageChange(data.meta.pagination.page + 1)}
-                    disabled={data.meta.pagination.page === data.meta.pagination.totalPages}
+                    onClick={() => handlePageChange(data?.meta?.pagination.page + 1)}
+                    disabled={data?.meta?.pagination.page === data?.meta?.pagination.totalPages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
                     Next

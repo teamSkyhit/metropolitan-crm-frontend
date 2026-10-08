@@ -11,7 +11,7 @@ interface CategoryFormProps {
 
 export function CategoryForm({ initialData }: CategoryFormProps) {
   const router = useRouter();
-  const { data: categoriesResponse } = useCategories({ limit: 100 });
+  const { data: categoriesResponse } = useCategories({ limit: 500 });
   const parentCategories = categoriesResponse?.data?.filter((c) => c.id !== initialData?.id) || [];
 
   const [formData, setFormData] = useState<CreateCategoryRequest>({

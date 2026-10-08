@@ -1,8 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { env } from '@/config/env';
 import { tokenStorage } from '../auth/token';
-import { authService } from '@/features/auth/auth.service';
-import { useAuthStore } from '@/features/auth/auth.store';
 
 export const apiClient = axios.create({
   baseURL: env.API_URL,
@@ -72,7 +70,15 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const tokens = await authService.refresh();
+        const refreshToken = tokenStorage.getRefreshToken();
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+
+        const refreshReq = await axios.post(env.API_URL + '/auth/refresh', {
+          refreshToken,
+        });
+        const tokens = refreshReq.data.data;
         tokenStorage.setToken(tokens.accessToken, tokens.refreshToken);
 
         if (originalRequest.headers) {
@@ -83,9 +89,13 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        // Clean logout without calling /auth/logout API to avoid loop
+        // We do not call authService.logout() to prevent circular dependency
+        // We will just clear tokens and trigger a hard reload to login
         tokenStorage.clearToken();
-        useAuthStore.getState().logout();
+        if (typeof window !== 'undefined') {
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+          window.location.assign('/login');
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

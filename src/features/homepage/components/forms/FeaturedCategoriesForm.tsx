@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function FeaturedCategoriesForm({ content, onChange }: Props) {
-  const { data: response } = useCategories({ limit: 100 });
+  const { data: response } = useCategories({ limit: 500 });
   const categories = response?.data || [];
 
   const handleAdd = (e: React.ChangeEvent<HTMLSelectElement>) => {

@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { formatDate } from '@/lib/utils/format';
 import { AlertCircle, Users, Inbox, Package, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
@@ -181,14 +182,12 @@ export default function DashboardPage() {
                     <span className="text-sm text-gray-600">{formatDate(enquiry.createdAt)}</span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => router.push(ROUTES.ENQUIRIES)}
-                      className="text-[var(--color-metro-navy)] font-medium hover:text-[var(--color-metro-navy)]/80 hover:bg-gray-100"
+                    <Link
+                      href={`${ROUTES.ENQUIRIES}/${enquiry.id}`}
+                      className="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium text-[var(--color-metro-navy)] hover:text-[var(--color-metro-navy)]/80 hover:bg-gray-100 transition-colors"
                     >
                       View
-                    </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
