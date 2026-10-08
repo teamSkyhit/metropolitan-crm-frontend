@@ -1,11 +1,14 @@
 import { EnquiryDetailClient } from '@/features/enquiries/components/EnquiryDetailClient';
 
-export default async function EnquiryDetailPage(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export function generateStaticParams() {
+  return [{ id: '1' }];
+}
 
+export default async function EnquiryDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
     <div className="max-w-7xl mx-auto">
-      <EnquiryDetailClient id={params.id} />
+      <EnquiryDetailClient id={id} />
     </div>
   );
 }
