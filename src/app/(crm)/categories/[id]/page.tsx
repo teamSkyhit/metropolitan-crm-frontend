@@ -1,10 +1,41 @@
-import { CategoryEditClient } from './client';
+'use client';
 
-export function generateStaticParams() {
-  return [{ id: '1' }];
-}
+import React from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { CategoryForm } from '@/features/categories/components/CategoryForm';
+import { CategoryImageManager } from '@/features/categories/components/CategoryImageManager';
+import { useCategory } from '@/features/categories/hooks/useCategories';
 
-export default async function EditPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <CategoryEditClient id={id} />;
+export default function EditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
+  const { data: category, isLoading, error } = useCategory(id);
+
+  if (isLoading) {
+    return <div className="p-6 text-center text-gray-500">Loading category...</div>;
+  }
+
+  if (error || !category) {
+    return <div className="p-6 text-center text-red-500">Failed to load category.</div>;
+  }
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center">
+        <Link href="/categories" className="mr-4 text-gray-500 hover:text-gray-700">
+          <ArrowLeft size={20} />
+        </Link>
+        <h1 className="text-2xl font-semibold text-gray-900">Edit Category: {category.name}</h1>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <CategoryForm initialData={category} />
+        </div>
+        <div>
+          <CategoryImageManager category={category} />
+        </div>
+      </div>
+    </div>
+  );
 }

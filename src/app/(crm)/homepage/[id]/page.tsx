@@ -1,17 +1,9 @@
-import React from 'react';
+import React, { use } from 'react';
 import { EditHomepageSectionWrapper } from '@/features/homepage/components/EditHomepageSectionWrapper';
 import { PageHeader } from '@/components/ui/page-header';
 
-export function generateStaticParams() {
-  return [{ id: '1' }];
-}
-
-export default async function EditHomepageSectionPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default function EditHomepageSectionPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
 
   return (
     <div className="p-6 max-w-4xl mx-auto w-full">
@@ -19,7 +11,7 @@ export default async function EditHomepageSectionPage({
         title="Edit Homepage Section"
         description="Modify the section configuration and content."
       />
-      <EditHomepageSectionWrapper id={id} />
+      <EditHomepageSectionWrapper id={resolvedParams.id} />
     </div>
   );
 }

@@ -12,6 +12,7 @@ interface ModalProps {
 
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const modalRef = React.useRef<HTMLDivElement>(null);
+  const openerRef = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -42,6 +43,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
     };
 
     if (isOpen) {
+      openerRef.current = (document.activeElement as HTMLElement) || null;
       document.addEventListener('keydown', handleEscape);
       document.addEventListener('keydown', handleTab);
       document.body.style.overflow = 'hidden';
@@ -59,6 +61,9 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       document.removeEventListener('keydown', handleEscape);
       document.removeEventListener('keydown', handleTab);
       document.body.style.overflow = 'unset';
+      if (openerRef.current && typeof openerRef.current.focus === 'function') {
+        openerRef.current.focus();
+      }
     };
   }, [isOpen, onClose]);
 

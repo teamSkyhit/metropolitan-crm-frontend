@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
 import { NAVIGATION_CONFIG } from '@/config/navigation';
 
@@ -61,9 +62,13 @@ export function Header({ onMenuClick }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-4 relative">
-        <Button variant="ghost" size="icon">
+        <Link
+          href="/notifications"
+          className="p-2 rounded-md hover:bg-gray-100 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
+          aria-label="View notifications"
+        >
           <Bell className="w-5 h-5 text-gray-600" />
-        </Button>
+        </Link>
 
         <div className="relative" ref={menuRef}>
           <button

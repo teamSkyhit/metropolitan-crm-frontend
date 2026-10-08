@@ -41,6 +41,7 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
   };
 
   const handleLogoDelete = async () => {
+    setIsLogoConfirmOpen(false);
     setLogoError(null);
     try {
       await deleteLogo.mutateAsync(brand.id);
@@ -79,6 +80,7 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
   };
 
   const handleBannerDelete = async () => {
+    setIsBannerConfirmOpen(false);
     setBannerError(null);
     try {
       await deleteBanner.mutateAsync(brand.id);

@@ -49,6 +49,7 @@ export function ProductImageManager({ product }: { product: Product }) {
   };
 
   const confirmDelete = () => {
+    setIsConfirmOpen(false);
     deleteImage.mutate(undefined, {
       onSuccess: () => {
         toast.success('Image deleted successfully.');

@@ -79,17 +79,22 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     } catch (e) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      if ((e as any)?.response?.status !== 401) {
-        console.error('Initialize failed', e);
+      const status = (e as any)?.response?.status;
+      if (status === 401) {
+        tokenStorage.clearToken();
+        getQueryClient().clear();
+        set({
+          user: null,
+          role: null,
+          isAuthenticated: false,
+          isInitializing: false,
+        });
+      } else {
+        console.error('Initialize failed with non-auth error:', e);
+        set({
+          isInitializing: false,
+        });
       }
-      tokenStorage.clearToken();
-      getQueryClient().clear();
-      set({
-        user: null,
-        role: null,
-        isAuthenticated: false,
-        isInitializing: false,
-      });
     }
   },
 }));

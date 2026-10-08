@@ -46,6 +46,7 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
   };
 
   const handleDelete = async () => {
+    setIsConfirmOpen(false);
     setError('');
     try {
       await deleteMutation.mutateAsync(category.id);
