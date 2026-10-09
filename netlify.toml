@@ -5,6 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
   NEXT_TELEMETRY_DISABLED = "1"
-  NEXT_PUBLIC_API_URL = "https://metropolitan-staging-1d6f.up.railway.app/api/v1"
+  NEXT_PUBLIC_API_URL = "/api/v1"
+
 
 
