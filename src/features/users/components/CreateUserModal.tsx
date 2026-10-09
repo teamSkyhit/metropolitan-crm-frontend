@@ -56,7 +56,8 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
         <div className="space-y-2">
           <label className="text-sm font-medium">Password</label>
           <Input
-            type="text"
+            type="password"
+            autoComplete="new-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}

@@ -1,0 +1,24 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+  BACKEND_INTERNAL_URL = "https://metropolitan-staging-1d6f.up.railway.app"
+
+[[redirects]]
+  from = "/api/v1/*"
+  to = "https://metropolitan-staging-1d6f.up.railway.app/api/v1/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://metropolitan-staging-1d6f.up.railway.app/uploads/:splat"
+  status = 200
+  force = true
+

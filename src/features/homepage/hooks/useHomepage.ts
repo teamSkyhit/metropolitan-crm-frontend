@@ -63,8 +63,9 @@ export function useDeleteHomepageSection() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => homepageService.deleteSection(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: homepageKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: homepageKeys.detail(id) });
     },
   });
 }

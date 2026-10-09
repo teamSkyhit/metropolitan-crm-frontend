@@ -1,7 +1,9 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { use, useState } from 'react';
 import { useBrand, useDeleteBrand, useRestoreBrand } from '@/features/brands/hooks/useBrands';
+import toast from 'react-hot-toast';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { BrandForm } from '@/features/brands/components/BrandForm';
 import { BrandImageManager } from '@/features/brands/components/BrandImageManager';
 import { ChevronLeft, Trash2, RefreshCw } from 'lucide-react';
@@ -12,6 +14,7 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
   const { data: brand, isLoading, error } = useBrand(resolvedParams.id);
   const deleteBrand = useDeleteBrand();
   const restoreBrand = useRestoreBrand();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   if (isLoading) {
     return <div className="p-6 text-gray-500">Loading brand details...</div>;
@@ -21,20 +24,23 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
     return <div className="p-6 text-red-500">Failed to load brand.</div>;
   }
 
-  const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this brand?')) {
-      try {
-        await deleteBrand.mutateAsync(brand.id);
-      } catch (
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        err: any
-      ) {
-        alert(
-          err?.response?.data?.error?.message ??
-            err?.response?.data?.message ??
-            'Failed to delete brand.'
-        );
-      }
+  const handleDelete = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const onConfirmDelete = async () => {
+    setIsConfirmOpen(false);
+    try {
+      await deleteBrand.mutateAsync(brand.id);
+    } catch (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      err: any
+    ) {
+      toast.error(
+        err?.response?.data?.error?.message ??
+          err?.response?.data?.message ??
+          'Failed to delete brand.'
+      );
     }
   };
 
@@ -45,7 +51,7 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      alert(
+      toast.error(
         err?.response?.data?.error?.message ??
           err?.response?.data?.message ??
           'Failed to restore brand.'
@@ -92,6 +98,16 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
         <BrandForm initialData={brand} />
         <BrandImageManager brand={brand} />
       </div>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Delete Brand"
+        message="Are you sure you want to delete this brand?"
+        confirmLabel="Delete"
+        isDestructive={true}
+        onConfirm={onConfirmDelete}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
     </div>
   );
 }

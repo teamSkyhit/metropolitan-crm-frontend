@@ -1,7 +1,6 @@
 import { apiClient } from '@/lib/api/client';
 import {
   User,
-  UserLookup,
   PaginatedResponse,
   CreateUserRequest,
   UpdateUserRequest,
@@ -57,14 +56,6 @@ export const usersService = {
     payload: ResetUserPasswordRequest
   ): Promise<{ success: boolean; data: User }> => {
     const { data } = await apiClient.post(`/users/${id}/reset-password`, payload);
-    return data;
-  },
-
-  lookupUsers: async (params?: {
-    search?: string;
-    role?: Role;
-  }): Promise<{ success: boolean; data: UserLookup[] }> => {
-    const { data } = await apiClient.get('/users/lookup', { params });
     return data;
   },
 };

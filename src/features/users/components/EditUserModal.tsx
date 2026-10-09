@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useUpdateUser } from '@/features/users/hooks/useUsers';
 import { User } from '@/features/users/types';
 
@@ -15,6 +17,13 @@ interface Props {
 export function EditUserModal({ user, isOpen, onClose }: Props) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [confirmConfig, setConfirmConfig] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const update = useUpdateUser();
 
@@ -27,7 +36,7 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
       });
       onClose();
     } catch (error: any) {
-      alert(
+      toast.error(
         error?.response?.data?.error?.message ||
           error?.response?.data?.message ||
           'Failed to update user'
@@ -55,6 +64,17 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
           </Button>
         </div>
       </form>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onCancel={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          confirmConfig.onConfirm();
+          setIsConfirmOpen(false);
+        }}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+      />
     </Modal>
   );
 }

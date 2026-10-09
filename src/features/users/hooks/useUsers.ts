@@ -98,10 +98,3 @@ export function useResetUserPassword() {
       usersService.resetUserPassword(id, payload),
   });
 }
-
-export function useUserLookup(params?: { search?: string; role?: Role }) {
-  return useQuery({
-    queryKey: USERS_KEYS.lookup(JSON.stringify(params)),
-    queryFn: () => usersService.lookupUsers(params),
-  });
-}

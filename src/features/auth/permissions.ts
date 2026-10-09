@@ -11,20 +11,35 @@ export function hasAnyRole(userRole: Role | undefined | null, expectedRoles: Rol
   return expectedRoles.includes(userRole);
 }
 
-// Super admin has access to everything by default.
+// Super admin has access to all CRM routes explicitly.
 // Sales Manager has restricted access.
 export function canAccessRoute(userRole: Role | undefined | null, route: string): boolean {
   if (!userRole) return false;
-  if (userRole === ROLES.SUPER_ADMIN) return true;
 
-  // Sales Manager restricted routes
-  const restrictedForSalesManager = [ROUTES.USERS, ROUTES.SETTINGS, ROUTES.HOMEPAGE];
+  const allowedForSalesManager = [
+    ROUTES.DASHBOARD,
+    ROUTES.ENQUIRIES,
+    ROUTES.PRODUCTS,
+    ROUTES.CATEGORIES,
+    ROUTES.BRANDS,
+    ROUTES.NOTIFICATIONS,
+  ];
 
-  if (userRole === ROLES.SALES_MANAGER) {
-    return !restrictedForSalesManager.some((r) => route.startsWith(r));
-  }
+  const allowedForSuperAdmin = [
+    ...allowedForSalesManager,
+    ROUTES.USERS,
+    ROUTES.HOMEPAGE,
+    ROUTES.SETTINGS,
+  ];
 
-  return false;
+  const allowedRoutes =
+    userRole === ROLES.SUPER_ADMIN
+      ? allowedForSuperAdmin
+      : userRole === ROLES.SALES_MANAGER
+        ? allowedForSalesManager
+        : [];
+
+  return allowedRoutes.some((r) => route === r || route.startsWith(r + '/'));
 }
 
 export type Permission =

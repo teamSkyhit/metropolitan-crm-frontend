@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useResetUserPassword } from '@/features/users/hooks/useUsers';
 import { User } from '@/features/users/types';
+import toast from 'react-hot-toast';
 
 interface Props {
   user: User;
@@ -24,10 +25,10 @@ export function ResetPasswordModal({ user, isOpen, onClose }: Props) {
         id: user.id,
         payload: { newPassword },
       });
-      alert('Password reset successful');
+      toast.success('Password reset successful');
       onClose();
     } catch (error: any) {
-      alert(
+      toast.error(
         error?.response?.data?.error?.message ||
           error?.response?.data?.message ||
           'Failed to reset password'
@@ -41,7 +42,8 @@ export function ResetPasswordModal({ user, isOpen, onClose }: Props) {
         <div className="space-y-2">
           <label className="text-sm font-medium">New Password</label>
           <Input
-            type="text"
+            type="password"
+            autoComplete="new-password"
             required
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}

@@ -12,17 +12,17 @@ import { ProductImageManager } from '@/features/products/components/ProductImage
 import { ProductSpecificationsEditor } from '@/features/products/components/ProductSpecificationsEditor';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, use } from 'react';
+import toast from 'react-hot-toast';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
-import { use } from 'react';
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const { data, isLoading, isError } = useProduct(resolvedParams.id);
   const updateProduct = useUpdateProduct(resolvedParams.id);
   const deleteProduct = useDeleteProduct(resolvedParams.id);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   if (isLoading) {
     return <div className="p-8 text-center text-gray-500">Loading product...</div>;
@@ -46,16 +46,13 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const handleUpdate = (
     payload: Partial<import('@/features/products/types').CreateProductRequest>
   ) => {
-    setErrorMsg(null);
-    setSuccessMsg(null);
     updateProduct.mutate(payload, {
       onSuccess: () => {
-        setSuccessMsg('Product updated successfully.');
-        setTimeout(() => setSuccessMsg(null), 3000);
+        toast.success('Product updated successfully.');
       },
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       onError: (err: any) => {
-        setErrorMsg(
+        toast.error(
           err?.response?.data?.error?.message ||
             err?.response?.data?.message ||
             'Failed to update product.'
@@ -65,23 +62,24 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleDelete = () => {
-    if (
-      window.confirm('Are you sure you want to delete this product? This action cannot be undone.')
-    ) {
-      deleteProduct.mutate(undefined, {
-        onSuccess: () => {
-          router.push(ROUTES.PRODUCTS);
-        },
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        onError: (err: any) => {
-          setErrorMsg(
-            err?.response?.data?.error?.message ||
-              err?.response?.data?.message ||
-              'Failed to delete product.'
-          );
-        },
-      });
-    }
+    setShowConfirmDelete(true);
+  };
+
+  const confirmDelete = () => {
+    setShowConfirmDelete(false);
+    deleteProduct.mutate(undefined, {
+      onSuccess: () => {
+        router.push(ROUTES.PRODUCTS);
+      },
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      onError: (err: any) => {
+        toast.error(
+          err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            'Failed to delete product.'
+        );
+      },
+    });
   };
 
   return (
@@ -106,17 +104,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         </Button>
       </div>
 
-      {successMsg && (
-        <div className="p-4 bg-green-50 text-green-700 rounded-md border border-green-200">
-          {successMsg}
-        </div>
-      )}
-      {errorMsg && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-md border border-red-200">
-          {errorMsg}
-        </div>
-      )}
-
       <ProductForm
         initialData={product}
         mode="edit"
@@ -127,6 +114,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       <ProductImageManager product={product} />
 
       <ProductSpecificationsEditor product={product} />
+
+      <ConfirmDialog
+        isOpen={showConfirmDelete}
+        title="Delete Product"
+        message="Are you sure you want to delete this product? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirmDelete(false)}
+        isDestructive={true}
+      />
     </div>
   );
 }

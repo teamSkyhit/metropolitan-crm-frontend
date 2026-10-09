@@ -2,16 +2,24 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { brandsService } from '../brands.service';
 import { BrandQuery, CreateBrandRequest, UpdateBrandRequest } from '../types';
 
+export const BRAND_KEYS = {
+  all: ['brands'] as const,
+  lists: () => [...BRAND_KEYS.all, 'list'] as const,
+  list: (query: BrandQuery) => [...BRAND_KEYS.lists(), query] as const,
+  details: () => [...BRAND_KEYS.all, 'detail'] as const,
+  detail: (id: string) => [...BRAND_KEYS.details(), id] as const,
+};
+
 export const useBrands = (query: BrandQuery = {}) => {
   return useQuery({
-    queryKey: ['brands', query],
+    queryKey: BRAND_KEYS.list(query),
     queryFn: () => brandsService.getBrands(query),
   });
 };
 
 export const useBrand = (id: string) => {
   return useQuery({
-    queryKey: ['brand', id],
+    queryKey: BRAND_KEYS.detail(id),
     queryFn: () => brandsService.getBrand(id),
     enabled: !!id,
   });

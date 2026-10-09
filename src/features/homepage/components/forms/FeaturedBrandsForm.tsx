@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function FeaturedBrandsForm({ content, onChange }: Props) {
-  const { data: response } = useBrands({ limit: 100 });
+  const { data: response } = useBrands({ limit: 500 });
   const brands = response?.data || [];
 
   const handleAdd = (e: React.ChangeEvent<HTMLSelectElement>) => {

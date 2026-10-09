@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Edit, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Category } from '../types';
 import { useDeleteCategory } from '../hooks/useCategories';
 
@@ -12,6 +13,7 @@ interface CategoryTableProps {
 
 export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
   const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   if (isLoading) {
     return <div className="p-4 text-center text-gray-500">Loading categories...</div>;
@@ -22,13 +24,27 @@ export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
   }
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      deleteCategory(id);
+    setDeleteId(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      deleteCategory(deleteId);
+      setDeleteId(null);
     }
   };
 
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        title="Delete Category"
+        message="Are you sure you want to delete this category?"
+        confirmLabel="Delete"
+        isDestructive={true}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>

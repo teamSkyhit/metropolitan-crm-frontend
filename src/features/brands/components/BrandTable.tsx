@@ -152,7 +152,7 @@ export function BrandTable() {
         </div>
 
         {/* Pagination */}
-        {data && data.meta.pagination.totalPages > 1 && (
+        {data?.meta?.pagination && data.meta.pagination.totalPages > 1 && (
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>

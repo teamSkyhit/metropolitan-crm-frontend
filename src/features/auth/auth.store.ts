@@ -54,14 +54,22 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   initialize: async () => {
-    const token = tokenStorage.getToken();
+    let token = tokenStorage.getToken();
+    const refreshToken = tokenStorage.getRefreshToken();
 
-    if (!token) {
+    if (!token && !refreshToken) {
       set({ isInitializing: false, isAuthenticated: false });
       return;
     }
 
     try {
+      if (!token && refreshToken) {
+        // Attempt to refresh token silently
+        const tokens = await authService.refresh();
+        tokenStorage.setToken(tokens.accessToken, tokens.refreshToken);
+        token = tokens.accessToken;
+      }
+
       const user = await authService.getCurrentUser();
       set({
         user,
@@ -69,15 +77,24 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: true,
         isInitializing: false,
       });
-    } catch {
-      tokenStorage.clearToken();
-      getQueryClient().clear();
-      set({
-        user: null,
-        role: null,
-        isAuthenticated: false,
-        isInitializing: false,
-      });
+    } catch (e) {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      const status = (e as any)?.response?.status;
+      if (status === 401) {
+        tokenStorage.clearToken();
+        getQueryClient().clear();
+        set({
+          user: null,
+          role: null,
+          isAuthenticated: false,
+          isInitializing: false,
+        });
+      } else {
+        console.error('Initialize failed with non-auth error:', e);
+        set({
+          isInitializing: false,
+        });
+      }
     }
   },
 }));

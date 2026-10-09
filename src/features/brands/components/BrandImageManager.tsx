@@ -2,9 +2,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { Brand } from '../types';
 import { useUploadLogo, useDeleteLogo, useUploadBanner, useDeleteBanner } from '../hooks/useBrands';
 import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export function BrandImageManager({ brand }: { brand: Brand }) {
   const uploadLogo = useUploadLogo();
@@ -15,38 +17,45 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
   const [logoError, setLogoError] = useState<string | null>(null);
   const [bannerError, setBannerError] = useState<string | null>(null);
 
+  const [isLogoConfirmOpen, setIsLogoConfirmOpen] = useState(false);
+  const [isBannerConfirmOpen, setIsBannerConfirmOpen] = useState(false);
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setLogoError(null);
     try {
       await uploadLogo.mutateAsync({ id: brand.id, file });
+      toast.success('Logo uploaded successfully');
     } catch (
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      setLogoError(
+      const errorMsg =
         err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to upload logo.'
-      );
+        err?.response?.data?.message ??
+        'Failed to upload logo.';
+      setLogoError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
   const handleLogoDelete = async () => {
-    if (!confirm('Are you sure you want to delete the logo?')) return;
+    setIsLogoConfirmOpen(false);
     setLogoError(null);
     try {
       await deleteLogo.mutateAsync(brand.id);
+      toast.success('Logo deleted successfully');
     } catch (
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      setLogoError(
+      const errorMsg =
         err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to delete logo.'
-      );
+        err?.response?.data?.message ??
+        'Failed to delete logo.';
+      setLogoError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
@@ -56,32 +65,36 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
     setBannerError(null);
     try {
       await uploadBanner.mutateAsync({ id: brand.id, file });
+      toast.success('Banner uploaded successfully');
     } catch (
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      setBannerError(
+      const errorMsg =
         err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to upload banner.'
-      );
+        err?.response?.data?.message ??
+        'Failed to upload banner.';
+      setBannerError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
   const handleBannerDelete = async () => {
-    if (!confirm('Are you sure you want to delete the banner?')) return;
+    setIsBannerConfirmOpen(false);
     setBannerError(null);
     try {
       await deleteBanner.mutateAsync(brand.id);
+      toast.success('Banner deleted successfully');
     } catch (
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
     ) {
-      setBannerError(
+      const errorMsg =
         err?.response?.data?.error?.message ??
-          err?.response?.data?.message ??
-          'Failed to delete banner.'
-      );
+        err?.response?.data?.message ??
+        'Failed to delete banner.';
+      setBannerError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
@@ -114,7 +127,7 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
               {brand.logoUrl && (
                 <button
                   type="button"
-                  onClick={handleLogoDelete}
+                  onClick={() => setIsLogoConfirmOpen(true)}
                   disabled={deleteLogo.isPending}
                   className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 disabled:opacity-50"
                 >
@@ -156,7 +169,7 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
               {brand.bannerUrl && (
                 <button
                   type="button"
-                  onClick={handleBannerDelete}
+                  onClick={() => setIsBannerConfirmOpen(true)}
                   disabled={deleteBanner.isPending}
                   className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 disabled:opacity-50"
                 >
@@ -168,6 +181,26 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isLogoConfirmOpen}
+        title="Delete Logo"
+        message="Are you sure you want to delete the logo?"
+        confirmLabel="Delete"
+        isDestructive
+        onConfirm={handleLogoDelete}
+        onCancel={() => setIsLogoConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={isBannerConfirmOpen}
+        title="Delete Banner"
+        message="Are you sure you want to delete the banner?"
+        confirmLabel="Delete"
+        isDestructive
+        onConfirm={handleBannerDelete}
+        onCancel={() => setIsBannerConfirmOpen(false)}
+      />
     </div>
   );
 }

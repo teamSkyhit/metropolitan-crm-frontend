@@ -6,7 +6,8 @@ import { PageHeader } from '@/components/ui/page-header';
 import { useEnquiries } from '@/features/enquiries/hooks/useEnquiries';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { ENQUIRY_STATUSES } from '@/features/enquiries/types';
-import { useUserLookup } from '@/features/users/hooks/useUserLookup';
+import { useUsers } from '@/features/users/hooks/useUsers';
+import { ROLES } from '@/lib/constants/roles';
 import {
   Table,
   TableBody,
@@ -76,7 +77,7 @@ function EnquiriesList() {
     }
   }, [debouncedSearch, search, localSearch, updateUrl]);
 
-  const { data: usersData } = useUserLookup();
+  const { data: usersData } = useUsers({ limit: 100, role: ROLES.SALES_MANAGER });
   const { data, isLoading, isError, refetch } = useEnquiries({
     page,
     limit: 20,

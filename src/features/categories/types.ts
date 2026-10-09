@@ -21,17 +21,8 @@ export interface CategoryQuery {
   parentId?: string;
 }
 
-export interface CategoriesResponse {
-  data: Category[];
-  meta: {
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    };
-  };
-}
+import { PaginatedResponse } from '@/types/api';
+export type CategoriesResponse = PaginatedResponse<Category>;
 
 export interface CreateCategoryRequest {
   name: string;

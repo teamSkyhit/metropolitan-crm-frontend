@@ -10,6 +10,8 @@ import {
 import { HomepageSectionType } from '../types';
 import { Edit, Trash2, ArrowUp, ArrowDown, LayoutTemplate } from 'lucide-react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export function HomepageSectionList() {
   const { data: sections, isLoading, isError } = useHomepageSections();
@@ -18,6 +20,8 @@ export function HomepageSectionList() {
 
   const [localSections, setLocalSections] = useState<any[]>([]);
   const [isOrderChanged, setIsOrderChanged] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (sections && !isOrderChanged) {
@@ -66,22 +70,27 @@ export function HomepageSectionList() {
     try {
       await reorderMutation.mutateAsync({ items });
       setIsOrderChanged(false);
+      toast.success('Order saved successfully');
     } catch (err: any) {
-      alert(err?.response?.data?.error?.message || 'Failed to reorder sections');
+      toast.error(err?.response?.data?.error?.message || 'Failed to reorder sections');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (
-      confirm(
-        'Delete this homepage section? It will no longer be available on the public homepage.'
-      )
-    ) {
-      try {
-        await deleteMutation.mutateAsync(id);
-      } catch (err: any) {
-        alert(err?.response?.data?.error?.message || 'Failed to delete section');
-      }
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await deleteMutation.mutateAsync(deleteId);
+      toast.success('Section deleted successfully');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error?.message || 'Failed to delete section');
+    } finally {
+      setIsConfirmOpen(false);
+      setDeleteId(null);
     }
   };
 
@@ -192,7 +201,7 @@ export function HomepageSectionList() {
               <Edit className="w-5 h-5" />
             </Link>
             <button
-              onClick={() => handleDelete(section.id)}
+              onClick={() => handleDeleteClick(section.id)}
               disabled={deleteMutation.isPending}
               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
               title="Delete Section"
@@ -202,6 +211,19 @@ export function HomepageSectionList() {
           </div>
         </div>
       ))}
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setDeleteId(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Homepage Section"
+        message="Delete this homepage section? It will no longer be available on the public homepage."
+        confirmLabel={deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+        cancelLabel="Cancel"
+      />
     </div>
   );
 }

@@ -54,6 +54,7 @@ function LoginForm() {
     try {
       const response = await authService.login({ email, password });
       setAuth(response.user, response.tokens);
+
       const redirect = searchParams.get('redirect');
       if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
         router.replace(redirect);

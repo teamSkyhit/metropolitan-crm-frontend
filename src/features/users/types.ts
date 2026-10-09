@@ -12,26 +12,8 @@ export interface User {
   updatedAt: string;
 }
 
-export interface UserLookup {
-  id: string;
-  name: string;
-  role: Role;
-}
-
-export interface PaginationMeta {
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-}
-
-export interface PaginatedResponse<T> {
-  success: boolean;
-  data: T[];
-  meta: {
-    pagination: PaginationMeta;
-  };
-}
+import { PaginatedResponse } from '@/types/api';
+export type { PaginatedResponse };
 
 export interface CreateUserRequest {
   name: string;
