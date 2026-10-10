@@ -8,7 +8,6 @@ import { CategoryImageManager } from '@/features/categories/components/CategoryI
 import { useCategory } from '@/features/categories/hooks/useCategories';
 
 export function CategoryEditClient({ id }: { id: string }) {
-  
   const { data: category, isLoading, error } = useCategory(id);
 
   if (isLoading) {

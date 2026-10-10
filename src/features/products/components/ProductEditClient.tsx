@@ -18,7 +18,6 @@ import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export function ProductEditClient({ id }: { id: string }) {
-  
   const router = useRouter();
   const { data, isLoading, isError } = useProduct(id);
   const updateProduct = useUpdateProduct(id);

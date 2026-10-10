@@ -11,7 +11,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export function BrandEditClient({ id }: { id: string }) {
-  
   const router = useRouter();
   const { data: brand, isLoading, error } = useBrand(id);
   const deleteBrand = useDeleteBrand();
