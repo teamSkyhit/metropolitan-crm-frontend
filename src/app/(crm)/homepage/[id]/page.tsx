@@ -1,12 +1,14 @@
-import React, { use } from 'react';
 import { EditHomepageSectionWrapper } from '@/features/homepage/components/EditHomepageSectionWrapper';
 import { PageHeader } from '@/components/ui/page-header';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export default function EditHomepageSectionPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
+export function generateStaticParams() {
+  return [{ id: 'placeholder' }];
+}
 
+export default async function EditHomepageSectionPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return (
     <div className="p-6 max-w-4xl mx-auto w-full">
       <div className="flex items-center gap-4 mb-6">
@@ -24,7 +26,7 @@ export default function EditHomepageSectionPage({ params }: { params: Promise<{ 
           />
         </div>
       </div>
-      <EditHomepageSectionWrapper id={resolvedParams.id} />
+      <EditHomepageSectionWrapper id={params.id} />
     </div>
   );
 }
