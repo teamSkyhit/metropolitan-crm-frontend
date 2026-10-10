@@ -60,7 +60,7 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadMutation.isPending}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[#0b2e59] rounded-md hover:bg-[#0b2e59]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0b2e59] disabled:opacity-50 transition-colors"
             >
               {uploadMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -90,21 +90,7 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {data?.data.map((media) => (
-                <div
-                  key={media.id}
-                  className="relative group cursor-pointer aspect-square rounded-lg border-2 border-transparent hover:border-blue-500 overflow-hidden bg-white shadow-sm"
-                  onClick={() => onSelect(media)}
-                >
-                  <img
-                    src={media.thumbnailUrl || media.publicUrl}
-                    alt={media.fileName}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity" />
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-xs text-white truncate">{media.fileName}</p>
-                  </div>
-                </div>
+                <MediaGridItem key={media.id} media={media} onSelect={onSelect} />
               ))}
             </div>
           )}
@@ -136,5 +122,35 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
         )}
       </div>
     </Modal>
+  );
+}
+
+function MediaGridItem({ media, onSelect }: { media: Media; onSelect: (media: Media) => void }) {
+  const [hasError, setHasError] = useState(false);
+  const imageUrl = media.thumbnailUrl || media.publicUrl;
+
+  return (
+    <div
+      className="relative group cursor-pointer aspect-square rounded-lg border-2 border-transparent hover:border-[#0b2e59] overflow-hidden bg-gray-100 shadow-sm"
+      onClick={() => onSelect(media)}
+    >
+      {hasError ? (
+        <div className="w-full h-full flex flex-col items-center justify-center p-2 text-gray-400 bg-gray-50">
+          <ImageIcon className="w-8 h-8 mb-1 text-gray-300" />
+          <p className="text-[10px] text-gray-500 text-center truncate w-full">{media.fileName}</p>
+        </div>
+      ) : (
+        <img
+          src={imageUrl}
+          alt={media.fileName}
+          className="w-full h-full object-cover"
+          onError={() => setHasError(true)}
+        />
+      )}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <p className="text-xs text-white truncate">{media.fileName}</p>
+      </div>
+    </div>
   );
 }

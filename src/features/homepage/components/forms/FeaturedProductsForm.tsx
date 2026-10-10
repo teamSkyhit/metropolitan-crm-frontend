@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import { FeaturedProductsContent } from '../../types';
 import { useProducts } from '@/features/products/hooks/useProducts';
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export function FeaturedProductsForm({ content, onChange }: Props) {
-  const { data: response } = useProducts({ limit: 500 });
+  const { data: response } = useProducts({ limit: 100 });
   const products = response?.data || [];
 
   const handleAdd = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -63,19 +64,36 @@ export function FeaturedProductsForm({ content, onChange }: Props) {
                   key={id}
                   className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-md"
                 >
-                  <div>
-                    {product ? (
-                      <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                  <div className="flex items-center gap-3">
+                    {product?.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt=""
+                        className="w-10 h-10 object-cover rounded border border-gray-200 bg-white"
+                      />
                     ) : (
-                      <div className="text-sm font-medium text-red-500">
-                        Invalid Product ID: {id}
+                      <div className="w-10 h-10 rounded border border-gray-200 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                        No img
                       </div>
                     )}
+                    <div>
+                      {product ? (
+                        <>
+                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                          <div className="text-xs text-gray-500">SKU: {product.sku}</div>
+                        </>
+                      ) : (
+                        <div className="text-sm font-medium text-red-500">
+                          Invalid Product ID: {id}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <button
                     onClick={() => handleRemove(id)}
                     type="button"
                     className="text-red-500 hover:text-red-700 p-1"
+                    title="Remove product"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

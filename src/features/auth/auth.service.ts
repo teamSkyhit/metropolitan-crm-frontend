@@ -29,4 +29,19 @@ export const authService = {
       await apiClient.post('/auth/logout', { refreshToken });
     }
   },
+
+  async changePassword(payload: {
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<AuthSession> {
+    const response = await apiClient.post<ApiResponse<AuthSession>>(
+      '/auth/change-password',
+      payload
+    );
+    return response.data.data;
+  },
+
+  async logoutAll(): Promise<void> {
+    await apiClient.post('/auth/logout-all');
+  },
 };

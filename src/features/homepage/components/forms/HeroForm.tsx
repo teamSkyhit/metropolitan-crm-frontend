@@ -96,9 +96,14 @@ export function HeroForm({ content, onChange }: Props) {
                     <ArrowDown className="w-4 h-4" />
                   </button>
                 </div>
-                <span className="font-medium text-gray-900">
-                  Slide {index + 1}: {slide.heading}
-                </span>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-8 rounded border border-gray-200 overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
+                    <MediaPreview mediaId={slide.mediaId} />
+                  </div>
+                  <span className="font-medium text-gray-900">
+                    Slide {index + 1}: {slide.heading}
+                  </span>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button

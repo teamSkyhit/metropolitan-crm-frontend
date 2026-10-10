@@ -1,16 +1,29 @@
 import React, { use } from 'react';
 import { EditHomepageSectionWrapper } from '@/features/homepage/components/EditHomepageSectionWrapper';
 import { PageHeader } from '@/components/ui/page-header';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 export default function EditHomepageSectionPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
 
   return (
     <div className="p-6 max-w-4xl mx-auto w-full">
-      <PageHeader
-        title="Edit Homepage Section"
-        description="Modify the section configuration and content."
-      />
+      <div className="flex items-center gap-4 mb-6">
+        <Link
+          href="/homepage"
+          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          aria-label="Back to Homepage CMS"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div className="flex-1">
+          <PageHeader
+            title="Edit Homepage Section"
+            description="Modify the section configuration and content."
+          />
+        </div>
+      </div>
       <EditHomepageSectionWrapper id={resolvedParams.id} />
     </div>
   );

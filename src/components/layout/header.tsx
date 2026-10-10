@@ -1,8 +1,9 @@
 'use client';
 
-import { Menu, Bell, LogOut } from 'lucide-react';
+import { Menu, Bell, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/auth.store';
+import { useUnreadCount } from '@/features/notifications/hooks/useNotifications';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -43,6 +44,9 @@ export function Header({ onMenuClick }: HeaderProps) {
   });
   const pageTitle = currentPage ? currentPage.name : 'Metro Industrial CRM';
 
+  const { data: unreadData } = useUnreadCount();
+  const unreadCount = unreadData?.count ?? 0;
+
   return (
     <header className="flex items-center justify-between h-16 px-4 border-b bg-white">
       <div className="flex items-center gap-4">
@@ -64,10 +68,15 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center gap-4 relative">
         <Link
           href="/notifications"
-          className="p-2 rounded-md hover:bg-gray-100 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
-          aria-label="View notifications"
+          className="relative p-2 rounded-md hover:bg-gray-100 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
+          aria-label={`View notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
         >
           <Bell className="w-5 h-5 text-gray-600" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white leading-none">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </Link>
 
         <div className="relative" ref={menuRef}>
@@ -99,6 +108,14 @@ export function Header({ onMenuClick }: HeaderProps) {
                   {user?.role?.replace('_', ' ')}
                 </p>
               </div>
+              <Link
+                href="/settings"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors border-b border-gray-100"
+              >
+                <Settings className="w-4 h-4 text-gray-500" />
+                Settings
+              </Link>
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 transition-colors"

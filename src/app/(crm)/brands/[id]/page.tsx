@@ -6,11 +6,13 @@ import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { BrandForm } from '@/features/brands/components/BrandForm';
 import { BrandImageManager } from '@/features/brands/components/BrandImageManager';
-import { ChevronLeft, Trash2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function EditPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
+  const router = useRouter();
   const { data: brand, isLoading, error } = useBrand(resolvedParams.id);
   const deleteBrand = useDeleteBrand();
   const restoreBrand = useRestoreBrand();
@@ -32,6 +34,8 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
     setIsConfirmOpen(false);
     try {
       await deleteBrand.mutateAsync(brand.id);
+      toast.success('Brand deleted successfully.');
+      router.push('/brands');
     } catch (
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       err: any
@@ -62,13 +66,9 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
   return (
     <div className="p-6 max-w-4xl mx-auto w-full">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <Link
-            href="/brands"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Back to Brands
+        <div className="flex items-center">
+          <Link href="/brands" className="mr-4 text-gray-500 hover:text-gray-700">
+            <ArrowLeft size={20} />
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Edit Brand</h1>
         </div>

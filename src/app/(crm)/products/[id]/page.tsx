@@ -1,6 +1,7 @@
 'use client';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { ROUTES } from '@/lib/constants/routes';
 import {
   useProduct,
@@ -87,9 +88,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       <div className="flex items-center gap-4">
         <Link
           href={ROUTES.PRODUCTS}
-          className="inline-flex h-9 items-center justify-center rounded-md border border-gray-300 px-3 text-sm font-medium transition-colors hover:bg-gray-100"
+          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          aria-label="Back to Products"
         >
-          Back
+          <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
           <PageHeader title={product.name} description={`SKU: ${product.sku}`} />
@@ -104,16 +106,21 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         </Button>
       </div>
 
-      <ProductForm
-        initialData={product}
-        mode="edit"
-        onSubmit={handleUpdate}
-        isPending={updateProduct.isPending}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <ProductForm
+            initialData={product}
+            mode="edit"
+            onSubmit={handleUpdate}
+            isPending={updateProduct.isPending}
+          />
+          <ProductSpecificationsEditor product={product} />
+        </div>
 
-      <ProductImageManager product={product} />
-
-      <ProductSpecificationsEditor product={product} />
+        <div className="space-y-6">
+          <ProductImageManager product={product} />
+        </div>
+      </div>
 
       <ConfirmDialog
         isOpen={showConfirmDelete}
