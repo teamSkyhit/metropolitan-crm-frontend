@@ -11,8 +11,12 @@ import { useAuthStore } from '@/features/auth/auth.store';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
+import { useParams } from 'next/navigation';
 
-export function EnquiryDetailClient({ id }: { id: string }) {
+export function EnquiryDetailClient({ id: _propId }: { id: string }) {
+  const params = useParams();
+  // Read the real ID from the URL at runtime (the prop is always "placeholder" in static export)
+  const id = (params?.id as string) || _propId;
   const { data: response, isLoading, isError } = useEnquiry(id);
   const user = useAuthStore((state) => state.user);
 

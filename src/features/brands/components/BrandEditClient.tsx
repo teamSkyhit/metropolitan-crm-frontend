@@ -8,10 +8,13 @@ import { BrandForm } from '@/features/brands/components/BrandForm';
 import { BrandImageManager } from '@/features/brands/components/BrandImageManager';
 import { ArrowLeft, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
-export function BrandEditClient({ id }: { id: string }) {
+export function BrandEditClient({ id: _propId }: { id: string }) {
   const router = useRouter();
+  const params = useParams();
+  // Read the real ID from the URL at runtime (the prop is always "placeholder" in static export)
+  const id = (params?.id as string) || _propId;
   const { data: brand, isLoading, error } = useBrand(id);
   const deleteBrand = useDeleteBrand();
   const restoreBrand = useRestoreBrand();

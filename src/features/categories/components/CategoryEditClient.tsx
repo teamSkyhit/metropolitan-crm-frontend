@@ -6,8 +6,12 @@ import { ArrowLeft } from 'lucide-react';
 import { CategoryForm } from '@/features/categories/components/CategoryForm';
 import { CategoryImageManager } from '@/features/categories/components/CategoryImageManager';
 import { useCategory } from '@/features/categories/hooks/useCategories';
+import { useParams } from 'next/navigation';
 
-export function CategoryEditClient({ id }: { id: string }) {
+export function CategoryEditClient({ id: _propId }: { id: string }) {
+  const params = useParams();
+  // Read the real ID from the URL at runtime (the prop is always "placeholder" in static export)
+  const id = (params?.id as string) || _propId;
   const { data: category, isLoading, error } = useCategory(id);
 
   if (isLoading) {
