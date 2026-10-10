@@ -50,12 +50,7 @@ export const productsService = {
     formData.append('image', file);
     const response = await apiClient.put<{ success: boolean; data: Product }>(
       `/products/${id}/image`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      formData
     );
     return response.data;
   },
