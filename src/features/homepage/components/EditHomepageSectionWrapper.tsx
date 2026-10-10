@@ -7,7 +7,8 @@ import { useRouteId } from '@/lib/hooks/useRouteId';
 
 export function EditHomepageSectionWrapper({ id: _propId }: { id: string }) {
   const routeId = useRouteId();
-  const id = (routeId && routeId !== 'placeholder') ? routeId : (_propId !== 'placeholder' ? _propId : '');
+  const id =
+    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
   const { data: section, isLoading, isError } = useHomepageSection(id);
 
   if (!id || isLoading) return <div className="text-center py-10">Loading section...</div>;

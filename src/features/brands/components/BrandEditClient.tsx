@@ -17,7 +17,8 @@ export function BrandEditClient({ id: _propId }: { id: string }) {
   // ID — useParams() alone returns "placeholder" in static export hard-navigation.
   const routeId = useRouteId();
   // Never use "placeholder" for querying real backend APIs!
-  const id = (routeId && routeId !== 'placeholder') ? routeId : (_propId !== 'placeholder' ? _propId : '');
+  const id =
+    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
   const { data: brand, isLoading, error } = useBrand(id);
   const deleteBrand = useDeleteBrand();
   const restoreBrand = useRestoreBrand();

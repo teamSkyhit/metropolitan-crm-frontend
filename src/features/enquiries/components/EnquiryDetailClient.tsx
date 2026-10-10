@@ -15,7 +15,8 @@ import { useRouteId } from '@/lib/hooks/useRouteId';
 
 export function EnquiryDetailClient({ id: _propId }: { id: string }) {
   const routeId = useRouteId();
-  const id = (routeId && routeId !== 'placeholder') ? routeId : (_propId !== 'placeholder' ? _propId : '');
+  const id =
+    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
   const { data: response, isLoading, isError } = useEnquiry(id);
   const user = useAuthStore((state) => state.user);
 

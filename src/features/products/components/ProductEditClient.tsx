@@ -20,7 +20,8 @@ import { useRouteId } from '@/lib/hooks/useRouteId';
 
 export function ProductEditClient({ id: _propId }: { id: string }) {
   const routeId = useRouteId();
-  const id = (routeId && routeId !== 'placeholder') ? routeId : (_propId !== 'placeholder' ? _propId : '');
+  const id =
+    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
   const router = useRouter();
   const { data, isLoading, isError } = useProduct(id);
   const updateProduct = useUpdateProduct(id);
