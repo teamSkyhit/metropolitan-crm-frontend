@@ -23,6 +23,7 @@ export function canAccessRoute(userRole: Role | undefined | null, route: string)
     ROUTES.CATEGORIES,
     ROUTES.BRANDS,
     ROUTES.NOTIFICATIONS,
+    ROUTES.SETTINGS,
   ];
 
   const allowedForSuperAdmin = [

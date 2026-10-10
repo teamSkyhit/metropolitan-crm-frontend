@@ -14,6 +14,7 @@ interface AuthState {
   // Actions
   setAuth: (user: User, tokens: AuthTokens) => void;
   logout: () => void;
+  logoutAll: () => Promise<void>;
   initialize: () => Promise<void>;
 }
 
@@ -39,6 +40,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (e) {
       console.error(
         'Logout API failed, continuing local cleanup:',
+        e instanceof Error ? e.message : 'Unknown error'
+      );
+    } finally {
+      tokenStorage.clearToken();
+      getQueryClient().clear();
+      set({
+        user: null,
+        role: null,
+        isAuthenticated: false,
+        isInitializing: false,
+      });
+    }
+  },
+
+  logoutAll: async () => {
+    try {
+      await authService.logoutAll();
+    } catch (e) {
+      console.error(
+        'Logout-all API failed, continuing local cleanup:',
         e instanceof Error ? e.message : 'Unknown error'
       );
     } finally {

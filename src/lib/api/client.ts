@@ -4,9 +4,6 @@ import { tokenStorage } from '../auth/token';
 
 export const apiClient = axios.create({
   baseURL: env.API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 let isRefreshing = false;
@@ -31,6 +28,17 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // If payload is FormData, do not let Content-Type be set to application/json
+  // The browser/Axios MUST set multipart/form-data with the correct boundary
+  if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+    if (config.headers) {
+      delete config.headers['Content-Type'];
+    }
+  } else if (config.headers && !config.headers['Content-Type']) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
   return config;
 });
 

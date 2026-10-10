@@ -1,9 +1,6 @@
 [build]
   command = "npm run build"
-  publish = ".next"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -22,3 +19,37 @@
   status = 200
   force = true
 
+# Dynamic [id] routes: serve the placeholder shell so the client-side JS can read
+# the real ID from useParams() and fetch the correct data at runtime.
+# Static sub-routes (e.g. /brands/new) are matched first by Netlify because they
+# exist as real files in the publish dir, so they are NOT affected by these rules.
+[[redirects]]
+  from = "/brands/:id"
+  to = "/brands/placeholder.html"
+  status = 200
+
+[[redirects]]
+  from = "/categories/:id"
+  to = "/categories/placeholder.html"
+  status = 200
+
+[[redirects]]
+  from = "/products/:id"
+  to = "/products/placeholder.html"
+  status = 200
+
+[[redirects]]
+  from = "/enquiries/:id"
+  to = "/enquiries/placeholder.html"
+  status = 200
+
+[[redirects]]
+  from = "/homepage/:id"
+  to = "/homepage/placeholder.html"
+  status = 200
+
+# SPA fallback: serve index.html for any other route not matched above
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

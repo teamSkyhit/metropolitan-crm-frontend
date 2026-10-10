@@ -29,11 +29,7 @@ export const mediaService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await apiClient.post<ApiResponse<Media>>('/media/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await apiClient.post<ApiResponse<Media>>('/media/upload', formData);
     // Assuming backend returns ApiResponse<Media> or just Media depending on the standard
     // Some backend APIs return { data: Media }, let's return response.data.data if ApiResponse is used
     return response.data.data ?? response.data;
