@@ -12,22 +12,22 @@ import { ProductForm } from '@/features/products/components/ProductForm';
 import { ProductImageManager } from '@/features/products/components/ProductImageManager';
 import { ProductSpecificationsEditor } from '@/features/products/components/ProductSpecificationsEditor';
 import { Button } from '@/components/ui/button';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { useRouteId } from '@/lib/hooks/useRouteId';
 
 export function ProductEditClient({ id: _propId }: { id: string }) {
-  const params = useParams();
-  // Read the real ID from the URL at runtime (the prop is always "placeholder" in static export)
-  const id = (params?.id as string) || _propId;
+  const routeId = useRouteId();
+  const id = (routeId && routeId !== 'placeholder') ? routeId : (_propId !== 'placeholder' ? _propId : '');
   const router = useRouter();
   const { data, isLoading, isError } = useProduct(id);
   const updateProduct = useUpdateProduct(id);
   const deleteProduct = useDeleteProduct(id);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
-  if (isLoading) {
+  if (!id || isLoading) {
     return <div className="p-8 text-center text-gray-500">Loading product...</div>;
   }
 

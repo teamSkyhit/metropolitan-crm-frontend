@@ -11,16 +11,15 @@ import { useAuthStore } from '@/features/auth/auth.store';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
-import { useParams } from 'next/navigation';
+import { useRouteId } from '@/lib/hooks/useRouteId';
 
 export function EnquiryDetailClient({ id: _propId }: { id: string }) {
-  const params = useParams();
-  // Read the real ID from the URL at runtime (the prop is always "placeholder" in static export)
-  const id = (params?.id as string) || _propId;
+  const routeId = useRouteId();
+  const id = (routeId && routeId !== 'placeholder') ? routeId : (_propId !== 'placeholder' ? _propId : '');
   const { data: response, isLoading, isError } = useEnquiry(id);
   const user = useAuthStore((state) => state.user);
 
-  if (isLoading) {
+  if (!id || isLoading) {
     return (
       <div className="animate-pulse space-y-6">
         <div className="h-8 bg-gray-200 rounded w-1/4"></div>

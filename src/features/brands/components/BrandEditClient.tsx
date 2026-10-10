@@ -8,19 +8,22 @@ import { BrandForm } from '@/features/brands/components/BrandForm';
 import { BrandImageManager } from '@/features/brands/components/BrandImageManager';
 import { ArrowLeft, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useRouteId } from '@/lib/hooks/useRouteId';
 
 export function BrandEditClient({ id: _propId }: { id: string }) {
   const router = useRouter();
-  const params = useParams();
-  // Read the real ID from the URL at runtime (the prop is always "placeholder" in static export)
-  const id = (params?.id as string) || _propId;
+  // useRouteId reads from window.location.pathname on mount to get the real
+  // ID — useParams() alone returns "placeholder" in static export hard-navigation.
+  const routeId = useRouteId();
+  // Never use "placeholder" for querying real backend APIs!
+  const id = (routeId && routeId !== 'placeholder') ? routeId : (_propId !== 'placeholder' ? _propId : '');
   const { data: brand, isLoading, error } = useBrand(id);
   const deleteBrand = useDeleteBrand();
   const restoreBrand = useRestoreBrand();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  if (isLoading) {
+  if (!id || isLoading) {
     return <div className="p-6 text-gray-500">Loading brand details...</div>;
   }
 
