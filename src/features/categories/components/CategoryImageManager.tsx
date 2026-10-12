@@ -2,11 +2,14 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, FileImage } from 'lucide-react';
 import { useUploadCategoryBanner, useDeleteCategoryBanner } from '../hooks/useCategories';
 import { Category } from '../types';
 import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { Media } from '@/features/media/types';
+import { urlToFile } from '@/lib/utils/media';
 
 interface CategoryImageManagerProps {
   category: Category;
@@ -16,6 +19,7 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>('');
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
 
   const uploadMutation = useUploadCategoryBanner();
   const deleteMutation = useDeleteCategoryBanner();
@@ -64,6 +68,26 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
     }
   };
 
+  const handleMediaSelect = async (media: Media) => {
+    setIsMediaModalOpen(false);
+    setError('');
+    try {
+      const file = await urlToFile(media);
+      await uploadMutation.mutateAsync({ id: category.id, image: file });
+      toast.success('Banner updated successfully from media library');
+    } catch (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      err: any
+    ) {
+      const errorMessage =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to set banner';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
+
   const isPending = uploadMutation.isPending || deleteMutation.isPending;
 
   return (
@@ -106,7 +130,7 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
           </div>
         )}
 
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-3 justify-center">
           <input
             type="file"
             ref={fileInputRef}
@@ -123,8 +147,23 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
             <Upload size={16} className="mr-2" />
             {category.bannerUrl ? 'Change Banner' : 'Upload Banner'}
           </button>
+          <button
+            type="button"
+            onClick={() => setIsMediaModalOpen(true)}
+            disabled={isPending}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          >
+            <FileImage size={16} className="mr-2 text-gray-600" />
+            Select Media
+          </button>
         </div>
       </div>
+
+      <MediaSelectorModal
+        isOpen={isMediaModalOpen}
+        onClose={() => setIsMediaModalOpen(false)}
+        onSelect={handleMediaSelect}
+      />
     </div>
   );
 }

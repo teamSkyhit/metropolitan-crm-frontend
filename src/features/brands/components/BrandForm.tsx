@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useCreateBrand, useUpdateBrand } from '../hooks/useBrands';
 import { brandsService } from '../brands.service';
 import { Brand } from '../types';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, FileImage } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { urlToFile } from '@/lib/utils/media';
 
 interface BrandFormProps {
   initialData?: Brand;
@@ -26,6 +28,9 @@ export function BrandForm({ initialData }: BrandFormProps) {
 
   const [selectedBanner, setSelectedBanner] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+
+  const [isLogoMediaOpen, setIsLogoMediaOpen] = useState(false);
+  const [isBannerMediaOpen, setIsBannerMediaOpen] = useState(false);
 
   const [name, setName] = useState(initialData?.name ?? '');
   const [description, setDescription] = useState(initialData?.description ?? '');
@@ -220,15 +225,26 @@ export function BrandForm({ initialData }: BrandFormProps) {
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => logoInputRef.current?.click()}
-            disabled={isPending}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-          >
-            <Upload className="w-4 h-4 mr-1.5" />
-            {logoPreview || initialData?.logoUrl ? 'Change Logo' : 'Select Logo'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => logoInputRef.current?.click()}
+              disabled={isPending}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+            >
+              <Upload className="w-4 h-4 mr-1.5" />
+              {logoPreview || initialData?.logoUrl ? 'Change Logo' : 'Select Logo'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsLogoMediaOpen(true)}
+              disabled={isPending}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+            >
+              <FileImage className="w-4 h-4 mr-1.5 text-gray-600" />
+              Select Media
+            </button>
+          </div>
         </div>
       </div>
 
@@ -279,17 +295,58 @@ export function BrandForm({ initialData }: BrandFormProps) {
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => bannerInputRef.current?.click()}
-            disabled={isPending}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-          >
-            <Upload className="w-4 h-4 mr-1.5" />
-            {bannerPreview || initialData?.bannerUrl ? 'Change Banner' : 'Select Banner'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => bannerInputRef.current?.click()}
+              disabled={isPending}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+            >
+              <Upload className="w-4 h-4 mr-1.5" />
+              {bannerPreview || initialData?.bannerUrl ? 'Change Banner' : 'Select Banner'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsBannerMediaOpen(true)}
+              disabled={isPending}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+            >
+              <FileImage className="w-4 h-4 mr-1.5 text-gray-600" />
+              Select Media
+            </button>
+          </div>
         </div>
       </div>
+
+      <MediaSelectorModal
+        isOpen={isLogoMediaOpen}
+        onClose={() => setIsLogoMediaOpen(false)}
+        onSelect={async (media) => {
+          setIsLogoMediaOpen(false);
+          try {
+            const file = await urlToFile(media);
+            setSelectedLogo(file);
+            setLogoPreview(URL.createObjectURL(file));
+          } catch {
+            toast.error('Failed to load selected media.');
+          }
+        }}
+      />
+
+      <MediaSelectorModal
+        isOpen={isBannerMediaOpen}
+        onClose={() => setIsBannerMediaOpen(false)}
+        onSelect={async (media) => {
+          setIsBannerMediaOpen(false);
+          try {
+            const file = await urlToFile(media);
+            setSelectedBanner(file);
+            setBannerPreview(URL.createObjectURL(file));
+          } catch {
+            toast.error('Failed to load selected media.');
+          }
+        }}
+      />
 
       <div className="flex items-center gap-2">
         <input

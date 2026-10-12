@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useCreateCategory, useUpdateCategory, useCategories } from '../hooks/useCategories';
 import { categoriesService } from '../categories.service';
 import { Category, CreateCategoryRequest } from '../types';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, FileImage } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { urlToFile } from '@/lib/utils/media';
 
 interface CategoryFormProps {
   initialData?: Category;
@@ -18,6 +20,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const { data: categoriesResponse } = useCategories({ limit: 100 });
   const parentCategories = categoriesResponse?.data?.filter((c) => c.id !== initialData?.id) || [];
 
@@ -259,17 +262,43 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isPending}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <Upload className="w-4 h-4 mr-1.5" />
-            {filePreview || initialData?.bannerUrl ? 'Change Image' : 'Select Image'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isPending}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Upload className="w-4 h-4 mr-1.5" />
+              {filePreview || initialData?.bannerUrl ? 'Change Image' : 'Select Image'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsMediaModalOpen(true)}
+              disabled={isPending}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <FileImage className="w-4 h-4 mr-1.5 text-gray-600" />
+              Select Media
+            </button>
+          </div>
         </div>
       </div>
+
+      <MediaSelectorModal
+        isOpen={isMediaModalOpen}
+        onClose={() => setIsMediaModalOpen(false)}
+        onSelect={async (media) => {
+          setIsMediaModalOpen(false);
+          try {
+            const file = await urlToFile(media);
+            setSelectedFile(file);
+            setFilePreview(URL.createObjectURL(file));
+          } catch {
+            toast.error('Failed to load selected media image.');
+          }
+        }}
+      />
 
       <div className="flex items-center">
         <input

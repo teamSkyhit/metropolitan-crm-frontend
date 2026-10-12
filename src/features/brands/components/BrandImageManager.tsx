@@ -5,8 +5,11 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Brand } from '../types';
 import { useUploadLogo, useDeleteLogo, useUploadBanner, useDeleteBanner } from '../hooks/useBrands';
-import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
+import { Image as ImageIcon, Trash2, Upload, FileImage } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { Media } from '@/features/media/types';
+import { urlToFile } from '@/lib/utils/media';
 
 export function BrandImageManager({ brand }: { brand: Brand }) {
   const uploadLogo = useUploadLogo();
@@ -19,6 +22,9 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
 
   const [isLogoConfirmOpen, setIsLogoConfirmOpen] = useState(false);
   const [isBannerConfirmOpen, setIsBannerConfirmOpen] = useState(false);
+
+  const [isLogoMediaOpen, setIsLogoMediaOpen] = useState(false);
+  const [isBannerMediaOpen, setIsBannerMediaOpen] = useState(false);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -98,6 +104,46 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
     }
   };
 
+  const handleLogoMediaSelect = async (media: Media) => {
+    setIsLogoMediaOpen(false);
+    setLogoError(null);
+    try {
+      const file = await urlToFile(media);
+      await uploadLogo.mutateAsync({ id: brand.id, file });
+      toast.success('Logo updated successfully from media library');
+    } catch (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      err: any
+    ) {
+      const errorMsg =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to set logo.';
+      setLogoError(errorMsg);
+      toast.error(errorMsg);
+    }
+  };
+
+  const handleBannerMediaSelect = async (media: Media) => {
+    setIsBannerMediaOpen(false);
+    setBannerError(null);
+    try {
+      const file = await urlToFile(media);
+      await uploadBanner.mutateAsync({ id: brand.id, file });
+      toast.success('Banner updated successfully from media library');
+    } catch (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      err: any
+    ) {
+      const errorMsg =
+        err?.response?.data?.error?.message ??
+        err?.response?.data?.message ??
+        'Failed to set banner.';
+      setBannerError(errorMsg);
+      toast.error(errorMsg);
+    }
+  };
+
   return (
     <div className="space-y-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6 max-w-2xl">
       <div>
@@ -112,7 +158,7 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
             )}
           </div>
           <div className="space-y-3">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <label className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 <Upload className="w-4 h-4 mr-2" />
                 {uploadLogo.isPending ? 'Uploading...' : 'Upload Logo'}
@@ -124,6 +170,15 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
                   disabled={uploadLogo.isPending}
                 />
               </label>
+              <button
+                type="button"
+                onClick={() => setIsLogoMediaOpen(true)}
+                disabled={uploadLogo.isPending}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <FileImage className="w-4 h-4 mr-2 text-gray-600" />
+                Select Media
+              </button>
               {brand.logoUrl && (
                 <button
                   type="button"
@@ -152,9 +207,9 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
               <ImageIcon className="text-gray-400 w-8 h-8" />
             )}
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <p className="text-xs text-gray-500">Recommended size: 1200x400px. PNG or JPG.</p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <label className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 <Upload className="w-4 h-4 mr-2" />
                 {uploadBanner.isPending ? 'Uploading...' : 'Upload Banner'}
@@ -166,6 +221,15 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
                   disabled={uploadBanner.isPending}
                 />
               </label>
+              <button
+                type="button"
+                onClick={() => setIsBannerMediaOpen(true)}
+                disabled={uploadBanner.isPending}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <FileImage className="w-4 h-4 mr-2 text-gray-600" />
+                Select Media
+              </button>
               {brand.bannerUrl && (
                 <button
                   type="button"
@@ -181,6 +245,18 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
           </div>
         </div>
       </div>
+
+      <MediaSelectorModal
+        isOpen={isLogoMediaOpen}
+        onClose={() => setIsLogoMediaOpen(false)}
+        onSelect={handleLogoMediaSelect}
+      />
+
+      <MediaSelectorModal
+        isOpen={isBannerMediaOpen}
+        onClose={() => setIsBannerMediaOpen(false)}
+        onSelect={handleBannerMediaSelect}
+      />
 
       <ConfirmDialog
         isOpen={isLogoConfirmOpen}

@@ -5,8 +5,10 @@ import { useBrands } from '@/features/brands/hooks/useBrands';
 import { useCategories } from '@/features/categories/hooks/useCategories';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, X, Heading, List, Bold, Italic, Eye, Edit3 } from 'lucide-react';
+import { Upload, X, Heading, List, Bold, Italic, Eye, Edit3, FileImage } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { urlToFile } from '@/lib/utils/media';
 
 interface ProductFormProps {
   initialData?: Partial<CreateProductRequest>;
@@ -30,6 +32,7 @@ export function ProductForm({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<CreateProductRequest>>({
     name: initialData?.name || '',
     sku: initialData?.sku || '',
@@ -532,18 +535,48 @@ export function ProductForm({
               </div>
             )}
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isPending || readOnly}
-              className="flex items-center gap-1.5"
-            >
-              <Upload className="w-4 h-4" />
-              <span>{previewUrl ? 'Change Image' : 'Select Image'}</span>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPending || readOnly}
+                className="flex items-center gap-1.5"
+              >
+                <Upload className="w-4 h-4" />
+                <span>{previewUrl ? 'Change Image' : 'Select Image'}</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsMediaModalOpen(true)}
+                disabled={isPending || readOnly}
+                className="flex items-center gap-1.5"
+              >
+                <FileImage className="w-4 h-4 text-gray-600" />
+                <span>Select Media</span>
+              </Button>
+            </div>
           </div>
+
+          <MediaSelectorModal
+            isOpen={isMediaModalOpen}
+            onClose={() => setIsMediaModalOpen(false)}
+            onSelect={async (media) => {
+              setIsMediaModalOpen(false);
+              try {
+                const file = await urlToFile(media);
+                onImageChange?.(file);
+                const objectUrl = URL.createObjectURL(file);
+                setPreviewUrl(objectUrl);
+              } catch {
+                toast.error('Failed to load selected media image.');
+              }
+            }}
+          />
         </div>
       )}
 
