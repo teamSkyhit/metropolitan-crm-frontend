@@ -1,4 +1,4 @@
-﻿/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useRef, useState } from 'react';
@@ -74,11 +74,14 @@ export function ProductGalleryManager({
         toast.success(`Uploaded ${newFiles.length} image(s) to gallery.`);
       } catch (err: unknown) {
         const anyErr = err as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-        toast.error(
-          anyErr?.response?.data?.error?.message ||
-            anyErr?.response?.data?.message ||
-            'Failed to upload gallery images.'
-        );
+        const msg = anyErr?.response?.data?.error?.message || anyErr?.response?.data?.message || '';
+        if (anyErr?.response?.status === 404 || msg.includes('Route not found')) {
+          toast.error(
+            'Product gallery endpoint is not yet supported on this backend. Please use Primary Image above.'
+          );
+        } else {
+          toast.error(msg || 'Failed to upload gallery images.');
+        }
       } finally {
         setIsUploading(false);
       }

@@ -37,6 +37,7 @@ import { ProductFeaturesEditor } from '@/features/products/components/ProductFea
 import { ProductKeyBenefitsEditor } from '@/features/products/components/ProductKeyBenefitsEditor';
 import { RelatedProductsSelector } from '@/features/products/components/RelatedProductsSelector';
 import { ProductGalleryManager } from '@/features/products/components/ProductGalleryManager';
+import { ProductImageManager } from '@/features/products/components/ProductImageManager';
 import { ProductVideoManager } from '@/features/products/components/ProductVideoManager';
 import { ProductDocumentManager } from '@/features/products/components/ProductDocumentManager';
 import { Button } from '@/components/ui/button';
@@ -257,6 +258,9 @@ export function ProductEditClient({ id }: { id: string }) {
 
         {/* Right Column: Media Subresources */}
         <div className="space-y-6">
+          {/* Primary Product Image */}
+          <ProductImageManager product={product} />
+
           {/* Gallery */}
           <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
             <ProductGalleryManager
