@@ -3,12 +3,8 @@
 import React from 'react';
 import { HomepageSectionForm } from './HomepageSectionForm';
 import { useHomepageSection } from '../hooks/useHomepage';
-import { useRouteId } from '@/lib/hooks/useRouteId';
 
-export function EditHomepageSectionWrapper({ id: _propId }: { id: string }) {
-  const routeId = useRouteId();
-  const id =
-    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
+export function EditHomepageSectionWrapper({ id }: { id: string }) {
   const { data: section, isLoading, isError } = useHomepageSection(id);
 
   if (!id || isLoading) return <div className="text-center py-10">Loading section...</div>;

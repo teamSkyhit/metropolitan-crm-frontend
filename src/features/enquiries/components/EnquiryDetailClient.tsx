@@ -11,12 +11,8 @@ import { useAuthStore } from '@/features/auth/auth.store';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
-import { useRouteId } from '@/lib/hooks/useRouteId';
 
-export function EnquiryDetailClient({ id: _propId }: { id: string }) {
-  const routeId = useRouteId();
-  const id =
-    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
+export function EnquiryDetailClient({ id }: { id: string }) {
   const { data: response, isLoading, isError } = useEnquiry(id);
   const user = useAuthStore((state) => state.user);
 

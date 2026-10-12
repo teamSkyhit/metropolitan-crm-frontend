@@ -1,26 +1,31 @@
 import type { NextConfig } from 'next';
 
-const isProd = process.env.NODE_ENV === 'production';
-
 const nextConfig: NextConfig = {
-  // Only enforce static export during build/export for Netlify; in dev mode, keep dynamic SSR so dynamic routes work
-  ...(isProd ? { output: 'export' } : {}),
   images: {
     unoptimized: true,
   },
-  // In development, proxy /uploads/* to the local backend port 5000 so uploaded images display properly
-  ...(!isProd
-    ? {
-        async rewrites() {
-          return [
-            {
-              source: '/uploads/:path*',
-              destination: 'http://localhost:5000/uploads/:path*',
-            },
-          ];
-        },
-      }
-    : {}),
+  async rewrites() {
+    const backendUrl =
+      process.env.BACKEND_INTERNAL_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      'https://metropolitan-staging-1d6f.up.railway.app';
+    const baseUrl = backendUrl.startsWith('http')
+      ? backendUrl
+      : 'https://metropolitan-staging-1d6f.up.railway.app';
+
+    const cleanBaseUrl = baseUrl.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
+
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: `${cleanBaseUrl}/api/v1/:path*`,
+      },
+      {
+        source: '/uploads/:path*',
+        destination: `${cleanBaseUrl}/uploads/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

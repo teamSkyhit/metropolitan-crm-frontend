@@ -76,6 +76,8 @@ export function UserList() {
               err?.response?.data?.message ||
               'Failed to delete user'
           );
+        } finally {
+          setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
         }
       },
     });

@@ -3,10 +3,6 @@ import { PageHeader } from '@/components/ui/page-header';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export function generateStaticParams() {
-  return [{ id: 'placeholder' }];
-}
-
 export default async function EditHomepageSectionPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   return (

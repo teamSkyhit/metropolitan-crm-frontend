@@ -9,16 +9,9 @@ import { BrandImageManager } from '@/features/brands/components/BrandImageManage
 import { ArrowLeft, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useRouteId } from '@/lib/hooks/useRouteId';
 
-export function BrandEditClient({ id: _propId }: { id: string }) {
+export function BrandEditClient({ id }: { id: string }) {
   const router = useRouter();
-  // useRouteId reads from window.location.pathname on mount to get the real
-  // ID — useParams() alone returns "placeholder" in static export hard-navigation.
-  const routeId = useRouteId();
-  // Never use "placeholder" for querying real backend APIs!
-  const id =
-    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
   const { data: brand, isLoading, error } = useBrand(id);
   const deleteBrand = useDeleteBrand();
   const restoreBrand = useRestoreBrand();

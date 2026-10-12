@@ -6,12 +6,8 @@ import { ArrowLeft } from 'lucide-react';
 import { CategoryForm } from '@/features/categories/components/CategoryForm';
 import { CategoryImageManager } from '@/features/categories/components/CategoryImageManager';
 import { useCategory } from '@/features/categories/hooks/useCategories';
-import { useRouteId } from '@/lib/hooks/useRouteId';
 
-export function CategoryEditClient({ id: _propId }: { id: string }) {
-  const routeId = useRouteId();
-  const id =
-    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
+export function CategoryEditClient({ id }: { id: string }) {
   const { data: category, isLoading, error } = useCategory(id);
 
   if (!id || isLoading) {

@@ -1,4 +1,6 @@
 'use client';
+
+import React, { useState } from 'react';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -7,25 +9,76 @@ import {
   useProduct,
   useUpdateProduct,
   useDeleteProduct,
+  useAddProductFeature,
+  useUpdateProductFeature,
+  useReorderProductFeatures,
+  useDeleteProductFeature,
+  useAddProductKeyBenefit,
+  useUpdateProductKeyBenefit,
+  useReorderProductKeyBenefits,
+  useDeleteProductKeyBenefit,
+  useSetRelatedProducts,
+  useUploadProductGallery,
+  useReorderProductGallery,
+  useSetProductPrimaryImage,
+  useDeleteProductGalleryImage,
+  useUploadProductVideos,
+  useUpdateProductVideo,
+  useReorderProductVideos,
+  useDeleteProductVideo,
+  useUploadProductDocuments,
+  useUpdateProductDocument,
+  useReorderProductDocuments,
+  useDeleteProductDocument,
 } from '@/features/products/hooks/useProduct';
 import { ProductForm } from '@/features/products/components/ProductForm';
-import { ProductImageManager } from '@/features/products/components/ProductImageManager';
 import { ProductSpecificationsEditor } from '@/features/products/components/ProductSpecificationsEditor';
+import { ProductFeaturesEditor } from '@/features/products/components/ProductFeaturesEditor';
+import { ProductKeyBenefitsEditor } from '@/features/products/components/ProductKeyBenefitsEditor';
+import { RelatedProductsSelector } from '@/features/products/components/RelatedProductsSelector';
+import { ProductGalleryManager } from '@/features/products/components/ProductGalleryManager';
+import { ProductVideoManager } from '@/features/products/components/ProductVideoManager';
+import { ProductDocumentManager } from '@/features/products/components/ProductDocumentManager';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { useRouteId } from '@/lib/hooks/useRouteId';
 
-export function ProductEditClient({ id: _propId }: { id: string }) {
-  const routeId = useRouteId();
-  const id =
-    routeId && routeId !== 'placeholder' ? routeId : _propId !== 'placeholder' ? _propId : '';
+export function ProductEditClient({ id }: { id: string }) {
   const router = useRouter();
+
   const { data, isLoading, isError } = useProduct(id);
   const updateProduct = useUpdateProduct(id);
   const deleteProduct = useDeleteProduct(id);
+
+  // Subresource hooks
+  const addFeature = useAddProductFeature(id);
+  const updateFeature = useUpdateProductFeature(id);
+  const reorderFeatures = useReorderProductFeatures(id);
+  const deleteFeature = useDeleteProductFeature(id);
+
+  const addKeyBenefit = useAddProductKeyBenefit(id);
+  const updateKeyBenefit = useUpdateProductKeyBenefit(id);
+  const reorderKeyBenefits = useReorderProductKeyBenefits(id);
+  const deleteKeyBenefit = useDeleteProductKeyBenefit(id);
+
+  const setRelatedProducts = useSetRelatedProducts(id);
+
+  const uploadGallery = useUploadProductGallery(id);
+  const reorderGallery = useReorderProductGallery(id);
+  const setPrimaryGallery = useSetProductPrimaryImage(id);
+  const deleteGallery = useDeleteProductGalleryImage(id);
+
+  const uploadVideos = useUploadProductVideos(id);
+  const updateVideo = useUpdateProductVideo(id);
+  const reorderVideos = useReorderProductVideos(id);
+  const deleteVideo = useDeleteProductVideo(id);
+
+  const uploadDocs = useUploadProductDocuments(id);
+  const updateDoc = useUpdateProductDocument(id);
+  const reorderDocs = useReorderProductDocuments(id);
+  const deleteDoc = useDeleteProductDocument(id);
+
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   if (!id || isLoading) {
@@ -54,13 +107,33 @@ export function ProductEditClient({ id: _propId }: { id: string }) {
       onSuccess: () => {
         toast.success('Product updated successfully.');
       },
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      onError: (err: any) => {
-        toast.error(
-          err?.response?.data?.error?.message ||
-            err?.response?.data?.message ||
-            'Failed to update product.'
-        );
+      onError: (err: unknown) => {
+        const errorObj = err as {
+          response?: {
+            data?: {
+              error?: {
+                message?: string;
+                details?: Array<{ field?: string; message?: string }>;
+              };
+              message?: string;
+            };
+          };
+        };
+        const errorData = errorObj?.response?.data?.error;
+        let msg =
+          errorData?.message || errorObj?.response?.data?.message || 'Failed to update product.';
+        if (
+          errorData?.details &&
+          Array.isArray(errorData.details) &&
+          errorData.details.length > 0
+        ) {
+          const detailStr = errorData.details
+            .map((d) => (d.field ? `${d.field}: ${d.message}` : d.message))
+            .filter(Boolean)
+            .join('; ');
+          msg = `${msg}: ${detailStr}`;
+        }
+        toast.error(msg);
       },
     });
   };
@@ -75,11 +148,13 @@ export function ProductEditClient({ id: _propId }: { id: string }) {
       onSuccess: () => {
         router.push(ROUTES.PRODUCTS);
       },
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      onError: (err: any) => {
+      onError: (err: unknown) => {
+        const errorObj = err as {
+          response?: { data?: { error?: { message?: string }; message?: string } };
+        };
         toast.error(
-          err?.response?.data?.error?.message ||
-            err?.response?.data?.message ||
+          errorObj?.response?.data?.error?.message ||
+            errorObj?.response?.data?.message ||
             'Failed to delete product.'
         );
       },
@@ -110,6 +185,7 @@ export function ProductEditClient({ id: _propId }: { id: string }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Core Info & Content Sections */}
         <div className="lg:col-span-2 space-y-6">
           <ProductForm
             initialData={product}
@@ -117,11 +193,126 @@ export function ProductEditClient({ id: _propId }: { id: string }) {
             onSubmit={handleUpdate}
             isPending={updateProduct.isPending}
           />
-          <ProductSpecificationsEditor product={product} />
+
+          {/* Specifications */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <ProductSpecificationsEditor product={product} />
+          </div>
+
+          {/* Features */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <ProductFeaturesEditor
+              features={product.features || []}
+              onAddAsync={async (feat) => {
+                await addFeature.mutateAsync(feat);
+              }}
+              onUpdateAsync={async (featureId, feat) => {
+                await updateFeature.mutateAsync({ featureId, payload: feat });
+              }}
+              onReorderAsync={async (ids) => {
+                await reorderFeatures.mutateAsync(ids);
+              }}
+              onDeleteAsync={async (featureId) => {
+                await deleteFeature.mutateAsync(featureId);
+              }}
+            />
+          </div>
+
+          {/* Key Benefits */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <ProductKeyBenefitsEditor
+              benefits={product.keyBenefits || []}
+              onAddAsync={async (ben) => {
+                await addKeyBenefit.mutateAsync(ben);
+              }}
+              onUpdateAsync={async (benefitId, ben) => {
+                await updateKeyBenefit.mutateAsync({ benefitId, payload: ben });
+              }}
+              onReorderAsync={async (ids) => {
+                await reorderKeyBenefits.mutateAsync(ids);
+              }}
+              onDeleteAsync={async (benefitId) => {
+                await deleteKeyBenefit.mutateAsync(benefitId);
+              }}
+            />
+          </div>
+
+          {/* Related Products */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <h4 className="text-sm font-semibold text-gray-900 mb-1">Related Products</h4>
+            <p className="text-xs text-gray-500 mb-4">
+              Select other products from the catalog to recommend on this product&apos;s detail
+              page.
+            </p>
+            <RelatedProductsSelector
+              currentProductId={product.id}
+              selectedProducts={product.relatedProducts || []}
+              onChange={async (newRelated) => {
+                await setRelatedProducts.mutateAsync(newRelated.map((p) => p.id));
+              }}
+              disabled={setRelatedProducts.isPending}
+            />
+          </div>
         </div>
 
+        {/* Right Column: Media Subresources */}
         <div className="space-y-6">
-          <ProductImageManager product={product} />
+          {/* Gallery */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <ProductGalleryManager
+              gallery={product.gallery || []}
+              onUploadAsync={async (files) => {
+                await uploadGallery.mutateAsync(files);
+              }}
+              onReorderAsync={async (imageIds) => {
+                await reorderGallery.mutateAsync(imageIds);
+              }}
+              onSetPrimaryAsync={async (galleryImageId) => {
+                await setPrimaryGallery.mutateAsync(galleryImageId);
+              }}
+              onDeleteAsync={async (galleryImageId) => {
+                await deleteGallery.mutateAsync(galleryImageId);
+              }}
+            />
+          </div>
+
+          {/* Videos */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <ProductVideoManager
+              videos={product.videos || []}
+              onUploadAsync={async (files, title) => {
+                await uploadVideos.mutateAsync({ files, title });
+              }}
+              onUpdateTitleAsync={async (videoId, title) => {
+                await updateVideo.mutateAsync({ videoId, payload: { title } });
+              }}
+              onReorderAsync={async (videoIds) => {
+                await reorderVideos.mutateAsync(videoIds);
+              }}
+              onDeleteAsync={async (videoId) => {
+                await deleteVideo.mutateAsync(videoId);
+              }}
+            />
+          </div>
+
+          {/* Documents */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <ProductDocumentManager
+              documents={product.documents || []}
+              onUploadAsync={async (files, title) => {
+                await uploadDocs.mutateAsync({ files, title });
+              }}
+              onUpdateTitleAsync={async (documentId, title) => {
+                await updateDoc.mutateAsync({ documentId, payload: { title } });
+              }}
+              onReorderAsync={async (documentIds) => {
+                await reorderDocs.mutateAsync(documentIds);
+              }}
+              onDeleteAsync={async (documentId) => {
+                await deleteDoc.mutateAsync(documentId);
+              }}
+            />
+          </div>
         </div>
       </div>
 

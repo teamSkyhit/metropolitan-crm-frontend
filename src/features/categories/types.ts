@@ -3,6 +3,7 @@ export interface Category {
   name: string;
   slug: string;
   description: string | null;
+  imageUrl?: string | null;
   bannerUrl: string | null;
   isActive: boolean;
   sortOrder: number;
