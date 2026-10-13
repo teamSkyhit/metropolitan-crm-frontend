@@ -13,7 +13,7 @@ export default function BrandsPage() {
         </div>
         <Link
           href="/brands/new"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0b2e59] hover:bg-[#0b2e59]/90 focus:outline-none transition-colors"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Brand

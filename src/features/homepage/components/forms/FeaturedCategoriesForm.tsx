@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import { FeaturedCategoriesContent } from '../../types';
 import { useCategories } from '@/features/categories/hooks/useCategories';
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export function FeaturedCategoriesForm({ content, onChange }: Props) {
-  const { data: response } = useCategories({ limit: 500 });
+  const { data: response } = useCategories({ limit: 100 });
   const categories = response?.data || [];
 
   const handleAdd = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -61,13 +62,30 @@ export function FeaturedCategoriesForm({ content, onChange }: Props) {
                   key={id}
                   className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-md"
                 >
-                  <div className="text-sm font-medium text-gray-900">
-                    {cat?.name || `Unknown (${id})`}
+                  <div className="flex items-center gap-3">
+                    {cat?.bannerUrl ? (
+                      <img
+                        src={cat.bannerUrl}
+                        alt=""
+                        className="w-12 h-8 object-cover rounded border border-gray-200 bg-white"
+                      />
+                    ) : (
+                      <div className="w-12 h-8 rounded border border-gray-200 bg-gray-100 flex items-center justify-center text-[10px] text-gray-400">
+                        No banner
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {cat?.name || `Unknown (${id})`}
+                      </div>
+                      {cat?.slug && <div className="text-xs text-gray-500">/{cat.slug}</div>}
+                    </div>
                   </div>
                   <button
                     onClick={() => handleRemove(id)}
                     type="button"
                     className="text-red-500 hover:text-red-700 p-1"
+                    title="Remove category"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

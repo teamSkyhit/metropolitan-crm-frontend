@@ -21,4 +21,3 @@
   to = "https://metropolitan-staging-1d6f.up.railway.app/uploads/:splat"
   status = 200
   force = true
-

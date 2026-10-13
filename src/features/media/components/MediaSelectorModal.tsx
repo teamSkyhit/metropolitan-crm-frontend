@@ -1,11 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { useMedia, useUploadMedia } from '../hooks/useMedia';
 import { Media } from '../types';
-import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
+import {
+  Upload,
+  Image as ImageIcon,
+  Loader2,
+  FileText,
+  Video as VideoIcon,
+  Play,
+} from 'lucide-react';
+import { formatFileSize } from '@/lib/utils/format';
 
 interface MediaSelectorModalProps {
   isOpen: boolean;
@@ -13,10 +21,13 @@ interface MediaSelectorModalProps {
   onSelect: (media: Media) => void;
 }
 
+type MediaTypeFilter = 'all' | 'image' | 'video' | 'pdf';
+
 export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorModalProps) {
   const [page, setPage] = useState(1);
+  const [filterType, setFilterType] = useState<MediaTypeFilter>('all');
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const { data, isLoading, isError } = useMedia({ page, limit: 20 });
+  const { data, isLoading, isError } = useMedia({ page, limit: 40 });
   const uploadMutation = useUploadMedia();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,30 +48,94 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
     }
   };
 
+  const mediaItems = data?.data;
+  const filteredMedia = useMemo(() => {
+    if (!mediaItems) return [];
+    if (filterType === 'all') return mediaItems;
+
+    return mediaItems.filter((m) => {
+      const mime = m.mimeType?.toLowerCase() || '';
+      const name = m.fileName?.toLowerCase() || '';
+      const isPdf = mime.includes('pdf') || name.endsWith('.pdf');
+      const isVideo = mime.startsWith('video/') || /\.(mp4|webm|ogg|mov|mkv)$/i.test(name);
+
+      if (filterType === 'pdf') return isPdf;
+      if (filterType === 'video') return isVideo;
+      if (filterType === 'image') return !isPdf && !isVideo;
+      return true;
+    });
+  }, [mediaItems, filterType]);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Select Media">
-      <div className="flex flex-col space-y-4 h-[60vh]">
+      <div className="flex flex-col space-y-4 h-[65vh]">
         {/* Header Actions */}
         {uploadError && (
           <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-md">
             {uploadError}
           </div>
         )}
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-medium text-gray-900">Media Library</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center space-x-1 border rounded-lg p-0.5 bg-gray-100/80 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => setFilterType('all')}
+              className={`px-3 py-1.5 rounded-md transition-colors ${
+                filterType === 'all'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterType('image')}
+              className={`px-3 py-1.5 rounded-md transition-colors ${
+                filterType === 'image'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Images
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterType('video')}
+              className={`px-3 py-1.5 rounded-md transition-colors ${
+                filterType === 'video'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Videos
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterType('pdf')}
+              className={`px-3 py-1.5 rounded-md transition-colors ${
+                filterType === 'pdf'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              PDFs
+            </button>
+          </div>
+
           <div>
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
               className="hidden"
-              accept="image/*"
+              accept="image/*,video/*,application/pdf"
             />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadMutation.isPending}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[#0b2e59] rounded-md hover:bg-[#0b2e59]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0b2e59] disabled:opacity-50 transition-colors shadow-sm"
             >
               {uploadMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -82,35 +157,21 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
             <div className="flex items-center justify-center h-full text-red-500">
               Failed to load media.
             </div>
-          ) : data?.data.length === 0 ? (
+          ) : filteredMedia.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <ImageIcon className="w-12 h-12 mb-2 text-gray-400" />
-              <p>No media found.</p>
+              <p className="text-sm">No media found for the selected filter.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {data?.data.map((media) => (
-                <div
-                  key={media.id}
-                  className="relative group cursor-pointer aspect-square rounded-lg border-2 border-transparent hover:border-blue-500 overflow-hidden bg-white shadow-sm"
-                  onClick={() => onSelect(media)}
-                >
-                  <img
-                    src={media.thumbnailUrl || media.publicUrl}
-                    alt={media.fileName}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity" />
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-xs text-white truncate">{media.fileName}</p>
-                  </div>
-                </div>
+              {filteredMedia.map((media) => (
+                <MediaGridItem key={media.id} media={media} onSelect={onSelect} />
               ))}
             </div>
           )}
         </div>
 
-        {/* Pagination (Simple) */}
+        {/* Pagination */}
         {data?.meta?.pagination && data.meta.pagination.totalPages > 1 && (
           <div className="flex justify-center items-center space-x-4 pt-2">
             <button
@@ -136,5 +197,104 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
         )}
       </div>
     </Modal>
+  );
+}
+
+function MediaGridItem({ media, onSelect }: { media: Media; onSelect: (media: Media) => void }) {
+  const [hasError, setHasError] = useState(false);
+  const mime = media.mimeType?.toLowerCase() || '';
+  const name = media.fileName?.toLowerCase() || '';
+  const isPdf = mime.includes('pdf') || name.endsWith('.pdf');
+  const isVideo = mime.startsWith('video/') || /\.(mp4|webm|ogg|mov|mkv)$/i.test(name);
+  const imageUrl = media.thumbnailUrl || media.publicUrl;
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(media);
+        }
+      }}
+      className="relative group cursor-pointer aspect-square rounded-lg border-2 border-transparent hover:border-[#0b2e59] focus:outline-none focus:ring-2 focus:ring-[#0b2e59] overflow-hidden bg-gray-100 shadow-sm transition-all"
+      onClick={() => onSelect(media)}
+    >
+      {isPdf ? (
+        <div className="w-full h-full flex flex-col items-center justify-between p-3 bg-rose-50/50 text-rose-700 select-none">
+          <div className="self-end">
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
+              PDF
+            </span>
+          </div>
+          <FileText className="w-10 h-10 text-red-500 drop-shadow-sm my-auto" />
+          <div className="w-full text-center">
+            <p
+              className="text-[11px] font-medium text-gray-800 truncate w-full"
+              title={media.fileName}
+            >
+              {media.fileName}
+            </p>
+            {media.fileSize ? (
+              <p className="text-[10px] text-gray-400 mt-0.5">{formatFileSize(media.fileSize)}</p>
+            ) : null}
+          </div>
+        </div>
+      ) : isVideo ? (
+        <div className="relative w-full h-full bg-gray-900 flex items-center justify-center overflow-hidden">
+          {hasError ? (
+            <div className="w-full h-full flex flex-col items-center justify-center p-2 text-gray-300">
+              <VideoIcon className="w-8 h-8 mb-1 text-blue-400" />
+              <p className="text-[10px] text-gray-300 text-center truncate w-full">
+                {media.fileName}
+              </p>
+            </div>
+          ) : (
+            <>
+              <video
+                src={`${media.publicUrl}#t=0.5`}
+                preload="metadata"
+                muted
+                playsInline
+                className="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity"
+                onError={() => setHasError(true)}
+              />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-xs group-hover:scale-110 transition-transform">
+                  <Play className="w-4 h-4 fill-white ml-0.5" />
+                </div>
+              </div>
+              <div className="absolute top-2 right-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-600/90 text-white px-1.5 py-0.5 rounded shadow">
+                  VIDEO
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      ) : hasError ? (
+        <div className="w-full h-full flex flex-col items-center justify-center p-2 text-gray-400 bg-gray-50">
+          <ImageIcon className="w-8 h-8 mb-1 text-gray-300" />
+          <p className="text-[10px] text-gray-500 text-center truncate w-full">{media.fileName}</p>
+        </div>
+      ) : (
+        <img
+          src={imageUrl}
+          alt={media.fileName}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+          onError={() => setHasError(true)}
+        />
+      )}
+
+      {/* Overlay gradient & filename */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <p className="text-xs text-white truncate font-medium">{media.fileName}</p>
+        {media.fileSize ? (
+          <p className="text-[10px] text-gray-300">{formatFileSize(media.fileSize)}</p>
+        ) : null}
+      </div>
+    </div>
   );
 }

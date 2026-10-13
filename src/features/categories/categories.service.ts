@@ -37,12 +37,22 @@ export const categoriesService = {
     return data.data;
   },
 
+  async uploadImage(id: string, image: File): Promise<Category> {
+    const formData = new FormData();
+    formData.append('image', image);
+    const { data } = await apiClient.put<{ data: Category }>(`/categories/${id}/image`, formData);
+    return data.data;
+  },
+
+  async deleteImage(id: string): Promise<Category> {
+    const { data } = await apiClient.delete<{ data: Category }>(`/categories/${id}/image`);
+    return data.data;
+  },
+
   async uploadBanner(id: string, image: File): Promise<Category> {
     const formData = new FormData();
     formData.append('banner', image);
-    const { data } = await apiClient.put<{ data: Category }>(`/categories/${id}/banner`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const { data } = await apiClient.put<{ data: Category }>(`/categories/${id}/banner`, formData);
     return data.data;
   },
 

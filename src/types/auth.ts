@@ -5,4 +5,9 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  isActive?: boolean;
+  mustChangePassword?: boolean;
+  lastLoginAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }

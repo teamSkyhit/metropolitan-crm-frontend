@@ -60,7 +60,7 @@ function CategoriesPageContent() {
         <h1 className="text-2xl font-semibold text-gray-900">Categories</h1>
         <Link
           href="/categories/new"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0b2e59] hover:bg-[#0b2e59]/90 transition-colors"
         >
           <Plus size={16} className="mr-2" />
           New Category

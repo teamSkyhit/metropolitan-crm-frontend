@@ -16,7 +16,7 @@ export function EnquiryDetailClient({ id }: { id: string }) {
   const { data: response, isLoading, isError } = useEnquiry(id);
   const user = useAuthStore((state) => state.user);
 
-  if (isLoading) {
+  if (!id || isLoading) {
     return (
       <div className="animate-pulse space-y-6">
         <div className="h-8 bg-gray-200 rounded w-1/4"></div>

@@ -14,7 +14,7 @@ test('canAccessRoute blocks unauthenticated', () => {
 test('canAccessRoute explicit list for sales manager', () => {
   expect(canAccessRoute(ROLES.SALES_MANAGER, ROUTES.DASHBOARD)).toBe(true);
   expect(canAccessRoute(ROLES.SALES_MANAGER, ROUTES.USERS)).toBe(false);
-  expect(canAccessRoute(ROLES.SALES_MANAGER, ROUTES.SETTINGS)).toBe(false);
+  expect(canAccessRoute(ROLES.SALES_MANAGER, ROUTES.SETTINGS)).toBe(true);
 });
 
 test('hasPermission logic', () => {

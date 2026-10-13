@@ -42,9 +42,7 @@ export const brandsService = {
   uploadLogo: async (id: string, file: File): Promise<Brand> => {
     const formData = new FormData();
     formData.append('logo', file);
-    const res = await apiClient.put<{ data: Brand }>(`${basePath}/${id}/logo`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const res = await apiClient.put<{ data: Brand }>(`${basePath}/${id}/logo`, formData);
     return res.data.data;
   },
 
@@ -56,9 +54,7 @@ export const brandsService = {
   uploadBanner: async (id: string, file: File): Promise<Brand> => {
     const formData = new FormData();
     formData.append('banner', file);
-    const res = await apiClient.put<{ data: Brand }>(`${basePath}/${id}/banner`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const res = await apiClient.put<{ data: Brand }>(`${basePath}/${id}/banner`, formData);
     return res.data.data;
   },
 

@@ -17,6 +17,11 @@ export interface AuthSession {
   tokens: AuthTokens;
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 // Responses based on backend envelope
 export interface ApiResponse<T> {
   success: boolean;

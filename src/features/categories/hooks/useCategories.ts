@@ -82,3 +82,26 @@ export const useDeleteCategoryBanner = () => {
     },
   });
 };
+
+export const useUploadCategoryImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, image }: { id: string; image: File }) =>
+      categoriesService.uploadImage(id, image),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['category', variables.id] });
+    },
+  });
+};
+
+export const useDeleteCategoryImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => categoriesService.deleteImage(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['category', id] });
+    },
+  });
+};

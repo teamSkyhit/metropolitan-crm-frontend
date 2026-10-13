@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import { FeaturedBrandsContent } from '../../types';
 import { useBrands } from '@/features/brands/hooks/useBrands';
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export function FeaturedBrandsForm({ content, onChange }: Props) {
-  const { data: response } = useBrands({ limit: 500 });
+  const { data: response } = useBrands({ limit: 100 });
   const brands = response?.data || [];
 
   const handleAdd = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -61,13 +62,30 @@ export function FeaturedBrandsForm({ content, onChange }: Props) {
                   key={id}
                   className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-md"
                 >
-                  <div className="text-sm font-medium text-gray-900">
-                    {brand?.name || `Unknown (${id})`}
+                  <div className="flex items-center gap-3">
+                    {brand?.logoUrl ? (
+                      <img
+                        src={brand.logoUrl}
+                        alt=""
+                        className="w-8 h-8 object-contain rounded border border-gray-200 bg-white p-0.5"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded border border-gray-200 bg-gray-100 flex items-center justify-center text-[10px] text-gray-400">
+                        No logo
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {brand?.name || `Unknown (${id})`}
+                      </div>
+                      {brand?.slug && <div className="text-xs text-gray-500">/{brand.slug}</div>}
+                    </div>
                   </div>
                   <button
                     onClick={() => handleRemove(id)}
                     type="button"
                     className="text-red-500 hover:text-red-700 p-1"
+                    title="Remove brand"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

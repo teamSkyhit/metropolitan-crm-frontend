@@ -5,12 +5,17 @@ import { Product } from '../types';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { Media } from '@/features/media/types';
+import { urlToFile } from '@/lib/utils/media';
+import { FileImage } from 'lucide-react';
 
 export function ProductImageManager({ product }: { product: Product }) {
   const updateImage = useUpdateProductImage(product.id);
   const deleteImage = useDeleteProductImage(product.id);
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,6 +69,28 @@ export function ProductImageManager({ product }: { product: Product }) {
     });
   };
 
+  const handleMediaSelect = async (media: Media) => {
+    setIsMediaModalOpen(false);
+    try {
+      const file = await urlToFile(media);
+      updateImage.mutate(file, {
+        onSuccess: () => {
+          toast.success('Image updated successfully from media library.');
+        },
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        onError: (err: any) => {
+          toast.error(
+            err?.response?.data?.error?.message ||
+              err?.response?.data?.message ||
+              'Failed to set image.'
+          );
+        },
+      });
+    } catch {
+      toast.error('Failed to load selected media image.');
+    }
+  };
+
   const isPending = updateImage.isPending || deleteImage.isPending;
 
   return (
@@ -87,7 +114,8 @@ export function ProductImageManager({ product }: { product: Product }) {
 
         <div className="space-y-4 flex-1">
           <p className="text-sm text-gray-500">
-            Upload a high-quality image. Max size 5MB. Accepted formats: PNG, JPEG, WebP.
+            Upload a high-quality image or choose from the Media Library. Max size 5MB. Accepted
+            formats: PNG, JPEG, WebP.
           </p>
 
           <div className="flex flex-wrap gap-3">
@@ -107,6 +135,17 @@ export function ProductImageManager({ product }: { product: Product }) {
               {updateImage.isPending ? 'Uploading...' : 'Upload Image'}
             </Button>
 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsMediaModalOpen(true)}
+              disabled={isPending}
+              className="inline-flex items-center gap-1.5"
+            >
+              <FileImage className="w-4 h-4 text-gray-600" />
+              Select Media
+            </Button>
+
             {product.imageUrl && (
               <Button
                 type="button"
@@ -121,6 +160,13 @@ export function ProductImageManager({ product }: { product: Product }) {
           </div>
         </div>
       </div>
+
+      <MediaSelectorModal
+        isOpen={isMediaModalOpen}
+        onClose={() => setIsMediaModalOpen(false)}
+        onSelect={handleMediaSelect}
+      />
+
       <ConfirmDialog
         isOpen={isConfirmOpen}
         title="Remove Image"

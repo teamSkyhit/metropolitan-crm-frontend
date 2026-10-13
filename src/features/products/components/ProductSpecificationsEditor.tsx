@@ -4,45 +4,60 @@ import { Product, ProductSpecification } from '../types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-export function ProductSpecificationsEditor({ product }: { product: Product }) {
-  const updateSpecs = useUpdateProductSpecifications(product.id);
-  const [specs, setSpecs] = useState<ProductSpecification[]>(product.specifications || []);
-  const [isDirty, setIsDirty] = useState(false);
+export interface ProductSpecificationsEditorProps {
+  product?: Product;
+  value?: ProductSpecification[];
+  onChange?: (specs: ProductSpecification[]) => void;
+  disabled?: boolean;
+}
+
+export function ProductSpecificationsEditor({
+  product,
+  value,
+  onChange,
+  disabled = false,
+}: ProductSpecificationsEditorProps) {
+  const isControlled = typeof onChange === 'function';
+  const productId = product?.id || '';
+  const updateSpecs = useUpdateProductSpecifications(productId);
+
+  const [uncontrolledSpecs, setUncontrolledSpecs] = useState<ProductSpecification[]>(
+    product?.specifications || []
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const [prevSpecs, setPrevSpecs] = useState(product.specifications);
-  if (product.specifications !== prevSpecs) {
-    setPrevSpecs(product.specifications);
-    if (!isDirty) {
-      setSpecs(product.specifications || []);
+  const specs = isControlled ? value || [] : uncontrolledSpecs;
+
+  const updateList = (next: ProductSpecification[]) => {
+    if (isControlled) {
+      onChange?.(next);
+    } else {
+      setUncontrolledSpecs(next);
     }
-  }
+  };
 
   const handleAdd = () => {
     if (specs.length >= 100) {
       setErrorMsg('Maximum of 100 specifications allowed.');
       return;
     }
-    setSpecs([...specs, { key: '', value: '', unit: '' }]);
-    setIsDirty(true);
+    updateList([...specs, { key: '', value: '', unit: '' }]);
     setErrorMsg(null);
     setSuccessMsg(null);
   };
 
   const handleRemove = (index: number) => {
-    const newSpecs = [...specs];
-    newSpecs.splice(index, 1);
-    setSpecs(newSpecs);
-    setIsDirty(true);
+    const updated = [...specs];
+    updated.splice(index, 1);
+    updateList(updated);
     setErrorMsg(null);
   };
 
-  const handleChange = (index: number, field: keyof ProductSpecification, value: string) => {
-    const newSpecs = [...specs];
-    newSpecs[index] = { ...newSpecs[index], [field]: value };
-    setSpecs(newSpecs);
-    setIsDirty(true);
+  const handleChange = (index: number, field: keyof ProductSpecification, val: string) => {
+    const updated = [...specs];
+    updated[index] = { ...updated[index], [field]: val };
+    updateList(updated);
     setErrorMsg(null);
   };
 
@@ -69,25 +84,37 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
       keys.add(lowerKey);
     }
 
+    if (isControlled) {
+      updateList(cleanSpecs);
+      setSuccessMsg('Specifications validated.');
+      return;
+    }
+
+    if (!productId) return;
+
     updateSpecs.mutate(
       { specifications: cleanSpecs },
       {
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        onError: (err: any) =>
+        onError: (err: unknown) => {
+          const apiError = err as {
+            response?: { data?: { error?: { message?: string }; message?: string } };
+          };
           setErrorMsg(
-            err?.response?.data?.error?.message ||
-              err?.response?.data?.message ||
+            apiError?.response?.data?.error?.message ||
+              apiError?.response?.data?.message ||
               'Failed to save specifications.'
-          ),
+          );
+        },
         onSuccess: () => {
           setErrorMsg(null);
           setSuccessMsg('Specifications saved successfully.');
-          setIsDirty(false);
           setTimeout(() => setSuccessMsg(null), 3000);
         },
       }
     );
   };
+
+  const isSaving = updateSpecs.isPending || disabled;
 
   return (
     <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm space-y-4">
@@ -98,7 +125,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
           variant="outline"
           size="sm"
           onClick={handleAdd}
-          disabled={updateSpecs.isPending || specs.length >= 100}
+          disabled={isSaving || specs.length >= 100}
         >
           Add Row
         </Button>
@@ -129,7 +156,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
                   maxLength={100}
                   value={spec.key}
                   onChange={(e) => handleChange(idx, 'key', e.target.value)}
-                  disabled={updateSpecs.isPending}
+                  disabled={isSaving}
                 />
               </div>
               <div className="flex-1 w-full space-y-1">
@@ -139,7 +166,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
                   maxLength={500}
                   value={spec.value}
                   onChange={(e) => handleChange(idx, 'value', e.target.value)}
-                  disabled={updateSpecs.isPending}
+                  disabled={isSaving}
                 />
               </div>
               <div className="flex-1 w-full space-y-1">
@@ -149,7 +176,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
                   maxLength={50}
                   value={spec.unit || ''}
                   onChange={(e) => handleChange(idx, 'unit', e.target.value)}
-                  disabled={updateSpecs.isPending}
+                  disabled={isSaving}
                 />
               </div>
               <Button
@@ -157,7 +184,7 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
                 variant="outline"
                 className="text-red-600 hover:text-red-700 border-gray-300 sm:w-auto w-full"
                 onClick={() => handleRemove(idx)}
-                disabled={updateSpecs.isPending}
+                disabled={isSaving}
                 aria-label="Remove row"
               >
                 Remove
@@ -167,11 +194,13 @@ export function ProductSpecificationsEditor({ product }: { product: Product }) {
         </div>
       )}
 
-      <div className="pt-4 border-t border-gray-200 flex justify-end">
-        <Button onClick={handleSave} disabled={updateSpecs.isPending}>
-          {updateSpecs.isPending ? 'Saving...' : 'Save Specifications'}
-        </Button>
-      </div>
+      {!isControlled && (
+        <div className="pt-4 border-t border-gray-200 flex justify-end">
+          <Button onClick={handleSave} disabled={isSaving}>
+            {updateSpecs.isPending ? 'Saving...' : 'Save Specifications'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
