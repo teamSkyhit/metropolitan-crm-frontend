@@ -18,7 +18,6 @@ import {
   Check,
   ChevronDown,
   LoaderCircle,
-  ExternalLink,
   ArrowRight,
 } from 'lucide-react';
 import toast from 'react-hot-toast';

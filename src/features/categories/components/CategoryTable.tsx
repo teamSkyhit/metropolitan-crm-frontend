@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Edit2, Image as ImageIcon, Trash2, LoaderCircle, ExternalLink, Plus } from 'lucide-react';
+import { Edit2, Image as ImageIcon, Trash2, LoaderCircle, Plus } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Category } from '../types';
 import { useDeleteCategory } from '../hooks/useCategories';

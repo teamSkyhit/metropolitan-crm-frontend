@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Save, Sparkles, Layers } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants/routes';
 import { ProductForm } from '@/features/products/components/ProductForm';

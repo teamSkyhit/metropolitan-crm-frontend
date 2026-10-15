@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes';
-import { LogOut, X, ChevronRight } from 'lucide-react';
+import { LogOut, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { canAccessRoute } from '@/features/auth/permissions';
