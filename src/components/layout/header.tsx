@@ -81,7 +81,11 @@ export function Header({ onMenuClick, isMobileMenuOpen = false }: HeaderProps) {
           <div className="hidden items-center gap-1.5 text-[11px] font-semibold text-slate-400 sm:flex">
             <span>Workspace</span>
             <span>/</span>
-            <span className={subpageTitle ? 'text-slate-500' : 'text-[var(--color-metro-navy)] font-bold'}>
+            <span
+              className={
+                subpageTitle ? 'text-slate-500' : 'text-[var(--color-metro-navy)] font-bold'
+              }
+            >
               {pageTitle}
             </span>
             {subpageTitle && (

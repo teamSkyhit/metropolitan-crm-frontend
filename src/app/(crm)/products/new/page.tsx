@@ -460,7 +460,8 @@ export default function CreateProductPage() {
 
           {/* Features Card */}
           <div
-            id="product-features" className="scroll-mt-28 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
+            id="product-features"
+            className="scroll-mt-28 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
           >
             <ProductFeaturesEditor
               features={features}
@@ -471,7 +472,8 @@ export default function CreateProductPage() {
 
           {/* Key Benefits Card */}
           <div
-            id="product-benefits" className="scroll-mt-28 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
+            id="product-benefits"
+            className="scroll-mt-28 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
           >
             <ProductKeyBenefitsEditor
               benefits={benefits}

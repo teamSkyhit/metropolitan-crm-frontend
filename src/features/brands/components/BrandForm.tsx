@@ -520,7 +520,11 @@ export function BrandForm({ initialData }: BrandFormProps) {
             <div className="group overflow-hidden rounded-xl border border-slate-200 bg-white p-4 text-center shadow-xs transition hover:shadow-md">
               <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-2 shadow-2xs">
                 {activeLogoUrl ? (
-                  <img src={activeLogoUrl} alt={name || 'Brand'} className="h-full w-full object-contain" />
+                  <img
+                    src={activeLogoUrl}
+                    alt={name || 'Brand'}
+                    className="h-full w-full object-contain"
+                  />
                 ) : (
                   <Tag className="h-8 w-8 text-slate-300" />
                 )}

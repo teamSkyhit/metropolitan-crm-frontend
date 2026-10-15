@@ -197,7 +197,8 @@ export function BrandTable() {
                   data.meta.pagination.total
                 )}
               </span>{' '}
-              of <span className="font-bold text-slate-800">{data.meta.pagination.total}</span> brands
+              of <span className="font-bold text-slate-800">{data.meta.pagination.total}</span>{' '}
+              brands
             </p>
             <div className="flex items-center gap-2">
               <button
