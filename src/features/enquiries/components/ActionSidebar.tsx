@@ -51,7 +51,7 @@ export function ActionSidebar({
   return (
     <div className="space-y-6">
       {/* Status & Assignment */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex justify-between items-center">
           <h3 className="text-sm font-medium text-gray-900">Current Status</h3>
           <StatusBadge status={enquiry.status} />
@@ -108,10 +108,10 @@ export function ActionSidebar({
             <p className="mt-1 text-sm text-red-600">Failed to reassign.</p>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Internal Notes */}
-      <div className="bg-[var(--color-metro-navy)]/5 rounded-lg border border-[var(--color-metro-navy)]/10 shadow-sm p-6 space-y-4">
+      <section className="space-y-4 rounded-2xl border border-blue-100 bg-blue-50/60 p-5 shadow-sm">
         <h3 className="text-sm font-medium text-[var(--color-metro-navy)]">Internal Sales Notes</h3>
         {canEdit ? (
           <div className="space-y-3">
@@ -119,7 +119,7 @@ export function ActionSidebar({
               aria-label="Internal Sales Notes"
               rows={4}
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
-              placeholder="Private notes..."
+              placeholder="Add context visible only to your team…"
               value={salesNotes}
               onChange={(e) => setSalesNotes(e.target.value)}
               disabled={updateNotes.isPending}
@@ -139,10 +139,10 @@ export function ActionSidebar({
             {enquiry.salesNotes || 'No internal notes.'}
           </p>
         )}
-      </div>
+      </section>
 
       {/* Meta */}
-      <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 space-y-3 text-sm text-gray-500">
+      <section className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-500">
         <div className="flex justify-between">
           <span>Created:</span>
           <span className="text-gray-900">{formatDate(enquiry.createdAt)}</span>
@@ -157,7 +157,7 @@ export function ActionSidebar({
             <span className="text-gray-900">{enquiry.lineItemCount}</span>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

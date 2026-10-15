@@ -8,7 +8,7 @@ import { ProductFilters } from '@/features/products/components/ProductFilters';
 import { useProducts } from '@/features/products/hooks/useProducts';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Plus } from 'lucide-react';
 
 function ProductsList() {
   const searchParams = useSearchParams();
@@ -70,53 +70,29 @@ function ProductsList() {
       <ProductTable products={data?.data || []} isLoading={isLoading} />
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 border-t border-gray-200 sm:px-6 rounded-lg shadow-sm">
-          <div className="flex flex-1 justify-between sm:hidden">
-            <Button
+        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 shadow-xs sm:flex-row">
+          <p className="text-xs font-medium text-slate-500">
+            Showing page <span className="font-bold text-slate-800">{page}</span> of{' '}
+            <span className="font-bold text-slate-800">{totalPages}</span>
+          </p>
+          <div className="flex items-center gap-2">
+            <button
               onClick={() => handlePageChange(page - 1)}
               disabled={page <= 1}
-              variant="outline"
+              className="inline-flex h-9 items-center rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 disabled:opacity-40"
             >
               Previous
-            </Button>
-            <Button
+            </button>
+            <span className="px-2 text-xs font-bold text-slate-600">
+              {page} / {totalPages}
+            </span>
+            <button
               onClick={() => handlePageChange(page + 1)}
               disabled={page >= totalPages}
-              variant="outline"
+              className="inline-flex h-9 items-center rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 disabled:opacity-40"
             >
               Next
-            </Button>
-          </div>
-          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Showing page <span className="font-medium">{page}</span> of{' '}
-                <span className="font-medium">{totalPages}</span>
-              </p>
-            </div>
-            <div>
-              <nav
-                className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                aria-label="Pagination"
-              >
-                <Button
-                  variant="outline"
-                  className="rounded-l-md rounded-r-none"
-                  onClick={() => handlePageChange(page - 1)}
-                  disabled={page <= 1}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-r-md rounded-l-none border-l-0"
-                  onClick={() => handlePageChange(page + 1)}
-                  disabled={page >= totalPages}
-                >
-                  Next
-                </Button>
-              </nav>
-            </div>
+            </button>
           </div>
         </div>
       )}
@@ -127,17 +103,25 @@ function ProductsList() {
 export default function ProductsPage() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <PageHeader title="Products" description="Manage your product catalog." />
         <Link
           href={ROUTES.PRODUCTS + '/new'}
-          className="inline-flex items-center justify-center rounded-md bg-[var(--color-metro-navy)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-metro-navy)]/90"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--color-metro-navy)] px-4 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(16,47,87,0.18)] transition-all hover:bg-[#173e6e]"
         >
+          <Plus className="h-4 w-4" />
           Add Product
         </Link>
       </div>
 
-      <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100 rounded-lg" />}>
+      <Suspense
+        fallback={
+          <div
+            className="h-64 animate-pulse rounded-2xl border border-gray-200 bg-white"
+            aria-label="Loading products"
+          />
+        }
+      >
         <ProductsList />
       </Suspense>
     </div>

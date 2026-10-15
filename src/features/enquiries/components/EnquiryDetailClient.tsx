@@ -22,12 +22,12 @@ export function EnquiryDetailClient({ id }: { id: string }) {
         <div className="h-8 bg-gray-200 rounded w-1/4"></div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <div className="h-64 bg-gray-200 rounded-lg"></div>
-            <div className="h-40 bg-gray-200 rounded-lg"></div>
+            <div className="h-64 rounded-2xl bg-gray-200"></div>
+            <div className="h-40 rounded-2xl bg-gray-200"></div>
           </div>
           <div className="space-y-6">
-            <div className="h-48 bg-gray-200 rounded-lg"></div>
-            <div className="h-32 bg-gray-200 rounded-lg"></div>
+            <div className="h-48 rounded-2xl bg-gray-200"></div>
+            <div className="h-32 rounded-2xl bg-gray-200"></div>
           </div>
         </div>
       </div>
@@ -57,22 +57,22 @@ export function EnquiryDetailClient({ id }: { id: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-3">
         <Link
           href={ROUTES.ENQUIRIES}
-          className="inline-flex h-9 items-center justify-center rounded-md border border-gray-300 px-3 text-sm font-medium transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-metro-gold)] focus-visible:ring-offset-2"
+          className="mt-1 inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
         >
           Back
         </Link>
         <PageHeader
           title={`Enquiry ${enquiry.id.split('-')[0]}`}
-          description="Manage customer enquiry details."
+          description="Review the request, update ownership and status, then record each customer follow-up."
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
         {/* Main Column */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 xl:col-span-2">
           <CustomerInfoCard enquiry={enquiry} />
           <LineItemsTable items={enquiry.lineItems} />
           <FollowUpsTimeline
@@ -83,7 +83,7 @@ export function EnquiryDetailClient({ id }: { id: string }) {
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-1">
+        <div className="xl:col-span-1">
           <ActionSidebar enquiry={enquiry} canEdit={canEdit} canAssign={canAssign} />
         </div>
       </div>

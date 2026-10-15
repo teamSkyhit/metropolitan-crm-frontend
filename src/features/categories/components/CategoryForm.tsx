@@ -6,7 +6,21 @@ import { useRouter } from 'next/navigation';
 import { useCreateCategory, useUpdateCategory, useCategories } from '../hooks/useCategories';
 import { categoriesService } from '../categories.service';
 import { Category, CreateCategoryRequest } from '../types';
-import { Upload, X, Image as ImageIcon, FileImage } from 'lucide-react';
+import {
+  Upload,
+  X,
+  Image as ImageIcon,
+  FileImage,
+  FolderTree,
+  Layers,
+  Sparkles,
+  Eye,
+  Check,
+  ChevronDown,
+  LoaderCircle,
+  ExternalLink,
+  ArrowRight,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
 import { urlToFile } from '@/lib/utils/media';
@@ -182,205 +196,495 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
     }
   };
 
+  const selectedParentCategory = parentCategories.find((c) => c.id === formData.parentId);
+  const activeThumbnailUrl = imagePreview || initialData?.imageUrl;
+  const activeBannerUrl = bannerPreview || initialData?.bannerUrl;
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-6 bg-white p-6 rounded-lg shadow-sm border border-gray-200"
-    >
-      {error && <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-          <input
-            type="text"
-            name="name"
-            required
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div
+          role="alert"
+          className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 shadow-xs"
+        >
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
+            !
+          </div>
+          <div className="flex-1">{error}</div>
         </div>
+      )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-          <input
-            type="text"
-            name="slug"
-            required
-            value={formData.slug}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea
-            name="description"
-            rows={3}
-            value={formData.description ?? ''}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Parent Category</label>
-          <select
-            name="parentId"
-            value={formData.parentId ?? ''}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">None (Top Level)</option>
-            {parentCategories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* ── Category Thumbnail / Card Image ── */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Category Thumbnail / Card Image
-        </label>
-        <p className="text-xs text-gray-500 mb-2">Listing card image (Max 5MB: PNG, JPEG, WebP).</p>
-
-        <div className="flex items-center gap-4">
-          <input
-            type="file"
-            ref={imageInputRef}
-            onChange={handleImageSelect}
-            accept="image/jpeg,image/png,image/webp"
-            className="hidden"
-          />
-
-          {imagePreview ? (
-            <div className="relative group w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-              <img
-                src={imagePreview}
-                alt="Thumbnail preview"
-                className="w-full h-full object-cover"
-              />
-              <button
-                type="button"
-                onClick={clearImage}
-                className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-sm"
-                title="Remove image"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* ── Main Form Column (8 cols) ── */}
+        <div className="space-y-6 lg:col-span-8">
+          {/* Card 1: Details */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+            <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/70 px-6 py-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <FolderTree className="h-4.5 w-4.5" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Category Information</h2>
+                <p className="text-xs text-slate-500">
+                  Customer-facing identity and storefront URL path.
+                </p>
+              </div>
             </div>
-          ) : initialData?.imageUrl ? (
-            <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-              <img
-                src={initialData.imageUrl}
-                alt={`${initialData.name} current image`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-              <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
-              <span className="text-[10px]">No image</span>
-            </div>
-          )}
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => imageInputRef.current?.click()}
-              disabled={isPending}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-            >
-              <Upload className="w-4 h-4 mr-1.5" />
-              {imagePreview || initialData?.imageUrl ? 'Change Image' : 'Select Image'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsImageMediaOpen(true)}
-              disabled={isPending}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-            >
-              <FileImage className="w-4 h-4 mr-1.5 text-gray-600" />
-              Select Media
-            </button>
+            <div className="space-y-5 p-6">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <span>
+                      Category Name <span className="text-red-500">*</span>
+                    </span>
+                    <span className="text-[11px] font-normal text-slate-400">Required</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    value={formData.name}
+                    placeholder="e.g. Ergonomic Office Chairs"
+                    onChange={handleChange}
+                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <span>
+                      URL Slug <span className="text-red-500">*</span>
+                    </span>
+                    <span className="text-[11px] font-normal text-slate-400">SEO path</span>
+                  </label>
+                  <div className="relative flex items-center">
+                    <span className="pointer-events-none absolute left-3 select-none text-xs font-medium text-slate-400">
+                      /
+                    </span>
+                    <input
+                      type="text"
+                      name="slug"
+                      required
+                      value={formData.slug}
+                      placeholder="office-chairs"
+                      onChange={handleChange}
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-6 pr-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
+                    />
+                  </div>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    Lowercase letters, numbers and hyphens.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  rows={3}
+                  value={formData.description ?? ''}
+                  placeholder="Provide an informative overview of the products in this category..."
+                  onChange={handleChange}
+                  className="w-full resize-y rounded-xl border border-slate-200 bg-white p-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Hierarchy & Positioning */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+            <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/70 px-6 py-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                <Layers className="h-4.5 w-4.5" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Hierarchy & Placement</h2>
+                <p className="text-xs text-slate-500">
+                  Set parent relationships and sort order in menus.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Parent Category
+                </label>
+                <div className="relative">
+                  <select
+                    name="parentId"
+                    value={formData.parentId ?? ''}
+                    onChange={handleChange}
+                    className="h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white pl-3.5 pr-10 text-sm font-medium text-slate-800 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
+                  >
+                    <option value="">None (Top-Level Category)</option>
+                    {parentCategories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                </div>
+                <p className="mt-1 text-[11px] text-slate-400">
+                  Leave as top level if this should appear in main menu bar.
+                </p>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Display Order
+                </label>
+                <input
+                  type="number"
+                  name="sortOrder"
+                  min="0"
+                  value={formData.sortOrder}
+                  onChange={handleChange}
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
+                />
+                <p className="mt-1 text-[11px] text-slate-400">
+                  Lower numbers (0, 1, 2...) appear first in storefront listings.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Storefront Artwork */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+            <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/70 px-6 py-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                <Sparkles className="h-4.5 w-4.5" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Storefront Artwork</h2>
+                <p className="text-xs text-slate-500">
+                  High-resolution imagery for catalogue cards and header banners.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-6 p-6">
+              {/* Thumbnail section */}
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Category Thumbnail / Card Image
+                    </span>
+                    <p className="text-xs text-slate-400">
+                      Square listing card image (Max 5MB: PNG, JPEG, WebP). Recommended 600×600px.
+                    </p>
+                  </div>
+                  {activeThumbnailUrl && (
+                    <button
+                      type="button"
+                      onClick={clearImage}
+                      className="text-xs font-semibold text-red-600 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <input
+                  type="file"
+                  ref={imageInputRef}
+                  onChange={handleImageSelect}
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                />
+
+                <div className="flex flex-col items-start gap-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4 sm:flex-row sm:items-center">
+                  {activeThumbnailUrl ? (
+                    <div className="relative aspect-square w-28 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+                      <img
+                        src={activeThumbnailUrl}
+                        alt="Thumbnail preview"
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={clearImage}
+                        className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white shadow-sm transition hover:bg-red-700"
+                        title="Remove image"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => imageInputRef.current?.click()}
+                      className="flex aspect-square w-28 shrink-0 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white text-slate-400 transition hover:border-[var(--color-metro-navy)] hover:text-[var(--color-metro-navy)]"
+                    >
+                      <ImageIcon className="mb-1 h-6 w-6" />
+                      <span className="text-[11px] font-semibold">Upload</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-1 flex-col gap-2">
+                    <p className="text-xs leading-relaxed text-slate-600">
+                      Display across category grids, homepage featured collections, and navigation
+                      flyouts.
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => imageInputRef.current?.click()}
+                        disabled={isPending}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-98"
+                      >
+                        <Upload className="h-3.5 w-3.5 text-slate-500" />
+                        {activeThumbnailUrl ? 'Replace Image' : 'Select Local File'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsImageMediaOpen(true)}
+                        disabled={isPending}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-98"
+                      >
+                        <FileImage className="h-3.5 w-3.5 text-blue-600" />
+                        Media Library
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Banner section */}
+              <div className="border-t border-slate-100 pt-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Category Banner Image
+                    </span>
+                    <p className="text-xs text-slate-400">
+                      High-resolution wide header banner (Max 5MB: PNG, JPEG, WebP). Recommended
+                      1920×640px.
+                    </p>
+                  </div>
+                  {activeBannerUrl && (
+                    <button
+                      type="button"
+                      onClick={clearBanner}
+                      className="text-xs font-semibold text-red-600 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <input
+                  type="file"
+                  ref={bannerInputRef}
+                  onChange={handleBannerSelect}
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                />
+
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                  {activeBannerUrl ? (
+                    <div className="relative aspect-[3/1] w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+                      <img
+                        src={activeBannerUrl}
+                        alt="Banner preview"
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={clearBanner}
+                        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-white shadow-md transition hover:bg-red-700"
+                        title="Remove banner"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => bannerInputRef.current?.click()}
+                      className="flex aspect-[3.5/1] w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white p-6 text-slate-400 transition hover:border-[var(--color-metro-navy)] hover:text-[var(--color-metro-navy)]"
+                    >
+                      <ImageIcon className="mb-1.5 h-7 w-7" />
+                      <span className="text-xs font-semibold">Upload Category Banner (3:1)</span>
+                      <span className="mt-0.5 text-[10px] text-slate-400">
+                        PNG, JPG, or WebP up to 5MB
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => bannerInputRef.current?.click()}
+                      disabled={isPending}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-98"
+                    >
+                      <Upload className="h-3.5 w-3.5 text-slate-500" />
+                      {activeBannerUrl ? 'Change Banner' : 'Select Local Banner'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsBannerMediaOpen(true)}
+                      disabled={isPending}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-98"
+                    >
+                      <FileImage className="h-3.5 w-3.5 text-blue-600" />
+                      Choose from Media
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ── Category Banner Image ── */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Category Banner Image
-        </label>
-        <p className="text-xs text-gray-500 mb-2">
-          Recommended high-resolution banner image (Max 5MB: PNG, JPEG, WebP).
-        </p>
+        {/* ── Side Settings Column (4 cols) ── */}
+        <div className="space-y-6 lg:col-span-4">
+          {/* Card: Action / Submit Button */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+              Publishing Actions
+            </h3>
+            <div className="space-y-2.5">
+              <button
+                type="submit"
+                disabled={isPending}
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-metro-navy)] px-4 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(16,47,87,0.2)] transition hover:bg-[#153866] active:scale-98 disabled:opacity-50"
+              >
+                {isPending ? (
+                  <>
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                    <span>Saving Category...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" />
+                    <span>{initialData ? 'Update Category' : 'Create Category'}</span>
+                  </>
+                )}
+              </button>
 
-        <div className="flex items-center gap-4">
-          <input
-            type="file"
-            ref={bannerInputRef}
-            onChange={handleBannerSelect}
-            accept="image/jpeg,image/png,image/webp"
-            className="hidden"
-          />
-
-          {bannerPreview ? (
-            <div className="relative group w-48 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-              <img
-                src={bannerPreview}
-                alt="Banner preview"
-                className="w-full h-full object-cover"
-              />
               <button
                 type="button"
-                onClick={clearBanner}
-                className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-sm"
-                title="Remove banner"
+                onClick={() => router.push('/categories')}
+                disabled={isPending}
+                className="flex h-10 w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 active:scale-98"
               >
-                <X className="w-3.5 h-3.5" />
+                Cancel and Return
               </button>
             </div>
-          ) : initialData?.bannerUrl ? (
-            <div className="w-48 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-              <img
-                src={initialData.bannerUrl}
-                alt={`${initialData.name} current banner`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-48 h-24 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-              <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
-              <span className="text-xs">No banner chosen</span>
-            </div>
-          )}
+          </div>
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => bannerInputRef.current?.click()}
-              disabled={isPending}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+          {/* Card: Status & Visibility */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+              Visibility Status
+            </h3>
+
+            <div
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  isActive: !prev.isActive,
+                }))
+              }
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition ${
+                formData.isActive
+                  ? 'border-emerald-200 bg-emerald-50/40 text-emerald-950'
+                  : 'border-slate-200 bg-slate-50 text-slate-700'
+              }`}
             >
-              <Upload className="w-4 h-4 mr-1.5" />
-              {bannerPreview || initialData?.bannerUrl ? 'Change Banner' : 'Select Banner'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsBannerMediaOpen(true)}
-              disabled={isPending}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-            >
-              <FileImage className="w-4 h-4 mr-1.5 text-gray-600" />
-              Select Media
-            </button>
+              <div className="mt-0.5">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={formData.isActive}
+                  onChange={handleChange}
+                  className="h-4.5 w-4.5 rounded border-slate-300 text-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)]"
+                />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold">
+                    {formData.isActive ? 'Active and Published' : 'Draft / Hidden'}
+                  </span>
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      formData.isActive ? 'bg-emerald-500' : 'bg-slate-400'
+                    }`}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-slate-500">
+                  {formData.isActive
+                    ? 'Category is live on the public storefront and visible in navigation.'
+                    : 'Category is saved in CRM but hidden from public customers.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card: Live Storefront Card Preview */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Live Storefront Preview
+              </h3>
+              <Eye className="h-3.5 w-3.5 text-slate-400" />
+            </div>
+
+            <div className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+                {activeThumbnailUrl ? (
+                  <img
+                    src={activeThumbnailUrl}
+                    alt={formData.name || 'Preview'}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center text-slate-300">
+                    <ImageIcon className="h-8 w-8" />
+                    <span className="mt-1 text-[11px]">No Thumbnail</span>
+                  </div>
+                )}
+                <div className="absolute right-2 top-2">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                      formData.isActive
+                        ? 'bg-emerald-500/90 text-white backdrop-blur-xs'
+                        : 'bg-slate-800/80 text-white backdrop-blur-xs'
+                    }`}
+                  >
+                    {formData.isActive ? 'Live' : 'Draft'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3.5">
+                {selectedParentCategory && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                    {selectedParentCategory.name}
+                  </span>
+                )}
+                <h4 className="truncate text-sm font-bold text-slate-900">
+                  {formData.name || 'Untitled Category'}
+                </h4>
+                <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                  {formData.description || 'No description provided yet.'}
+                </p>
+                <div className="mt-2.5 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px] text-slate-400">
+                  <span className="font-mono truncate max-w-[150px]">
+                    /{formData.slug || 'slug'}
+                  </span>
+                  <span className="flex items-center text-[var(--color-metro-navy)] font-semibold">
+                    Explore <ArrowRight className="ml-0.5 h-3 w-3" />
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -414,48 +718,6 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
           }
         }}
       />
-
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="isActive"
-          name="isActive"
-          checked={formData.isActive}
-          onChange={handleChange}
-          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-        />
-        <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-          Active
-        </label>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-        <input
-          type="number"
-          name="sortOrder"
-          value={formData.sortOrder}
-          onChange={handleChange}
-          className="w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-        />
-      </div>
-
-      <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-        <button
-          type="button"
-          onClick={() => router.push('/categories')}
-          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0b2e59] hover:bg-[#0b2e59]/90 disabled:opacity-50"
-        >
-          {isPending ? 'Saving...' : initialData ? 'Update Category' : 'Create Category'}
-        </button>
-      </div>
     </form>
   );
 }

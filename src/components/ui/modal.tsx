@@ -71,34 +71,34 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none"
+      className="fixed inset-0 z-50 flex items-end justify-center overflow-x-hidden overflow-y-auto p-0 outline-none focus:outline-none sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
     >
       <div
-        className="fixed inset-0 bg-black/50 transition-opacity"
+        className="fixed inset-0 bg-[#07182d]/60 backdrop-blur-[3px] transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative w-full max-w-lg mx-auto my-6 z-50">
+      <div className="relative z-50 w-full max-w-lg sm:mx-auto sm:my-6">
         <div
           ref={modalRef}
-          className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none"
+          className="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-white/60 bg-white shadow-[0_24px_70px_rgba(6,24,45,0.28)] outline-none focus:outline-none sm:rounded-3xl"
         >
-          <div className="flex items-start justify-between p-5 border-b border-solid border-gray-200 rounded-t">
-            <h3 id="modal-title" className="text-xl font-semibold">
+          <div className="flex items-center justify-between border-b border-[#e8edf3] px-6 py-5">
+            <h3 id="modal-title" className="text-xl font-bold tracking-[-0.02em] text-[#17263b]">
               {title}
             </h3>
             <button
-              className="p-1 ml-auto bg-transparent border-0 text-gray-500 float-right outline-none focus:outline-none hover:text-gray-700"
+              className="ml-auto grid h-9 w-9 place-items-center rounded-xl border-0 bg-[#f2f5f8] text-gray-500 outline-none transition hover:bg-[#e8edf3] hover:text-[#17263b] focus-visible:ring-2 focus-visible:ring-[var(--color-metro-gold)]"
               onClick={onClose}
               aria-label="Close modal"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
-          <div className="relative p-6 flex-auto">{children}</div>
+          <div className="relative flex-auto overflow-y-auto p-6">{children}</div>
         </div>
       </div>
     </div>

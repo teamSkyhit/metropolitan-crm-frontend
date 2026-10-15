@@ -8,7 +8,7 @@ import { authService } from '@/features/auth/auth.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ROUTES } from '@/lib/constants/routes';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, LockKeyhole } from 'lucide-react';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -89,104 +89,167 @@ function LoginForm() {
   // Prevent flash while checking session
   if (isInitializing || isAuthenticated) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[var(--color-metro-navy)]"></div>
+      <div
+        className="flex h-dvh w-full flex-col items-center justify-center gap-3 bg-[#f4f7fb]"
+        role="status"
+        aria-live="polite"
+      >
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-[3px] border-[#d8e0ea] border-t-[var(--color-metro-navy)]"
+          aria-hidden="true"
+        />
+        <p className="text-sm font-medium text-[#65758b]">Preparing secure sign in…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-        <div className="flex flex-col items-center">
-          <Image
-            src="/logo.png"
-            alt="Metropolitan Industrial Supplies"
-            width={300}
-            height={64}
-            className="h-16 w-auto mb-4"
-            priority
-          />
-          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">Sign in to CRM</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your credentials to access the dashboard
-          </p>
+    <div className="grid min-h-dvh bg-[#f4f7fb] lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="relative hidden overflow-hidden bg-[var(--color-metro-navy)] p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
+        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full border-[80px] border-white/[0.035]" />
+        <div className="absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#d6a628]/[0.08] blur-3xl" />
+        <div className="relative flex justify-center w-full">
+          <div className="inline-flex rounded-none bg-white px-6 py-3 shadow-xl">
+            <Image
+              src="/logo.png"
+              alt="Metropolitan Industrial Supplies"
+              width={290}
+              height={82}
+              className="h-16 w-auto sm:h-[68px]"
+              priority
+            />
+          </div>
         </div>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded" role="alert">
-              <p className="text-sm text-red-700 font-medium">{error}</p>
+        <div className="relative max-w-xl mx-auto flex flex-col items-center text-center">
+          <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-[#e3ba50]">
+            One workspace. Total clarity.
+          </p>
+          <h1 className="text-4xl font-bold leading-[1.15] tracking-[-0.04em] xl:text-5xl">
+            Keep every customer conversation moving forward.
+          </h1>
+          <p className="mt-6 max-w-lg text-base leading-7 text-white/65">
+            Manage enquiries, products, and content from a focused workspace built for the
+            Metropolitan team.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-white/75">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-4 w-4 text-[#e3ba50]" /> Centralised enquiries
             </div>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email address
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                disabled={isLoading}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" aria-hidden="true" />
-                  ) : (
-                    <Eye className="h-5 w-5" aria-hidden="true" />
-                  )}
-                </button>
-              </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-4 w-4 text-[#e3ba50]" /> Secure team access
             </div>
           </div>
+        </div>
+        <p className="relative text-xs text-white/35 text-center w-full">
+          Metropolitan Industrial Supplies &middot; Internal CRM
+        </p>
+      </section>
 
-          <Button
-            type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--color-metro-navy)] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-metro-gold)] disabled:opacity-50"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                Signing in...
-              </span>
-            ) : (
-              'Sign In'
+      <section className="flex items-center justify-center px-5 py-10 sm:px-10 lg:px-14">
+        <div className="w-full max-w-md">
+          <div className="mb-9 flex flex-col items-start">
+            <Image
+              src="/logo.png"
+              alt="Metropolitan Industrial Supplies"
+              width={221}
+              height={63}
+              className="mb-8 h-12 w-auto lg:hidden"
+              priority
+            />
+            <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[#eaf0f7] text-[var(--color-metro-navy)]">
+              <LockKeyhole className="h-5 w-5" />
+            </div>
+            <h2 className="text-3xl font-bold tracking-[-0.04em] text-[#15263d]">Welcome back</h2>
+            <p className="mt-2 text-sm leading-6 text-[#6a788c]">
+              Sign in with your team credentials to continue.
+            </p>
+          </div>
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div
+                id="login-error"
+                className="rounded-xl border border-red-200 bg-red-50 p-4"
+                role="alert"
+                aria-live="assertive"
+              >
+                <p className="text-sm text-red-700 font-medium">{error}</p>
+              </div>
             )}
-          </Button>
-        </form>
-      </div>
+
+            <div className="space-y-5">
+              <div>
+                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[#34445a]">
+                  Email address
+                </label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  disabled={isLoading}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? 'login-error' : undefined}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="mb-2 block text-sm font-semibold text-[#34445a]"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    disabled={isLoading}
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? 'login-error' : undefined}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-5 w-5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <Button type="submit" className="h-12 w-full" disabled={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  Signing in...
+                </span>
+              ) : (
+                'Sign In'
+              )}
+            </Button>
+          </form>
+          <p className="mt-8 text-center text-xs text-[#8a96a6]">
+            Authorised team members only · Protected workspace
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
@@ -195,8 +258,16 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[var(--color-metro-navy)]"></div>
+        <div
+          className="flex h-dvh w-full flex-col items-center justify-center gap-3 bg-[#f4f7fb]"
+          role="status"
+          aria-live="polite"
+        >
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-[3px] border-[#d8e0ea] border-t-[var(--color-metro-navy)]"
+            aria-hidden="true"
+          />
+          <p className="text-sm font-medium text-[#65758b]">Loading secure sign in…</p>
         </div>
       }
     >

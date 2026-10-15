@@ -57,7 +57,7 @@ export function HeroForm({ content, onChange }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
         <h4 className="text-sm font-medium text-gray-700">Hero Slides ({slides.length}/10)</h4>
         <Button
           type="button"
@@ -74,10 +74,10 @@ export function HeroForm({ content, onChange }: Props) {
         {slides.map((slide, index) => (
           <div
             key={slide.id || index}
-            className="border border-gray-200 rounded-lg overflow-hidden"
+            className="overflow-hidden rounded-xl border border-gray-200"
           >
-            <div className="bg-gray-50 px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-3 bg-gray-50 px-3 py-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between sm:px-4">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="flex flex-col gap-1">
                   <button
                     type="button"
@@ -96,16 +96,16 @@ export function HeroForm({ content, onChange }: Props) {
                     <ArrowDown className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <div className="w-12 h-8 rounded border border-gray-200 overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
                     <MediaPreview mediaId={slide.mediaId} />
                   </div>
-                  <span className="font-medium text-gray-900">
+                  <span className="truncate text-sm font-medium text-gray-900 sm:text-base">
                     Slide {index + 1}: {slide.heading}
                   </span>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex justify-end gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -174,7 +174,7 @@ function SlideEditor({ slide, onChange }: { slide: HeroSlide; onChange: (s: Hero
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">CTA Label</label>
           <Input

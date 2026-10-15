@@ -171,15 +171,16 @@ export function ProductDescriptionEditor({
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
+    <div className="space-y-2.5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-          Product Description (Formatted Markdown)
+          Detailed description <span className="font-normal text-gray-400">(optional)</span>
         </label>
         <div className="flex items-center gap-1 border border-gray-200 rounded p-0.5 bg-gray-50">
           <button
             type="button"
             onClick={() => setIsPreviewMode(false)}
+            aria-pressed={!isPreviewMode}
             className={`px-2.5 py-1 text-xs font-medium rounded flex items-center gap-1.5 transition-colors ${
               !isPreviewMode
                 ? 'bg-white shadow-xs text-gray-800'
@@ -192,6 +193,7 @@ export function ProductDescriptionEditor({
           <button
             type="button"
             onClick={() => setIsPreviewMode(true)}
+            aria-pressed={isPreviewMode}
             className={`px-2.5 py-1 text-xs font-medium rounded flex items-center gap-1.5 transition-colors ${
               isPreviewMode
                 ? 'bg-white shadow-xs text-gray-800'
@@ -203,12 +205,18 @@ export function ProductDescriptionEditor({
           </button>
         </div>
       </div>
+      <p id="description-help" className="text-xs leading-5 text-gray-500">
+        Add technical details, applications, and operating advantages. Use the toolbar for headings
+        and lists.
+      </p>
 
       {!isPreviewMode && !readOnly && (
-        <div className="flex flex-wrap items-center gap-1 p-1 bg-gray-50 border border-gray-200 rounded-t-md border-b-0 text-gray-600">
+        <div className="flex flex-wrap items-center gap-1 rounded-t-xl border border-b-0 border-gray-200 bg-gray-50 p-1.5 text-gray-600">
           <button
             type="button"
             onClick={() => insertFormat('h2')}
+            disabled={disabled}
+            aria-label="Insert section heading"
             className="p-1.5 hover:bg-gray-200 rounded text-xs flex items-center gap-1"
             title="Heading 2"
           >
@@ -218,6 +226,8 @@ export function ProductDescriptionEditor({
           <button
             type="button"
             onClick={() => insertFormat('h3')}
+            disabled={disabled}
+            aria-label="Insert subheading"
             className="p-1.5 hover:bg-gray-200 rounded text-xs flex items-center gap-1"
             title="Heading 3"
           >
@@ -228,6 +238,8 @@ export function ProductDescriptionEditor({
           <button
             type="button"
             onClick={() => insertFormat('bold')}
+            disabled={disabled}
+            aria-label="Format selected text as bold"
             className="p-1.5 hover:bg-gray-200 rounded"
             title="Bold"
           >
@@ -236,6 +248,8 @@ export function ProductDescriptionEditor({
           <button
             type="button"
             onClick={() => insertFormat('italic')}
+            disabled={disabled}
+            aria-label="Format selected text as italic"
             className="p-1.5 hover:bg-gray-200 rounded"
             title="Italic"
           >
@@ -244,6 +258,8 @@ export function ProductDescriptionEditor({
           <button
             type="button"
             onClick={() => insertFormat('bullet')}
+            disabled={disabled}
+            aria-label="Insert bullet list"
             className="p-1.5 hover:bg-gray-200 rounded flex items-center gap-1 text-xs"
             title="Bullet List"
           >
@@ -254,7 +270,10 @@ export function ProductDescriptionEditor({
       )}
 
       {isPreviewMode ? (
-        <div className="w-full min-h-[160px] p-4 bg-gray-50 border border-gray-200 rounded-md">
+        <div
+          className="min-h-[180px] w-full rounded-xl border border-gray-200 bg-gray-50 p-4"
+          aria-label="Description preview"
+        >
           {renderDescriptionPreview(value || '')}
         </div>
       ) : (
@@ -267,8 +286,9 @@ export function ProductDescriptionEditor({
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled || readOnly}
           placeholder="Detailed description with markdown formatting..."
-          className={`w-full px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[var(--color-metro-navy)] focus:border-[var(--color-metro-navy)] ${
-            !readOnly ? 'rounded-b-md' : 'rounded-md'
+          aria-describedby="description-help"
+          className={`min-h-[180px] w-full resize-y border border-gray-300 px-3.5 py-3 text-sm focus:border-[var(--color-metro-navy)] focus:outline-none focus:ring-4 focus:ring-[#102f57]/10 ${
+            !readOnly ? 'rounded-b-xl' : 'rounded-xl'
           }`}
         />
       )}

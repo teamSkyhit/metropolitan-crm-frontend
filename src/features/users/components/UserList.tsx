@@ -15,7 +15,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 import { User } from '@/features/users/types';
-import { Pencil, Trash2, KeyRound, Power, PowerOff, AlertCircle, RefreshCcw } from 'lucide-react';
+import {
+  Pencil,
+  Trash2,
+  KeyRound,
+  Power,
+  PowerOff,
+  AlertCircle,
+  RefreshCcw,
+  Search,
+  UserPlus,
+  Users,
+} from 'lucide-react';
 import { CreateUserModal } from './CreateUserModal';
 import { EditUserModal } from './EditUserModal';
 import { ResetPasswordModal } from './ResetPasswordModal';
@@ -103,124 +114,149 @@ export function UserList() {
   const meta = data?.meta?.pagination;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Input
-          placeholder="Search by name or email..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
-        />
-        <Button onClick={() => setIsCreateModalOpen(true)}>Create Sales Manager</Button>
+    <div className="space-y-5">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative w-full sm:max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              aria-label="Search users"
+              placeholder="Search name or email"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
+            <UserPlus className="h-4 w-4" /> Add sales manager
+          </Button>
+        </div>
+        <p className="mt-3 text-xs text-slate-500">
+          Sales managers can manage assigned enquiries. Administrators retain full access.
+        </p>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
 
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                Loading users...
-              </TableCell>
-            </TableRow>
-          ) : isError ? (
-            <TableRow>
-              <TableCell colSpan={5} className="py-8">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center justify-center text-center">
-                  <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
-                  <h3 className="text-lg font-medium text-red-800">Failed to load users</h3>
-                  <p className="text-sm text-red-600 mt-2 mb-4">
-                    There was an error communicating with the server.
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => refetch()}
-                    className="border-red-200 text-red-700 hover:bg-red-100"
-                  >
-                    <RefreshCcw className="w-4 h-4 mr-2" />
-                    Try Again
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ) : users.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                No users found.
-              </TableCell>
-            </TableRow>
-          ) : (
-            users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${user.isActive ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'}`}
-                  >
-                    {user.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  {user.role === 'SALES_MANAGER' && (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleToggleStatus(user)}
-                        title={user.isActive ? 'Deactivate' : 'Activate'}
-                      >
-                        {user.isActive ? (
-                          <PowerOff className="h-4 w-4 text-red-500" />
-                        ) : (
-                          <Power className="h-4 w-4 text-green-500" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setResetPasswordUser(user)}
-                        title="Reset Password"
-                      >
-                        <KeyRound className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setEditingUser(user)}
-                        title="Edit User"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(user.id)}
-                        title="Delete User"
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </>
-                  )}
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                  Loading user accounts…
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-8">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center justify-center text-center">
+                    <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
+                    <h3 className="text-lg font-medium text-red-800">Failed to load users</h3>
+                    <p className="text-sm text-red-600 mt-2 mb-4">
+                      There was an error communicating with the server.
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => refetch()}
+                      className="border-red-200 text-red-700 hover:bg-red-100"
+                    >
+                      <RefreshCcw className="w-4 h-4 mr-2" />
+                      Try Again
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-14 text-center text-gray-500">
+                  <Users className="mx-auto mb-3 h-9 w-9 text-slate-300" />
+                  <p className="font-semibold text-slate-700">No users found</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Try another search or create a sales manager.
+                  </p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-semibold text-slate-900">{user.name}</TableCell>
+                  <TableCell className="text-slate-600">{user.email}</TableCell>
+                  <TableCell>
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                      {user.role.replace('_', ' ')}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${user.isActive ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'}`}
+                    >
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    {user.role === 'SALES_MANAGER' && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleStatus(user)}
+                          title={user.isActive ? 'Deactivate' : 'Activate'}
+                          aria-label={user.isActive ? 'Deactivate user' : 'Activate user'}
+                        >
+                          {user.isActive ? (
+                            <PowerOff className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <Power className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setResetPasswordUser(user)}
+                          title="Reset Password"
+                          aria-label="Reset user password"
+                        >
+                          <KeyRound className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setEditingUser(user)}
+                          title="Edit User"
+                          aria-label="Edit user"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(user.id)}
+                          title="Delete User"
+                          aria-label="Delete user"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {meta && meta.totalPages > 1 && (
-        <div className="flex items-center justify-end space-x-2">
+        <div className="flex flex-col items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm sm:flex-row">
           <Button
             variant="outline"
             size="sm"
@@ -229,7 +265,7 @@ export function UserList() {
           >
             Previous
           </Button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm font-medium text-slate-600">
             Page {meta.page} of {meta.totalPages}
           </span>
           <Button

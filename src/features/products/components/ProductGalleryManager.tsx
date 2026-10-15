@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ProductGalleryImage } from '../types';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import {
@@ -40,30 +40,36 @@ export function ProductGalleryManager({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const totalCount = gallery.length + localFiles.length;
   const isFull = totalCount >= 5;
 
-  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
-    if (!fileList || fileList.length === 0) return;
-
-    const newFiles = Array.from(fileList);
+  const processFiles = async (newFiles: File[]) => {
+    if (newFiles.length === 0) return;
+    setValidationError(null);
 
     // Validation: format and size
     for (const f of newFiles) {
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) {
-        toast.error(`"${f.name}" is not a valid format. Only JPG, PNG, and WebP are allowed.`);
+        const message = `"${f.name}" is not supported. Choose a JPG, PNG, or WebP image.`;
+        setValidationError(message);
+        toast.error(message);
         return;
       }
       if (f.size > 5 * 1024 * 1024) {
-        toast.error(`"${f.name}" exceeds the 5MB size limit.`);
+        const message = `"${f.name}" is larger than 5 MB. Choose a smaller image.`;
+        setValidationError(message);
+        toast.error(message);
         return;
       }
     }
 
     if (totalCount + newFiles.length > 5) {
-      toast.error(`Cannot exceed maximum of 5 gallery images. You currently have ${totalCount}.`);
+      const message = `You can add ${5 - totalCount} more image${5 - totalCount === 1 ? '' : 's'}. Remove extras and try again.`;
+      setValidationError(message);
+      toast.error(message);
       return;
     }
 
@@ -88,10 +94,18 @@ export function ProductGalleryManager({
     } else if (onLocalFilesChange) {
       onLocalFilesChange([...localFiles, ...newFiles]);
     }
+  };
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    await processFiles(Array.from(e.target.files || []));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (disabled || isUploading || isFull) return;
+    await processFiles(Array.from(e.dataTransfer.files));
   };
 
   const handleMove = async (index: number, direction: 'left' | 'right') => {
@@ -138,18 +152,27 @@ export function ProductGalleryManager({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h4 className="text-sm font-semibold text-gray-900">Product Gallery</h4>
-          <p className="text-xs text-gray-500">
-            Upload up to 5 images. JPG, PNG or WebP. Max 5 MB each. The primary image is used as the
-            hero thumbnail.
+          <h4 className="text-base font-semibold text-gray-900">Product Gallery</h4>
+          <p className="mt-1 text-xs leading-5 text-gray-500">
+            Add clear product angles and detail shots. The primary image appears first to customers.
           </p>
         </div>
-        <span className="text-xs font-semibold px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full border border-gray-200">
+        <span className="shrink-0 rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
           {totalCount} of 5 images
         </span>
       </div>
+
+      {validationError && (
+        <div
+          className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700"
+          role="alert"
+        >
+          <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-600" />
+          <span>{validationError}</span>
+        </div>
+      )}
 
       {/* Upload Zone */}
       {!isFull && (
@@ -167,7 +190,21 @@ export function ProductGalleryManager({
             type="button"
             disabled={disabled || isUploading}
             onClick={() => fileInputRef.current?.click()}
-            className="w-full py-6 border-2 border-dashed border-gray-300 hover:border-[#0b2e59] rounded-lg flex flex-col items-center justify-center text-gray-600 bg-gray-50/50 hover:bg-blue-50/30 transition-colors cursor-pointer group"
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsDragging(false);
+            }}
+            onDrop={handleDrop}
+            aria-describedby="gallery-upload-rules"
+            className={`group flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-metro-gold)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+              isDragging
+                ? 'border-[var(--color-metro-navy)] bg-blue-50 shadow-inner'
+                : 'border-gray-300 bg-gray-50/70 hover:border-[var(--color-metro-navy)] hover:bg-blue-50/30'
+            }`}
           >
             {isUploading ? (
               <>
@@ -176,17 +213,25 @@ export function ProductGalleryManager({
               </>
             ) : (
               <>
-                <Upload className="w-6 h-6 text-gray-400 group-hover:text-[#0b2e59] mb-1 transition-colors" />
-                <span className="text-xs font-medium text-gray-700">
-                  Click or drag images to upload
+                <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-gray-500 shadow-sm ring-1 ring-gray-200 transition-transform group-hover:scale-105 group-hover:text-[var(--color-metro-navy)]">
+                  <Upload className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <span className="text-[11px] text-gray-400">
-                  JPG, PNG, WebP up to 5MB (Max {5 - totalCount} more)
+                <span className="text-sm font-semibold text-gray-800">
+                  {isDragging ? 'Drop images here' : 'Drag images here or click to browse'}
+                </span>
+                <span id="gallery-upload-rules" className="mt-1 text-xs text-gray-500">
+                  JPG, PNG or WebP · 5 MB each · {5 - totalCount} remaining
                 </span>
               </>
             )}
           </button>
         </div>
+      )}
+
+      {isFull && (
+        <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600">
+          Gallery full — remove an image to upload another.
+        </p>
       )}
 
       {/* Gallery Grid */}
@@ -198,7 +243,11 @@ export function ProductGalleryManager({
               img.isPrimary ? 'border-[#0b2e59] ring-2 ring-[#0b2e59]/30' : 'border-gray-200'
             }`}
           >
-            <img src={img.publicUrl} alt="Gallery item" className="w-full h-full object-cover" />
+            <img
+              src={img.publicUrl}
+              alt={`Product gallery image ${idx + 1}`}
+              className="h-full w-full object-cover"
+            />
 
             {/* Badges */}
             {img.isPrimary && (
@@ -208,7 +257,7 @@ export function ProductGalleryManager({
             )}
 
             {/* Overlay actions */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+            <div className="absolute inset-0 flex flex-col justify-between bg-black/40 p-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -216,6 +265,7 @@ export function ProductGalleryManager({
                   disabled={disabled}
                   className="p-1 bg-red-600 hover:bg-red-700 text-white rounded shadow-sm"
                   title="Delete image"
+                  aria-label={`Remove gallery image ${idx + 1}`}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -229,6 +279,7 @@ export function ProductGalleryManager({
                     onClick={() => handleMove(idx, 'left')}
                     className="p-1 bg-white/90 hover:bg-white text-gray-700 rounded disabled:opacity-30"
                     title="Move left"
+                    aria-label={`Move image ${idx + 1} left`}
                   >
                     <ArrowLeft className="w-3 h-3" />
                   </button>
@@ -238,6 +289,7 @@ export function ProductGalleryManager({
                     onClick={() => handleMove(idx, 'right')}
                     className="p-1 bg-white/90 hover:bg-white text-gray-700 rounded disabled:opacity-30"
                     title="Move right"
+                    aria-label={`Move image ${idx + 1} right`}
                   >
                     <ArrowRight className="w-3 h-3" />
                   </button>
@@ -260,39 +312,27 @@ export function ProductGalleryManager({
 
         {/* Local files preview (during Create mode) */}
         {localFiles.map((f, idx) => {
-          const previewUrl = URL.createObjectURL(f);
           return (
-            <div
-              key={`local-${idx}`}
-              className="relative group rounded-lg overflow-hidden border border-dashed border-blue-400 bg-blue-50 aspect-square shadow-sm"
-            >
-              <img
-                src={previewUrl}
-                alt="New upload preview"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-blue-600 text-white text-[9px] rounded font-medium">
-                New
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const updated = [...localFiles];
-                  updated.splice(idx, 1);
-                  onLocalFilesChange?.(updated);
-                }}
-                className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded shadow-sm hover:bg-red-700"
-              >
-                <Trash2 className="w-3 h-3" />
-              </button>
-            </div>
+            <LocalImagePreview
+              key={`${f.name}-${f.size}-${f.lastModified}-${idx}`}
+              file={f}
+              index={idx}
+              onRemove={() => {
+                const updated = [...localFiles];
+                updated.splice(idx, 1);
+                onLocalFilesChange?.(updated);
+              }}
+            />
           );
         })}
 
         {totalCount === 0 && (
-          <div className="col-span-2 sm:col-span-3 md:col-span-5 p-4 text-center text-xs text-gray-400 border border-gray-200 rounded-lg flex flex-col items-center justify-center">
-            <ImageIcon className="w-8 h-8 text-gray-300 mb-1" />
-            <span>No gallery images uploaded yet</span>
+          <div className="col-span-2 flex min-h-28 flex-col items-center justify-center rounded-lg border border-gray-200 bg-gray-50/60 p-4 text-center sm:col-span-3 md:col-span-5">
+            <ImageIcon className="mb-2 h-8 w-8 text-gray-300" aria-hidden="true" />
+            <span className="text-xs font-medium text-gray-600">No gallery images yet</span>
+            <span className="mt-1 text-[11px] text-gray-400">
+              Uploaded images will appear here in display order.
+            </span>
           </div>
         )}
       </div>
@@ -307,6 +347,48 @@ export function ProductGalleryManager({
         onCancel={() => setDeleteTargetId(null)}
         isDestructive={true}
       />
+    </div>
+  );
+}
+
+function LocalImagePreview({
+  file,
+  index,
+  onRemove,
+}: {
+  file: File;
+  index: number;
+  onRemove: () => void;
+}) {
+  const [previewUrl] = useState(() => URL.createObjectURL(file));
+
+  useEffect(() => {
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
+
+  return (
+    <div className="group relative aspect-square overflow-hidden rounded-lg border border-dashed border-blue-400 bg-blue-50 shadow-sm">
+      <img
+        src={previewUrl}
+        alt={`New gallery upload: ${file.name}`}
+        className="h-full w-full object-cover"
+      />
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-2 pb-2 pt-6">
+        <p className="truncate text-[10px] font-medium text-white" title={file.name}>
+          {file.name}
+        </p>
+      </div>
+      <div className="absolute left-1.5 top-1.5 rounded bg-[var(--color-metro-navy)] px-1.5 py-0.5 text-[9px] font-semibold text-white">
+        New
+      </div>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute right-1.5 top-1.5 rounded bg-red-600 p-1 text-white shadow-sm hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        aria-label={`Remove new image ${index + 1}: ${file.name}`}
+      >
+        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
     </div>
   );
 }

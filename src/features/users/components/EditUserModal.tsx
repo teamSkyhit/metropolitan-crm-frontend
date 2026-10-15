@@ -29,10 +29,14 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (name.trim().length < 2) {
+      toast.error('Enter the user’s full name.');
+      return;
+    }
     try {
       await update.mutateAsync({
         id: user.id,
-        payload: { name, email },
+        payload: { name: name.trim(), email: email.trim() },
       });
       onClose();
     } catch (error: any) {
@@ -47,20 +51,40 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit User">
       <form onSubmit={handleSubmit} className="space-y-4">
+        <p className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+          Update the contact details used for this user’s CRM account.
+        </p>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Name</label>
-          <Input required value={name} onChange={(e) => setName(e.target.value)} />
+          <label htmlFor="edit-user-name" className="text-sm font-semibold text-slate-700">
+            Full name <span className="text-red-600">*</span>
+          </label>
+          <Input
+            id="edit-user-name"
+            autoComplete="name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Email</label>
-          <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <label htmlFor="edit-user-email" className="text-sm font-semibold text-slate-700">
+            Work email <span className="text-red-600">*</span>
+          </label>
+          <Input
+            id="edit-user-email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
-        <div className="flex justify-end space-x-2 pt-4">
+        <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button type="submit" disabled={update.isPending}>
-            {update.isPending ? 'Saving...' : 'Save'}
+            {update.isPending ? 'Saving changes…' : 'Save changes'}
           </Button>
         </div>
       </form>

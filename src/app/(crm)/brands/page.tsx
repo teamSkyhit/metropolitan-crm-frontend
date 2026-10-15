@@ -2,25 +2,30 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { BrandTable } from '@/features/brands/components/BrandTable';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function BrandsPage() {
   return (
-    <div className="p-6 max-w-7xl mx-auto w-full">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Brands</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage product brands and their assets.</p>
-        </div>
+    <div className="w-full space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <PageHeader title="Brands" description="Manage product brands and their assets." />
         <Link
           href="/brands/new"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0b2e59] hover:bg-[#0b2e59]/90 focus:outline-none transition-colors"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--color-metro-navy)] px-4 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(16,47,87,0.18)] transition-all hover:bg-[#173e6e] sm:w-auto"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4" />
           Add Brand
         </Link>
       </div>
 
-      <Suspense fallback={<div className="py-10 text-center text-gray-500">Loading brands...</div>}>
+      <Suspense
+        fallback={
+          <div
+            className="h-64 animate-pulse rounded-2xl border border-gray-200 bg-white"
+            aria-label="Loading brands"
+          />
+        }
+      >
         <BrandTable />
       </Suspense>
     </div>

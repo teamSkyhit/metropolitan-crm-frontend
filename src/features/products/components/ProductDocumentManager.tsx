@@ -45,6 +45,7 @@ export function ProductDocumentManager({
   const [pendingTitle, setPendingTitle] = useState('');
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   const totalCount = documents.length + localFiles.length;
   const isFull = totalCount >= 3;
@@ -54,19 +55,26 @@ export function ProductDocumentManager({
     if (!fileList || fileList.length === 0) return;
 
     const file = fileList[0];
+    setValidationError('');
+
+    const rejectFile = (message: string) => {
+      setValidationError(message);
+      toast.error(message);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
 
     // Validation: PDF only and 10MB max
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      toast.error('Invalid document format. Only PDF files are allowed.');
+      rejectFile('This document format is not supported. Choose a PDF file.');
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('PDF exceeds 10MB maximum size limit.');
+      rejectFile('This PDF is larger than 10 MB. Choose a smaller file.');
       return;
     }
 
     if (totalCount >= 3) {
-      toast.error('Maximum of 3 documents reached.');
+      rejectFile('This product already has the maximum of 3 documents.');
       return;
     }
 
@@ -80,11 +88,12 @@ export function ProductDocumentManager({
         setPendingTitle('');
       } catch (err: unknown) {
         const anyErr = err as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-        toast.error(
+        const message =
           anyErr?.response?.data?.error?.message ||
-            anyErr?.response?.data?.message ||
-            'Failed to upload document.'
-        );
+          anyErr?.response?.data?.message ||
+          'Failed to upload document.';
+        setValidationError(message);
+        toast.error(message);
       } finally {
         setIsUploading(false);
       }
@@ -144,7 +153,7 @@ export function ProductDocumentManager({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-start gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
         <div>
           <h4 className="text-sm font-semibold text-gray-900">Product Documents (PDFs)</h4>
           <p className="text-xs text-gray-500">
@@ -156,6 +165,15 @@ export function ProductDocumentManager({
         </span>
       </div>
 
+      {validationError && (
+        <div
+          className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-700"
+          role="alert"
+        >
+          {validationError}
+        </div>
+      )}
+
       {/* Upload Box */}
       {!isFull && (
         <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
@@ -165,6 +183,7 @@ export function ProductDocumentManager({
             </label>
             <input
               type="text"
+              maxLength={150}
               disabled={disabled || isUploading}
               value={pendingTitle}
               onChange={(e) => setPendingTitle(e.target.value)}
@@ -186,6 +205,7 @@ export function ProductDocumentManager({
             type="button"
             disabled={disabled || isUploading}
             onClick={() => fileInputRef.current?.click()}
+            aria-describedby="document-upload-rules"
             className="w-full py-4 border-2 border-dashed border-gray-300 hover:border-[#0b2e59] rounded-md flex flex-col items-center justify-center text-gray-600 hover:bg-blue-50/20 transition-colors"
           >
             {isUploading ? (
@@ -200,6 +220,9 @@ export function ProductDocumentManager({
               </div>
             )}
           </button>
+          <p id="document-upload-rules" className="text-center text-[11px] text-gray-500">
+            One file at a time · PDF only · Maximum 10 MB
+          </p>
         </div>
       )}
 
@@ -208,7 +231,7 @@ export function ProductDocumentManager({
         {documents.map((doc, idx) => (
           <div
             key={doc.id}
-            className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm flex items-center justify-between hover:border-gray-300 transition-colors"
+            className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-colors hover:border-gray-300 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-9 h-9 rounded bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 text-red-600">
@@ -219,6 +242,7 @@ export function ProductDocumentManager({
                 <div className="flex items-center gap-2 flex-1">
                   <input
                     type="text"
+                    maxLength={150}
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
                     className="px-2 py-0.5 text-xs border rounded"

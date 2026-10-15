@@ -20,7 +20,15 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { formatDate } from '@/lib/utils/format';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, AlertCircle, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Search,
+  AlertCircle,
+  Inbox,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react';
 import { ROUTES } from '@/lib/constants/routes';
 
 function EnquiriesList() {
@@ -98,11 +106,14 @@ function EnquiriesList() {
   };
 
   const selectClasses =
-    'flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)] focus:border-transparent';
+    'flex h-10 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900';
 
   if (isError) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center justify-center text-center">
+      <div
+        role="alert"
+        className="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 p-8 text-center"
+      >
         <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
         <h3 className="text-lg font-medium text-red-800">Failed to load enquiries</h3>
         <p className="text-sm text-red-600 mt-2 mb-4">
@@ -118,12 +129,29 @@ function EnquiriesList() {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm space-y-4">
+      <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <SlidersHorizontal className="h-4 w-4 text-[var(--color-metro-gold)]" /> Search and
+            filters
+          </div>
+          {(search || status || assignedTo || from || to) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearFilters}
+              className="gap-1.5 text-slate-600"
+            >
+              <X className="h-4 w-4" /> Clear all
+            </Button>
+          )}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             <Input
               placeholder="Search ID, name, company..."
+              aria-label="Search enquiries"
               className="pl-10"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
@@ -177,23 +205,10 @@ function EnquiriesList() {
             min={from}
           />
         </div>
-
-        {(search || status || assignedTo || from || to) && (
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearFilters}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              Clear Filters
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {isLoading ? (
           <div className="p-10 flex justify-center items-center h-64">
             <div className="animate-pulse flex flex-col items-center">
@@ -202,9 +217,12 @@ function EnquiriesList() {
             </div>
           </div>
         ) : !data || data.data.length === 0 ? (
-          <div className="p-10 text-center">
+          <div className="p-12 text-center">
             <Inbox className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No enquiries match your filters.</p>
+            <p className="font-semibold text-slate-800">No enquiries match your filters</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Clear filters or broaden the date range to see more results.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -261,7 +279,7 @@ function EnquiriesList() {
 
       {/* Pagination */}
       {data?.meta?.pagination && data.meta.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-lg shadow-sm sm:px-6">
+        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm sm:px-6">
           <div className="flex justify-between flex-1 sm:hidden">
             <Button
               variant="outline"
@@ -319,8 +337,18 @@ function EnquiriesList() {
 export default function EnquiriesPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Enquiries" description="Manage and track customer enquiries." />
-      <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100 rounded-lg" />}>
+      <PageHeader
+        title="Enquiries"
+        description="Review customer requests, assign ownership, and track every follow-up."
+      />
+      <Suspense
+        fallback={
+          <div
+            className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-white"
+            aria-label="Loading enquiries"
+          />
+        }
+      >
         <EnquiriesList />
       </Suspense>
     </div>

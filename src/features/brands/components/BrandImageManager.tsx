@@ -145,11 +145,11 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
   };
 
   return (
-    <div className="space-y-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6 max-w-2xl">
+    <div className="mt-6 space-y-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Brand Logo</h3>
         {logoError && <p className="text-red-500 text-sm mb-2">{logoError}</p>}
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
           <div className="h-24 w-24 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
             {brand.logoUrl ? (
               <img src={brand.logoUrl} alt="Logo" className="object-contain h-full w-full" />
@@ -157,8 +157,8 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
               <ImageIcon className="text-gray-400 w-8 h-8" />
             )}
           </div>
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
+          <div className="w-full space-y-3">
+            <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:flex sm:flex-wrap">
               <label className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 <Upload className="w-4 h-4 mr-2" />
                 {uploadLogo.isPending ? 'Uploading...' : 'Upload Logo'}
@@ -207,9 +207,9 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
               <ImageIcon className="text-gray-400 w-8 h-8" />
             )}
           </div>
-          <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-gray-500">Recommended size: 1200x400px. PNG or JPG.</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:flex sm:w-auto sm:flex-wrap">
               <label className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 <Upload className="w-4 h-4 mr-2" />
                 {uploadBanner.isPending ? 'Uploading...' : 'Upload Banner'}

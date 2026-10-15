@@ -33,7 +33,7 @@ export function PromoBannerForm({ content, onChange }: Props) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">CTA Label</label>
           <Input
@@ -54,8 +54,8 @@ export function PromoBannerForm({ content, onChange }: Props) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Banner Image *</label>
-        <div className="flex items-center gap-4">
-          <div className="h-20 w-32 bg-gray-100 border border-gray-200 rounded flex items-center justify-center overflow-hidden">
+        <div className="flex flex-col items-start gap-3 min-[420px]:flex-row min-[420px]:items-center">
+          <div className="h-24 w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-100 min-[420px]:h-20 min-[420px]:w-32">
             <MediaPreview mediaId={content.mediaId} />
           </div>
           <Button type="button" variant="outline" onClick={() => setIsMediaOpen(true)}>

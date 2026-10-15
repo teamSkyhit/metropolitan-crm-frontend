@@ -112,15 +112,15 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto pb-12">
+    <div className="mx-auto max-w-4xl space-y-8 pb-12">
       <PageHeader
         title="Account Settings"
         description="Manage your account profile, security preferences, and active sessions."
       />
 
       {/* 1. Account Information */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-center gap-3 border-b border-gray-100 p-4 sm:p-6">
           <div className="p-2 rounded-lg bg-[var(--color-metro-navy)]/10 text-[var(--color-metro-navy)]">
             <User className="w-5 h-5" />
           </div>
@@ -130,7 +130,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50">
+        <div className="grid grid-cols-1 gap-4 bg-gray-50/50 p-4 sm:p-6 md:grid-cols-2 md:gap-6">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Full Name
@@ -175,11 +175,11 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* 2. Security / Change Password */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-center gap-3 border-b border-gray-100 p-4 sm:p-6">
           <div className="p-2 rounded-lg bg-[var(--color-metro-navy)]/10 text-[var(--color-metro-navy)]">
             <KeyRound className="w-5 h-5" />
           </div>
@@ -192,16 +192,22 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <form onSubmit={handlePasswordSubmit} className="p-6 space-y-4">
+        <form onSubmit={handlePasswordSubmit} className="space-y-4 p-4 sm:p-6">
           {passwordError && (
-            <div className="p-3 rounded-md bg-red-50 border border-red-200 flex items-center gap-2 text-sm text-red-700">
+            <div
+              role="alert"
+              className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+            >
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{passwordError}</span>
             </div>
           )}
 
           {passwordSuccess && (
-            <div className="p-3 rounded-md bg-green-50 border border-green-200 flex items-center gap-2 text-sm text-green-700">
+            <div
+              role="status"
+              className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+            >
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{passwordSuccess}</span>
             </div>
@@ -260,21 +266,21 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="pt-2 flex justify-end">
+          <div className="flex justify-end pt-2">
             <Button
               type="submit"
               disabled={isSubmittingPassword}
-              className="bg-[var(--color-metro-navy)] hover:bg-[var(--color-metro-navy)]/90 text-white"
+              className="w-full bg-[var(--color-metro-navy)] text-white hover:bg-[var(--color-metro-navy)]/90 sm:w-auto"
             >
               {isSubmittingPassword ? 'Updating Password...' : 'Update Password'}
             </Button>
           </div>
         </form>
-      </div>
+      </section>
 
       {/* 3. Session Management / Logout Everywhere */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+      <section className="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
+        <div className="flex items-center gap-3 border-b border-gray-100 p-4 sm:p-6">
           <div className="p-2 rounded-lg bg-red-50 text-red-600">
             <Shield className="w-5 h-5" />
           </div>
@@ -286,7 +292,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
             <h3 className="text-sm font-semibold text-gray-900">Sign out of all sessions</h3>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -298,13 +304,13 @@ export default function SettingsPage() {
             variant="outline"
             onClick={() => setShowConfirmLogoutAll(true)}
             disabled={isLoggingOutAll}
-            className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 shrink-0 flex items-center gap-2"
+            className="flex w-full shrink-0 items-center gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 sm:w-auto"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign out all devices</span>
           </Button>
         </div>
-      </div>
+      </section>
 
       <ConfirmDialog
         isOpen={showConfirmLogoutAll}
