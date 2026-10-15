@@ -78,7 +78,7 @@ export function ProductVideoManager({
         let message = 'Failed to upload video.';
         if (anyErr?.response?.status === 413) {
           message =
-            'This video file is too large for upload through the network proxy. Please choose a smaller or compressed video.';
+            'The upload was rejected by the network proxy (HTTP 413: Payload Too Large). Netlify preview proxy enforces a ~6 MB request limit. To upload videos up to 100 MB, please ensure direct backend API access or compress the video.';
         } else if (anyErr?.response?.data?.error?.message) {
           message = anyErr.response.data.error.message;
         } else if (anyErr?.response?.data?.message) {
