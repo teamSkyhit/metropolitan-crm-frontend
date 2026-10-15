@@ -55,7 +55,7 @@ export function ProductFilters() {
           id="search"
           type="text"
           placeholder="Search products by name or SKU..."
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
+          className="block w-full h-10 rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
         />
@@ -67,7 +67,7 @@ export function ProductFilters() {
           onChange={(e) =>
             router.push(pathname + '?' + createQueryString('brandId', e.target.value))
           }
-          className="rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
+          className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
           aria-label="Filter by brand"
         >
           <option value="">All Brands</option>
@@ -83,7 +83,7 @@ export function ProductFilters() {
           onChange={(e) =>
             router.push(pathname + '?' + createQueryString('categoryId', e.target.value))
           }
-          className="rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
+          className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
           aria-label="Filter by category"
         >
           <option value="">All Categories</option>
@@ -99,11 +99,11 @@ export function ProductFilters() {
           onChange={(e) =>
             router.push(pathname + '?' + createQueryString('status', e.target.value))
           }
-          className="rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
+          className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
           aria-label="Filter by status"
         >
-          <option value="">All Statuses</option>
-          <option value="PUBLISHED">Published</option>
+          <option value="">All Status</option>
+          <option value="PUBLISHED">Active</option>
           <option value="DRAFT">Draft</option>
         </select>
 
@@ -112,7 +112,7 @@ export function ProductFilters() {
           onChange={(e) =>
             router.push(pathname + '?' + createQueryString('hotDeal', e.target.value))
           }
-          className="rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
+          className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
           aria-label="Filter by Hot Deal"
         >
           <option value="">Any Hot Deal Status</option>
@@ -130,7 +130,7 @@ export function ProductFilters() {
             urlParams.set('sortOrder', sortOrder);
             router.push(pathname + '?' + urlParams.toString());
           }}
-          className="rounded-md border-gray-300 shadow-sm focus:border-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)] sm:text-sm p-2 border"
+          className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
           aria-label="Sort by"
         >
           <option value="createdAt-desc">Newest First</option>

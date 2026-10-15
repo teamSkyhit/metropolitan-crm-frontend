@@ -13,7 +13,15 @@ import {
 } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { formatDate } from '@/lib/utils/format';
-import { AlertCircle, Users, Inbox, Package, CheckCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  Users,
+  Inbox,
+  Package,
+  CheckCircle,
+  ArrowUpRight,
+  Clock3,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -26,20 +34,31 @@ function StatCard({
   value,
   icon: Icon,
   colorClass,
+  hint,
 }: {
   title: string;
   value: number | string;
   icon: React.ElementType;
   colorClass: string;
+  hint: string;
 }) {
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex items-center gap-4">
-      <div className={`p-3 rounded-full ${colorClass}`}>
-        <Icon className="w-6 h-6" aria-hidden="true" />
+    <div className="group relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(15,38,68,0.09)]">
+      <div className="flex items-start justify-between gap-4">
+        <div className={`grid h-11 w-11 place-items-center rounded-xl ${colorClass}`}>
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </div>
+        <ArrowUpRight
+          className="h-4 w-4 text-gray-300 transition-colors group-hover:text-[#b98708]"
+          aria-hidden="true"
+        />
       </div>
-      <div>
-        <p className="text-sm font-medium text-gray-500">{title}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <div className="mt-5">
+        <p className="text-[13px] font-medium text-[#6a788c]">{title}</p>
+        <p className="mt-1 text-[30px] font-bold leading-none tracking-[-0.04em] text-[#15263d]">
+          {value}
+        </p>
+        <p className="mt-3 text-xs text-[#8491a3]">{hint}</p>
       </div>
     </div>
   );
@@ -48,15 +67,12 @@ function StatCard({
 function DashboardSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm h-24"
-          ></div>
+          <div key={i} className="h-44 rounded-2xl border border-gray-200 bg-white"></div>
         ))}
       </div>
-      <div className="bg-white border border-gray-200 rounded-lg h-64 shadow-sm"></div>
+      <div className="h-72 rounded-2xl border border-gray-200 bg-white"></div>
     </div>
   );
 }
@@ -103,47 +119,64 @@ export default function DashboardPage() {
   if (!data) return null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:items-center sm:justify-between gap-4">
+    <div className="space-y-7 pb-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <PageHeader
-          title="Dashboard"
-          description="Overview of CRM operational activity."
-          className="items-center sm:items-start"
+          title="Good to see you."
+          description="Here is what is happening across your sales workspace today."
         />
         <Button className="w-full sm:w-auto" onClick={() => router.push(ROUTES.ENQUIRIES)}>
           View All Enquiries
+          <ArrowUpRight className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Enquiries"
           value={data.counts.total}
           icon={Inbox}
-          colorClass="bg-blue-100 text-blue-600"
+          colorClass="bg-blue-50 text-blue-600"
+          hint="All customer requests"
         />
         <StatCard
           title="New"
           value={data.counts.new}
           icon={Package}
-          colorClass="bg-yellow-100 text-yellow-600"
+          colorClass="bg-amber-50 text-amber-600"
+          hint="Waiting for review"
         />
         <StatCard
           title="Assigned"
           value={data.counts.assigned}
           icon={Users}
-          colorClass="bg-purple-100 text-purple-600"
+          colorClass="bg-violet-50 text-violet-600"
+          hint="In active ownership"
         />
         <StatCard
           title="Closed Won"
           value={data.counts.closedWon}
           icon={CheckCircle}
-          colorClass="bg-green-100 text-green-600"
+          colorClass="bg-emerald-50 text-emerald-600"
+          hint="Successfully converted"
         />
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800">Recent Enquiries</h3>
+      <div className="space-y-4 rounded-2xl border border-[#e2e8f0] bg-white p-4 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold tracking-[-0.02em] text-[#17263b]">
+              Recent Enquiries
+            </h2>
+            <p className="mt-1 text-sm text-[#718096]">
+              Latest customer activity requiring your attention.
+            </p>
+          </div>
+          <div className="hidden items-center gap-2 rounded-full bg-[#f4f7fb] px-3 py-1.5 text-xs font-medium text-[#65758b] sm:flex">
+            <Clock3 className="h-3.5 w-3.5" />
+            Live overview
+          </div>
+        </div>
 
         {data.recentEnquiries.length === 0 ? (
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-10 text-center">
@@ -151,7 +184,7 @@ export default function DashboardPage() {
             <p className="text-gray-500 font-medium">No recent enquiries found.</p>
           </div>
         ) : (
-          <Table>
+          <Table className="min-w-[760px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Customer / Company</TableHead>
@@ -184,7 +217,7 @@ export default function DashboardPage() {
                   <TableCell className="text-right">
                     <Link
                       href={`${ROUTES.ENQUIRIES}/${enquiry.id}`}
-                      className="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium text-[var(--color-metro-navy)] hover:text-[var(--color-metro-navy)]/80 hover:bg-gray-100 transition-colors"
+                      className="inline-flex h-9 items-center justify-center rounded-lg bg-[#eef3f8] px-3 text-sm font-semibold text-[var(--color-metro-navy)] transition-colors hover:bg-[#e2eaf3]"
                     >
                       View
                     </Link>

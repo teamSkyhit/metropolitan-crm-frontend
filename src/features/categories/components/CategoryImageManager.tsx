@@ -118,7 +118,7 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
   return (
     <div className="space-y-6">
       {/* ── Category Thumbnail Image ── */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-4">
           <h3 className="text-base font-semibold text-gray-900">Category Thumbnail / Card Image</h3>
           <p className="text-xs text-gray-500">
@@ -126,7 +126,7 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-6">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
           {category.imageUrl ? (
             <div className="relative group w-32 h-32 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 flex-shrink-0">
               <img
@@ -151,7 +151,7 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2">
+          <div className="grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:flex sm:w-auto sm:flex-wrap">
             <input
               type="file"
               ref={imageInputRef}
@@ -182,7 +182,7 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
       </div>
 
       {/* ── Category Banner ── */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-4">
           <h3 className="text-base font-semibold text-gray-900">Category Banner</h3>
           <p className="text-xs text-gray-500">

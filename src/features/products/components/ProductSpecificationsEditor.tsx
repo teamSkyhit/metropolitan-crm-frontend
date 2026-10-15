@@ -3,6 +3,7 @@ import { useUpdateProductSpecifications } from '../hooks/useProduct';
 import { Product, ProductSpecification } from '../types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Plus, Ruler, Trash2 } from 'lucide-react';
 
 export interface ProductSpecificationsEditorProps {
   product?: Product;
@@ -117,9 +118,22 @@ export function ProductSpecificationsEditor({
   const isSaving = updateSpecs.isPending || disabled;
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-900">Specifications</h3>
+    <section
+      id="product-specifications"
+      className="space-y-5 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#eef3f8] text-[var(--color-metro-navy)]">
+            <Ruler className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-[#17263b]">Technical specifications</h3>
+            <p className="mt-1 text-xs leading-5 text-gray-500">
+              Add measurable product data such as weight, power, ratio, speed, or dimensions.
+            </p>
+          </div>
+        </div>
         <Button
           type="button"
           variant="outline"
@@ -127,32 +141,50 @@ export function ProductSpecificationsEditor({
           onClick={handleAdd}
           disabled={isSaving || specs.length >= 100}
         >
+          <Plus className="h-4 w-4" aria-hidden="true" />
           Add Row
         </Button>
       </div>
 
       {successMsg && (
-        <div className="p-3 bg-green-50 text-green-700 rounded-md border border-green-200 text-sm">
+        <div
+          className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+          role="status"
+        >
           {successMsg}
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-3 bg-red-50 text-red-700 rounded-md border border-red-200 text-sm">
+        <div
+          className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+          role="alert"
+        >
           {errorMsg}
         </div>
       )}
 
       {specs.length === 0 ? (
-        <p className="text-sm text-gray-500 italic py-4">No specifications added yet.</p>
+        <div className="rounded-xl border-2 border-dashed border-[#dce3ec] bg-[#f8fafc] px-4 py-8 text-center">
+          <p className="text-sm font-medium text-[#65758b]">No specifications added yet.</p>
+          <p className="mt-1 text-xs text-gray-400">
+            This section is optional, but useful for technical buyers.
+          </p>
+        </div>
       ) : (
         <div className="space-y-3">
           {specs.map((spec, idx) => (
-            <div key={idx} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div
+              key={idx}
+              className="grid gap-3 rounded-xl border border-[#e5eaf1] bg-[#f8fafc] p-3 sm:grid-cols-[1fr_1fr_0.65fr_auto] sm:items-end"
+            >
               <div className="flex-1 w-full space-y-1">
-                <label className="sr-only">Key</label>
+                <label htmlFor={`spec-key-${idx}`} className="text-xs font-semibold text-[#536277]">
+                  Specification
+                </label>
                 <Input
-                  placeholder="Key (e.g. Weight)"
+                  id={`spec-key-${idx}`}
+                  placeholder="e.g. Weight"
                   maxLength={100}
                   value={spec.key}
                   onChange={(e) => handleChange(idx, 'key', e.target.value)}
@@ -160,9 +192,15 @@ export function ProductSpecificationsEditor({
                 />
               </div>
               <div className="flex-1 w-full space-y-1">
-                <label className="sr-only">Value</label>
+                <label
+                  htmlFor={`spec-value-${idx}`}
+                  className="text-xs font-semibold text-[#536277]"
+                >
+                  Value
+                </label>
                 <Input
-                  placeholder="Value (e.g. 1.5)"
+                  id={`spec-value-${idx}`}
+                  placeholder="e.g. 1.5"
                   maxLength={500}
                   value={spec.value}
                   onChange={(e) => handleChange(idx, 'value', e.target.value)}
@@ -170,9 +208,15 @@ export function ProductSpecificationsEditor({
                 />
               </div>
               <div className="flex-1 w-full space-y-1">
-                <label className="sr-only">Unit (Optional)</label>
+                <label
+                  htmlFor={`spec-unit-${idx}`}
+                  className="text-xs font-semibold text-[#536277]"
+                >
+                  Unit <span className="font-normal text-gray-400">(optional)</span>
+                </label>
                 <Input
-                  placeholder="Unit (e.g. kg)"
+                  id={`spec-unit-${idx}`}
+                  placeholder="e.g. kg"
                   maxLength={50}
                   value={spec.unit || ''}
                   onChange={(e) => handleChange(idx, 'unit', e.target.value)}
@@ -182,12 +226,13 @@ export function ProductSpecificationsEditor({
               <Button
                 type="button"
                 variant="outline"
-                className="text-red-600 hover:text-red-700 border-gray-300 sm:w-auto w-full"
+                size="icon"
+                className="w-full border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700 sm:w-10"
                 onClick={() => handleRemove(idx)}
                 disabled={isSaving}
-                aria-label="Remove row"
+                aria-label={`Remove specification row ${idx + 1}`}
               >
-                Remove
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           ))}
@@ -201,6 +246,6 @@ export function ProductSpecificationsEditor({
           </Button>
         </div>
       )}
-    </div>
+    </section>
   );
 }

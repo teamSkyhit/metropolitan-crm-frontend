@@ -8,7 +8,7 @@ import {
   useDeleteHomepageSection,
 } from '../hooks/useHomepage';
 import { HomepageSectionType } from '../types';
-import { Edit, Trash2, ArrowUp, ArrowDown, LayoutTemplate } from 'lucide-react';
+import { Edit, Trash2, ArrowUp, ArrowDown, LayoutTemplate, AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -30,13 +30,27 @@ export function HomepageSectionList() {
     }
   }, [sections, isOrderChanged]);
 
-  if (isLoading) return <div className="text-center py-10">Loading sections...</div>;
+  if (isLoading)
+    return (
+      <div
+        className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-white"
+        aria-label="Loading homepage sections"
+      />
+    );
   if (isError)
-    return <div className="text-center py-10 text-red-500">Failed to load homepage sections.</div>;
+    return (
+      <div
+        role="alert"
+        className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700"
+      >
+        <AlertCircle className="h-5 w-5" /> Failed to load homepage sections. Refresh the page to
+        try again.
+      </div>
+    );
 
   if (!sections || sections.length === 0) {
     return (
-      <div className="text-center py-20 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
         <LayoutTemplate className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <h3 className="text-lg font-medium text-gray-900">No homepage sections configured yet.</h3>
         <p className="mt-2 text-gray-500">Get started by creating your first section.</p>
@@ -44,7 +58,7 @@ export function HomepageSectionList() {
           href="/homepage/new"
           className="mt-6 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[var(--color-metro-navy)] hover:bg-[var(--color-metro-gold)]"
         >
-          Add First Section
+          <Plus className="mr-2 h-4 w-4" /> Add first section
         </Link>
       </div>
     );
@@ -119,8 +133,12 @@ export function HomepageSectionList() {
 
   return (
     <div className="space-y-4">
+      <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-sm text-blue-900">
+        <span className="font-semibold">Homepage order:</span> sections appear publicly from top to
+        bottom. Use the arrows to reorder, then save your changes.
+      </div>
       {isOrderChanged && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center justify-between mb-6">
+        <div className="sticky top-3 z-10 mb-6 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-yellow-800 font-medium">You have unsaved order changes.</p>
           <div className="flex gap-2">
             <button
@@ -145,15 +163,16 @@ export function HomepageSectionList() {
       {localSections.map((section, index) => (
         <div
           key={section.id}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex items-center justify-between gap-6 transition-all hover:shadow-md"
+          className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
         >
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col gap-1">
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="flex shrink-0 flex-col gap-1 rounded-xl bg-slate-50 p-1">
               <button
                 disabled={index === 0 || reorderMutation.isPending}
                 onClick={() => handleMove(index, 'up')}
                 className="p-1 rounded text-gray-400 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
                 title="Move Up"
+                aria-label="Move section up"
               >
                 <ArrowUp className="w-4 h-4" />
               </button>
@@ -162,12 +181,13 @@ export function HomepageSectionList() {
                 onClick={() => handleMove(index, 'down')}
                 className="p-1 rounded text-gray-400 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
                 title="Move Down"
+                aria-label="Move section down"
               >
                 <ArrowDown className="w-4 h-4" />
               </button>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-3 mb-1">
                 <span className="text-xs font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-700">
                   {formatType(section.type)}
@@ -192,11 +212,12 @@ export function HomepageSectionList() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center justify-end gap-2 border-t border-slate-100 pt-3 sm:w-auto sm:border-0 sm:pt-0">
             <Link
               href={`/homepage/${section.id}`}
               className="p-2 text-gray-400 hover:text-[var(--color-metro-navy)] hover:bg-gray-50 rounded-md transition-colors"
               title="Edit Section"
+              aria-label="Edit homepage section"
             >
               <Edit className="w-5 h-5" />
             </Link>
@@ -205,6 +226,7 @@ export function HomepageSectionList() {
               disabled={deleteMutation.isPending}
               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
               title="Delete Section"
+              aria-label="Delete homepage section"
             >
               <Trash2 className="w-5 h-5" />
             </button>

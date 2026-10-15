@@ -25,7 +25,7 @@ export function CrmLayout({ children }: CrmLayoutProps) {
   }, [isMobileMenuOpen]);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-dvh overflow-hidden bg-[#f4f7fb]">
       {/* Desktop Sidebar */}
       <Sidebar className="hidden md:flex" />
 
@@ -41,7 +41,7 @@ export function CrmLayout({ children }: CrmLayoutProps) {
       {/* Mobile Sidebar */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-200 ease-in-out md:hidden',
+          'fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-300 ease-out md:hidden',
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -51,10 +51,10 @@ export function CrmLayout({ children }: CrmLayoutProps) {
         />
       </div>
 
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto h-full">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <Header onMenuClick={() => setIsMobileMenuOpen(true)} isMobileMenuOpen={isMobileMenuOpen} />
+        <main className="flex-1 overflow-y-auto px-3 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] min-[380px]:px-4 sm:px-6 sm:py-5 md:px-8 md:py-7 xl:px-10">
+          <div className="mx-auto h-full max-w-[1440px]">{children}</div>
         </main>
       </div>
     </div>

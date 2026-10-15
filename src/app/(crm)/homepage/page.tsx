@@ -6,22 +6,29 @@ import Link from 'next/link';
 
 export default function HomepageCMSPage() {
   return (
-    <div className="p-6 max-w-5xl mx-auto w-full">
-      <div className="flex justify-between items-center mb-6">
+    <div className="mx-auto w-full max-w-5xl space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <PageHeader
           title="Homepage CMS"
           description="Manage the sections displayed on the public website homepage."
         />
         <Link
           href="/homepage/new"
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[var(--color-metro-navy)] hover:bg-[var(--color-metro-gold)] rounded-md transition-colors"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--color-metro-navy)] px-4 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(16,47,87,0.18)] transition-all hover:bg-[#173e6e]"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="h-4 w-4" />
           Add Section
         </Link>
       </div>
 
-      <Suspense fallback={<div className="py-10 text-center text-gray-500">Loading...</div>}>
+      <Suspense
+        fallback={
+          <div
+            className="h-64 animate-pulse rounded-2xl border border-gray-200 bg-white"
+            aria-label="Loading homepage sections"
+          />
+        }
+      >
         <HomepageSectionList />
       </Suspense>
     </div>

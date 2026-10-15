@@ -1,0 +1,12 @@
+
+> metropolitan-crm-frontend@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.3.6 (webpack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.0.104:3002
+✓ Ready in 2.9s
+✓ Running next.config.ts took 234ms
+
+○ Compiling / ...
+ HEAD / 307 in 198ms (next.js: 13ms, application-code: 185ms)

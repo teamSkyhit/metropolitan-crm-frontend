@@ -28,14 +28,14 @@ export function FeaturedProductsForm({ content, onChange }: Props) {
   return (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Select Product</label>
+        <label className="mb-1.5 block text-sm font-semibold text-slate-700">Add products</label>
         <select
           onChange={handleAdd}
           defaultValue=""
-          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[var(--color-metro-navy)] sm:text-sm rounded-md"
+          className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm"
         >
           <option value="" disabled>
-            -- Select a product to add --
+            Select a product to add
           </option>
           {products
             .filter((p) => !content.productIds.includes(p.id))
@@ -52,8 +52,8 @@ export function FeaturedProductsForm({ content, onChange }: Props) {
           Selected Products ({content.productIds.length})
         </h4>
         {content.productIds.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
-            No products selected yet. Select at least 1.
+          <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center text-sm text-slate-500">
+            No products selected. Add at least one product for this section.
           </p>
         ) : (
           <ul className="space-y-2">
@@ -62,9 +62,9 @@ export function FeaturedProductsForm({ content, onChange }: Props) {
               return (
                 <li
                   key={id}
-                  className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-md"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     {product?.imageUrl ? (
                       <img
                         src={product.imageUrl}
@@ -76,10 +76,12 @@ export function FeaturedProductsForm({ content, onChange }: Props) {
                         No img
                       </div>
                     )}
-                    <div>
+                    <div className="min-w-0">
                       {product ? (
                         <>
-                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                          <div className="truncate text-sm font-semibold text-gray-900">
+                            {product.name}
+                          </div>
                           <div className="text-xs text-gray-500">SKU: {product.sku}</div>
                         </>
                       ) : (
@@ -92,7 +94,8 @@ export function FeaturedProductsForm({ content, onChange }: Props) {
                   <button
                     onClick={() => handleRemove(id)}
                     type="button"
-                    className="text-red-500 hover:text-red-700 p-1"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-red-500 hover:bg-red-50 hover:text-red-700"
+                    aria-label="Remove product"
                     title="Remove product"
                   >
                     <Trash2 className="w-4 h-4" />

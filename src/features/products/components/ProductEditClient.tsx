@@ -83,7 +83,12 @@ export function ProductEditClient({ id }: { id: string }) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   if (!id || isLoading) {
-    return <div className="p-8 text-center text-gray-500">Loading product...</div>;
+    return (
+      <div
+        className="h-96 animate-pulse rounded-2xl border border-gray-200 bg-white"
+        aria-label="Loading product"
+      />
+    );
   }
 
   if (isError || !data?.data) {
@@ -164,10 +169,10 @@ export function ProductEditClient({ id }: { id: string }) {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <Link
           href={ROUTES.PRODUCTS}
-          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#dce3ec] bg-white text-gray-500 transition hover:bg-[#f8fafc] hover:text-[#17263b]"
           aria-label="Back to Products"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -177,7 +182,7 @@ export function ProductEditClient({ id }: { id: string }) {
         </div>
         <Button
           variant="outline"
-          className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+          className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 sm:w-auto"
           onClick={handleDelete}
           disabled={deleteProduct.isPending}
         >
@@ -185,23 +190,47 @@ export function ProductEditClient({ id }: { id: string }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Core Info & Content Sections */}
-        <div className="lg:col-span-2 space-y-6">
-          <ProductForm
-            initialData={product}
-            mode="edit"
-            onSubmit={handleUpdate}
-            isPending={updateProduct.isPending}
-          />
+      <nav
+        aria-label="Product editor sections"
+        className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 xl:hidden"
+      >
+        {[
+          ['#product-core', 'Details'],
+          ['#product-specifications', 'Specifications'],
+          ['#product-features', 'Features'],
+          ['#product-benefits', 'Benefits'],
+          ['#product-media', 'Media'],
+        ].map(([href, label]) => (
+          <a
+            key={href}
+            href={href}
+            className="shrink-0 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm"
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
 
-          {/* Specifications */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-            <ProductSpecificationsEditor product={product} />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        {/* Left Column: Core Info & Content Sections */}
+        <div className="space-y-6 xl:col-span-2">
+          <div id="product-core" className="scroll-mt-24">
+            <ProductForm
+              initialData={product}
+              mode="edit"
+              onSubmit={handleUpdate}
+              isPending={updateProduct.isPending}
+            />
           </div>
 
+          {/* Specifications */}
+          <ProductSpecificationsEditor product={product} />
+
           {/* Features */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+          <div
+            id="product-features"
+            className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-4 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+          >
             <ProductFeaturesEditor
               features={product.features || []}
               onAddAsync={async (feat) => {
@@ -220,7 +249,10 @@ export function ProductEditClient({ id }: { id: string }) {
           </div>
 
           {/* Key Benefits */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+          <div
+            id="product-benefits"
+            className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-4 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+          >
             <ProductKeyBenefitsEditor
               benefits={product.keyBenefits || []}
               onAddAsync={async (ben) => {
@@ -239,7 +271,7 @@ export function ProductEditClient({ id }: { id: string }) {
           </div>
 
           {/* Related Products */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
             <h4 className="text-sm font-semibold text-gray-900 mb-1">Related Products</h4>
             <p className="text-xs text-gray-500 mb-4">
               Select other products from the catalog to recommend on this product&apos;s detail
@@ -257,12 +289,12 @@ export function ProductEditClient({ id }: { id: string }) {
         </div>
 
         {/* Right Column: Media Subresources */}
-        <div className="space-y-6">
+        <div id="product-media" className="scroll-mt-24 space-y-6">
           {/* Primary Product Image */}
           <ProductImageManager product={product} />
 
           {/* Gallery */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
             <ProductGalleryManager
               gallery={product.gallery || []}
               onUploadAsync={async (files) => {
@@ -281,7 +313,7 @@ export function ProductEditClient({ id }: { id: string }) {
           </div>
 
           {/* Videos */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
             <ProductVideoManager
               videos={product.videos || []}
               onUploadAsync={async (files, title) => {
@@ -300,7 +332,7 @@ export function ProductEditClient({ id }: { id: string }) {
           </div>
 
           {/* Documents */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
             <ProductDocumentManager
               documents={product.documents || []}
               onUploadAsync={async (files, title) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, Bell, LogOut, Settings } from 'lucide-react';
+import { Menu, Bell, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { useUnreadCount } from '@/features/notifications/hooks/useNotifications';
@@ -12,9 +12,10 @@ import { NAVIGATION_CONFIG } from '@/config/navigation';
 
 interface HeaderProps {
   onMenuClick?: () => void;
+  isMobileMenuOpen?: boolean;
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, isMobileMenuOpen = false }: HeaderProps) {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
   const router = useRouter();
@@ -27,8 +28,15 @@ export function Header({ onMenuClick }: HeaderProps) {
         setIsMenuOpen(false);
       }
     };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMenuOpen(false);
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -44,11 +52,19 @@ export function Header({ onMenuClick }: HeaderProps) {
   });
   const pageTitle = currentPage ? currentPage.name : 'Metro Industrial CRM';
 
+  // Subpage title determination for breadcrumb
+  let subpageTitle = '';
+  if (pathname?.endsWith('/new')) {
+    subpageTitle = 'New ' + (currentPage ? currentPage.name.replace(/s$/, '') : 'Item');
+  } else if (pathname?.split('/').length > 2 && !pathname?.endsWith('/new')) {
+    subpageTitle = 'Details';
+  }
+
   const { data: unreadData } = useUnreadCount();
   const unreadCount = unreadData?.count ?? 0;
 
   return (
-    <header className="flex items-center justify-between h-16 px-4 border-b bg-white">
+    <header className="relative z-30 flex h-[72px] shrink-0 items-center justify-between border-b border-[#e5eaf1] bg-white/95 px-4 backdrop-blur sm:px-6 md:px-8">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -56,19 +72,39 @@ export function Header({ onMenuClick }: HeaderProps) {
           onClick={onMenuClick}
           className="md:hidden"
           aria-label="Open sidebar menu"
-          aria-expanded="false"
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-navigation"
         >
           <Menu className="w-5 h-5" />
         </Button>
-        <h1 className="text-lg md:text-xl font-semibold text-gray-800 truncate max-w-[150px] sm:max-w-xs md:max-w-md">
-          {pageTitle}
-        </h1>
+        <div className="min-w-0">
+          <div className="hidden items-center gap-1.5 text-[11px] font-semibold text-slate-400 sm:flex">
+            <span>Workspace</span>
+            <span>/</span>
+            <span
+              className={
+                subpageTitle ? 'text-slate-500' : 'text-[var(--color-metro-navy)] font-bold'
+              }
+            >
+              {pageTitle}
+            </span>
+            {subpageTitle && (
+              <>
+                <span>/</span>
+                <span className="text-[var(--color-metro-navy)] font-bold">{subpageTitle}</span>
+              </>
+            )}
+          </div>
+          <h1 className="max-w-[180px] truncate text-lg font-bold tracking-[-0.02em] text-[#17263b] sm:max-w-xs md:max-w-md">
+            {subpageTitle || pageTitle}
+          </h1>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4 relative">
+      <div className="relative flex items-center gap-2 sm:gap-3">
         <Link
           href="/notifications"
-          className="relative p-2 rounded-md hover:bg-gray-100 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
+          className="relative grid h-10 w-10 place-items-center rounded-xl border border-transparent text-gray-500 transition-colors hover:border-gray-200 hover:bg-gray-50 hover:text-[#102f57] focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
           aria-label={`View notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
         >
           <Bell className="w-5 h-5 text-gray-600" />
@@ -81,14 +117,15 @@ export function Header({ onMenuClick }: HeaderProps) {
 
         <div className="relative" ref={menuRef}>
           <button
-            className="flex items-center gap-2 hover:bg-gray-100 p-1 pr-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
+            className="flex items-center gap-2 rounded-xl border border-transparent p-1.5 transition-colors hover:border-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)] sm:pr-2.5"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-expanded={isMenuOpen}
             aria-haspopup="true"
           >
-            <div className="w-8 h-8 rounded-full bg-[var(--color-metro-navy)] text-white flex items-center justify-center font-bold text-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-metro-navy)] text-sm font-bold text-white shadow-sm ring-2 ring-[#d6a628]/20">
               {userInitial}
             </div>
+            <ChevronDown className="hidden h-4 w-4 text-gray-400 md:block" />
             <div className="hidden md:flex flex-col items-start">
               <span className="text-sm font-medium text-gray-700 leading-tight">
                 {user?.name || 'User'}
@@ -100,7 +137,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50">
+            <div className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-gray-200 bg-white py-1.5 shadow-[0_18px_45px_rgba(15,38,68,0.16)]">
               <div className="px-4 py-3 border-b border-gray-100 md:hidden">
                 <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>

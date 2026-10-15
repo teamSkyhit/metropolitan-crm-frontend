@@ -2,7 +2,7 @@ import { EnquiryDetail } from '../types';
 
 export function CustomerInfoCard({ enquiry }: { enquiry: EnquiryDetail }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
+    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-gray-900">Customer Details</h2>
       <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
         <div>
@@ -15,13 +15,13 @@ export function CustomerInfoCard({ enquiry }: { enquiry: EnquiryDetail }) {
         </div>
         <div>
           <dt className="text-sm font-medium text-gray-500">Email</dt>
-          <dd className="mt-1 text-sm text-[var(--color-metro-navy)]">
+          <dd className="mt-1 break-all text-sm font-medium text-[var(--color-metro-navy)]">
             <a href={`mailto:${enquiry.email}`}>{enquiry.email}</a>
           </dd>
         </div>
         <div>
           <dt className="text-sm font-medium text-gray-500">Phone</dt>
-          <dd className="mt-1 text-sm text-[var(--color-metro-navy)]">
+          <dd className="mt-1 text-sm font-medium text-[var(--color-metro-navy)]">
             <a href={`tel:${enquiry.mobile}`}>{enquiry.mobile}</a>
           </dd>
         </div>
@@ -40,6 +40,6 @@ export function CustomerInfoCard({ enquiry }: { enquiry: EnquiryDetail }) {
           <p className="text-sm text-gray-900 whitespace-pre-wrap">{enquiry.message}</p>
         </div>
       )}
-    </div>
+    </section>
   );
 }

@@ -28,8 +28,16 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isInitializing) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[var(--color-metro-navy)]"></div>
+      <div
+        className="flex h-dvh w-full flex-col items-center justify-center gap-3 bg-[#f4f7fb]"
+        role="status"
+        aria-live="polite"
+      >
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-[3px] border-[#d8e0ea] border-t-[var(--color-metro-navy)]"
+          aria-hidden="true"
+        />
+        <p className="text-sm font-medium text-[#65758b]">Preparing your workspace…</p>
       </div>
     );
   }

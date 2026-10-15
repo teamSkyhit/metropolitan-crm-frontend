@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils/cn';
 
 export function Table({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) {
   return (
-    <div className="relative w-full overflow-auto border rounded-md border-gray-200 bg-white">
+    <div className="relative w-full overflow-auto rounded-2xl border border-[#e2e8f0] bg-white shadow-[0_5px_22px_rgba(15,38,68,0.04)]">
       <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>
   );
@@ -13,7 +13,7 @@ export function TableHeader({
   className,
   ...props
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className={cn('[&_tr]:border-b bg-gray-50', className)} {...props} />;
+  return <thead className={cn('[&_tr]:border-b bg-[#f7f9fc]', className)} {...props} />;
 }
 
 export function TableBody({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
@@ -24,7 +24,7 @@ export function TableRow({ className, ...props }: React.HTMLAttributes<HTMLTable
   return (
     <tr
       className={cn(
-        'border-b transition-colors hover:bg-gray-100/50 data-[state=selected]:bg-gray-100',
+        'border-b border-[#edf0f4] transition-colors hover:bg-[#f8fafc] data-[state=selected]:bg-[#f3f6fa]',
         className
       )}
       {...props}
@@ -36,7 +36,7 @@ export function TableHead({ className, ...props }: React.ThHTMLAttributes<HTMLTa
   return (
     <th
       className={cn(
-        'h-12 px-4 text-left align-middle font-medium text-gray-500 [&:has([role=checkbox])]:pr-0',
+        'h-12 px-5 text-left align-middle text-[11px] font-bold uppercase tracking-[0.08em] text-[#718096] [&:has([role=checkbox])]:pr-0',
         className
       )}
       {...props}
@@ -47,7 +47,7 @@ export function TableHead({ className, ...props }: React.ThHTMLAttributes<HTMLTa
 export function TableCell({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return (
     <td
-      className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0 text-gray-700', className)}
+      className={cn('p-5 align-middle text-[#42526a] [&:has([role=checkbox])]:pr-0', className)}
       {...props}
     />
   );

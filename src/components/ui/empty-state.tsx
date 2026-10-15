@@ -4,8 +4,8 @@ interface EmptyStateProps {
 
 export function EmptyState({ message = 'Module coming soon' }: EmptyStateProps) {
   return (
-    <div className="bg-white shadow rounded-lg p-6 min-h-[400px] flex items-center justify-center border border-gray-200 border-dashed">
-      <p className="text-gray-400 text-lg">{message}</p>
+    <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-[#ccd6e2] bg-white p-6 shadow-[0_5px_22px_rgba(15,38,68,0.04)]">
+      <p className="text-base font-medium text-[#8491a3]">{message}</p>
     </div>
   );
 }

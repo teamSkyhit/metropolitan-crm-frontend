@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 
 export function BrandFilters() {
@@ -49,30 +51,49 @@ export function BrandFilters() {
     }
   };
 
+  const hasFilters = Boolean(localSearch || searchParams.get('isActive'));
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6">
-      <div className="relative flex-1 max-w-md">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
-        </div>
-        <input
-          type="text"
-          value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
-          placeholder="Search brands..."
-          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-        />
+    <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
+        <SlidersHorizontal className="h-4 w-4 text-[var(--color-metro-gold)]" />
+        Find a brand
       </div>
-      <div>
-        <select
-          defaultValue={searchParams.get('isActive') ?? 'all'}
-          onChange={handleStatusChange}
-          className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white"
-        >
-          <option value="all">All Status</option>
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
-        </select>
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="relative flex-1 sm:max-w-md">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            aria-label="Search brands"
+            type="text"
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            placeholder="Search brands..."
+            className="pl-9"
+          />
+        </div>
+        <div className="relative sm:w-48">
+          <select
+            aria-label="Filter brands by status"
+            value={searchParams.get('isActive') ?? 'all'}
+            onChange={handleStatusChange}
+            className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-white pl-3.5 pr-9 text-sm font-medium text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
+          >
+            <option value="all">All Status</option>
+            <option value="true">Active</option>
+            <option value="false">Draft</option>
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        </div>
+        {hasFilters && (
+          <Button
+            variant="ghost"
+            type="button"
+            onClick={() => router.push(pathname)}
+            className="gap-2 text-slate-600"
+          >
+            <X className="h-4 w-4" /> Clear
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -15,11 +15,24 @@ interface Props {
 
 export function ResetPasswordModal({ user, isOpen, onClose }: Props) {
   const [newPassword, setNewPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const resetPassword = useResetUserPassword();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
+    if (
+      newPassword.length < 10 ||
+      newPassword.length > 64 ||
+      !/[A-Za-z]/.test(newPassword) ||
+      !/\d/.test(newPassword)
+    ) {
+      setErrorMsg(
+        'Password must be 10–64 characters and include at least one letter and one number.'
+      );
+      return;
+    }
     try {
       await resetPassword.mutateAsync({
         id: user.id,
@@ -39,9 +52,24 @@ export function ResetPasswordModal({ user, isOpen, onClose }: Props) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Reset Password">
       <form onSubmit={handleSubmit} className="space-y-4">
+        <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          Set a temporary password for <span className="font-semibold">{user.name}</span>. Share it
+          securely.
+        </p>
+        {errorMsg && (
+          <p
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700"
+          >
+            {errorMsg}
+          </p>
+        )}
         <div className="space-y-2">
-          <label className="text-sm font-medium">New Password</label>
+          <label htmlFor="reset-user-password" className="text-sm font-semibold text-slate-700">
+            New password <span className="text-red-600">*</span>
+          </label>
           <Input
+            id="reset-user-password"
             type="password"
             autoComplete="new-password"
             required
@@ -49,15 +77,15 @@ export function ResetPasswordModal({ user, isOpen, onClose }: Props) {
             onChange={(e) => setNewPassword(e.target.value)}
           />
           <p className="text-xs text-gray-500">
-            Must be 10-64 characters, at least one letter and one digit.
+            Must be 10–64 characters with at least one letter and one number.
           </p>
         </div>
-        <div className="flex justify-end space-x-2 pt-4">
+        <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button type="submit" disabled={resetPassword.isPending}>
-            {resetPassword.isPending ? 'Resetting...' : 'Reset'}
+            {resetPassword.isPending ? 'Resetting password…' : 'Reset password'}
           </Button>
         </div>
       </form>

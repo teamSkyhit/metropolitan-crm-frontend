@@ -171,10 +171,13 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100"
+      className="space-y-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
     >
       {error && (
-        <div className="p-4 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm">
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700"
+        >
           {error}
         </div>
       )}
@@ -364,7 +367,7 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
         )}
       </div>
 
-      <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+      <div className="sticky bottom-3 z-10 flex flex-col-reverse justify-end gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur sm:flex-row">
         <Button
           type="button"
           variant="outline"

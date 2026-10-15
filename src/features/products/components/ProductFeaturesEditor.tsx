@@ -50,14 +50,19 @@ export function ProductFeaturesEditor({
 
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationMessage, setValidationMessage] = useState('');
 
   const handleStartAdd = () => {
     setIsAddingNew(true);
     setNewForm({ icon: 'gear', title: '', description: '' });
+    setValidationMessage('');
   };
 
   const handleSaveNew = async () => {
-    if (!newForm.title.trim() || !newForm.description.trim()) return;
+    if (!newForm.title.trim() || !newForm.description.trim()) {
+      setValidationMessage('Enter both a feature title and description.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       if (onAddAsync) {
@@ -71,6 +76,7 @@ export function ProductFeaturesEditor({
         onChange([...features, newFeat]);
       }
       setIsAddingNew(false);
+      setValidationMessage('');
       setNewForm({ icon: 'gear', title: '', description: '' });
     } finally {
       setIsSubmitting(false);
@@ -80,10 +86,14 @@ export function ProductFeaturesEditor({
   const handleStartEdit = (feature: ProductFeature) => {
     setEditingId(feature.id);
     setEditForm({ icon: feature.icon, title: feature.title, description: feature.description });
+    setValidationMessage('');
   };
 
   const handleSaveEdit = async (featureId: string) => {
-    if (!editForm.title.trim() || !editForm.description.trim()) return;
+    if (!editForm.title.trim() || !editForm.description.trim()) {
+      setValidationMessage('Enter both a feature title and description.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       if (onUpdateAsync) {
@@ -92,6 +102,7 @@ export function ProductFeaturesEditor({
         onChange(features.map((f) => (f.id === featureId ? { ...f, ...editForm } : f)));
       }
       setEditingId(null);
+      setValidationMessage('');
     } finally {
       setIsSubmitting(false);
     }
@@ -126,7 +137,7 @@ export function ProductFeaturesEditor({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-start gap-3 min-[420px]:flex-row min-[420px]:justify-between">
         <div>
           <h4 className="text-sm font-semibold text-gray-900">Product Features</h4>
           <p className="text-xs text-gray-500">
@@ -139,7 +150,7 @@ export function ProductFeaturesEditor({
             type="button"
             disabled={disabled}
             onClick={handleStartAdd}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#0b2e59] hover:bg-[#0b2e59]/90 rounded-md transition-colors"
+            className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-[#0b2e59] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#0b2e59]/90 min-[420px]:w-auto"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Feature
@@ -174,9 +185,14 @@ export function ProductFeaturesEditor({
               </label>
               <input
                 type="text"
+                maxLength={120}
                 value={newForm.title}
-                onChange={(e) => setNewForm((prev) => ({ ...prev, title: e.target.value }))}
+                onChange={(e) => {
+                  setNewForm((prev) => ({ ...prev, title: e.target.value }));
+                  setValidationMessage('');
+                }}
                 placeholder="e.g. Robust Epicyclic Gearing"
+                aria-invalid={Boolean(validationMessage)}
                 className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-[#0b2e59]"
               />
             </div>
@@ -187,12 +203,21 @@ export function ProductFeaturesEditor({
             </label>
             <textarea
               rows={2}
+              maxLength={500}
               value={newForm.description}
-              onChange={(e) => setNewForm((prev) => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => {
+                setNewForm((prev) => ({ ...prev, description: e.target.value }));
+                setValidationMessage('');
+              }}
               placeholder="Detailed technical explanation of this feature..."
               className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-[#0b2e59]"
             />
           </div>
+          {validationMessage && (
+            <p className="text-xs font-medium text-red-600" role="alert">
+              {validationMessage}
+            </p>
+          )}
           <div className="flex justify-end gap-2">
             <button
               type="button"
@@ -203,7 +228,7 @@ export function ProductFeaturesEditor({
             </button>
             <button
               type="button"
-              disabled={isSubmitting || !newForm.title.trim() || !newForm.description.trim()}
+              disabled={isSubmitting}
               onClick={handleSaveNew}
               className="px-3 py-1.5 text-xs font-medium text-white bg-[#0b2e59] hover:bg-[#0b2e59]/90 rounded disabled:opacity-50"
             >
@@ -241,6 +266,7 @@ export function ProductFeaturesEditor({
                       <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
                       <input
                         type="text"
+                        maxLength={120}
                         value={editForm.title}
                         onChange={(e) =>
                           setEditForm((prev) => ({ ...prev, title: e.target.value }))
@@ -255,6 +281,7 @@ export function ProductFeaturesEditor({
                     </label>
                     <textarea
                       rows={2}
+                      maxLength={500}
                       value={editForm.description}
                       onChange={(e) =>
                         setEditForm((prev) => ({ ...prev, description: e.target.value }))
@@ -262,6 +289,11 @@ export function ProductFeaturesEditor({
                       className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
                     />
                   </div>
+                  {validationMessage && (
+                    <p className="text-xs font-medium text-red-600" role="alert">
+                      {validationMessage}
+                    </p>
+                  )}
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
