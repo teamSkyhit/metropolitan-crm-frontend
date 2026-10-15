@@ -274,12 +274,12 @@ export const productsService = {
     title?: string
   ): Promise<{ success: boolean; data: import('./types').ProductDocument[] }> {
     const formData = new FormData();
+    if (title && title.trim()) {
+      formData.append('title', title.trim().slice(0, 200));
+    }
     files.forEach((file) => {
       formData.append('documents', file);
     });
-    if (title) {
-      formData.append('title', title);
-    }
     const response = await apiClient.post<{
       success: boolean;
       data: import('./types').ProductDocument[];

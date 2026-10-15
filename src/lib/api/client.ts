@@ -33,7 +33,12 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // The browser/Axios MUST set multipart/form-data with the correct boundary
   if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
     if (config.headers) {
-      delete config.headers['Content-Type'];
+      if (typeof (config.headers as unknown as { delete?: (h: string) => void }).delete === 'function') {
+        (config.headers as unknown as { delete: (h: string) => void }).delete('Content-Type');
+        (config.headers as unknown as { delete: (h: string) => void }).delete('content-type');
+      }
+      delete (config.headers as Record<string, unknown>)['Content-Type'];
+      delete (config.headers as Record<string, unknown>)['content-type'];
     }
   } else if (config.headers && !config.headers['Content-Type']) {
     config.headers['Content-Type'] = 'application/json';
