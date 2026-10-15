@@ -63,13 +63,13 @@ export function ProductDocumentManager({
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // Validation: PDF only and 10MB max
+    // Validation: PDF only and 5MB max (safe for reverse proxy limits)
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       rejectFile('This document format is not supported. Choose a PDF file.');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      rejectFile('This PDF is larger than 10 MB. Choose a smaller file.');
+    if (file.size > 5 * 1024 * 1024) {
+      rejectFile('This PDF is larger than 5 MB. Choose a smaller or compressed file.');
       return;
     }
 
@@ -88,7 +88,10 @@ export function ProductDocumentManager({
         const anyErr = err as any; // eslint-disable-line @typescript-eslint/no-explicit-any
         let message = 'Failed to upload document.';
         const details = anyErr?.response?.data?.error?.details;
-        if (Array.isArray(details) && details.length > 0) {
+        if (anyErr?.response?.status === 413) {
+          message =
+            'This PDF file is too large for upload (maximum allowed size is 5 MB). Please choose a smaller or compressed PDF.';
+        } else if (Array.isArray(details) && details.length > 0) {
           message = details
             .map((d: { message?: string; field?: string }) => d.message || d.field)
             .filter(Boolean)
@@ -172,7 +175,7 @@ export function ProductDocumentManager({
         <div>
           <h4 className="text-sm font-semibold text-gray-900">Product Documents (PDFs)</h4>
           <p className="text-xs text-gray-500">
-            Upload up to 3 PDF technical datasheets, CAD drawings, or brochures (Max 10 MB each).
+            Upload up to 3 PDF technical datasheets, CAD drawings, or brochures (Max 5 MB each).
           </p>
         </div>
         <span className="text-xs font-semibold px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full border border-gray-200">
@@ -236,7 +239,7 @@ export function ProductDocumentManager({
             )}
           </button>
           <p id="document-upload-rules" className="text-center text-[11px] text-gray-500">
-            One file at a time · PDF only · Maximum 10 MB
+            One file at a time · PDF only · Maximum 5 MB
           </p>
         </div>
       )}
