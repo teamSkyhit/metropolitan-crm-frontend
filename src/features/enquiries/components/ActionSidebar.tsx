@@ -77,7 +77,11 @@ export function ActionSidebar({
               ))}
             </select>
             {updateStatus.isError && (
-              <p className="mt-1 text-sm text-red-600">Failed to update status.</p>
+              <p className="mt-1 text-sm text-red-600">
+                {(updateStatus.error as any)?.response?.data?.error?.message ||
+                  (updateStatus.error as any)?.message ||
+                  'Failed to update status.'}
+              </p>
             )}
           </div>
         )}
