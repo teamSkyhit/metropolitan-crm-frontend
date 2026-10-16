@@ -127,19 +127,17 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
     }
 
     try {
+      const cleanContent = sanitizeContentForBackend(type, content);
+
       if (isEdit) {
         // PATCH partial update: only send what changed if we wanted to be strictly minimal,
         // but since we keep full form state, we can send it all or minimal.
-        // The instructions: "CRITICAL PATCH RULE: The backend supports partial PATCH semantics.
-        // Only send fields the user actually changed where practical."
         const payload: UpdateHomepageSectionRequest = {};
         if (title !== (initialData.title ?? '')) payload.title = title || null;
         if (subtitle !== (initialData.subtitle ?? '')) payload.subtitle = subtitle || null;
         if (isActive !== initialData.isActive) payload.isActive = isActive;
 
-        // For simplicity of editing content, we just send the current content.
-        // Comparing deeply is complex, so we just send the content.
-        payload.content = content;
+        payload.content = cleanContent;
 
         await updateMutation.mutateAsync({ id: initialData.id, data: payload });
       } else {
@@ -148,7 +146,7 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
           title: title || null,
           subtitle: subtitle || null,
           isActive,
-          content,
+          content: cleanContent,
         };
         await createMutation.mutateAsync(payload);
       }
@@ -402,5 +400,46 @@ function getDefaultContent(type: HomepageSectionType): any {
       return { heading: '', mediaId: '' };
     default:
       return {} as any;
+  }
+}
+
+function sanitizeContentForBackend(type: HomepageSectionType, content: any): any {
+  if (!content) return content;
+  switch (type) {
+    case HomepageSectionType.HERO:
+      return {
+        slides: (content.slides || []).map((slide: any, idx: number) => ({
+          ...(slide.id ? { id: slide.id } : {}),
+          heading: slide.heading || 'Slide',
+          subheading: slide.subheading ? slide.subheading : null,
+          mediaId: slide.mediaId || (slide.media?.id ?? ''),
+          ctaLabel: slide.ctaLabel ? slide.ctaLabel : null,
+          ctaUrl: slide.ctaUrl ? slide.ctaUrl : null,
+          sortOrder: typeof slide.sortOrder === 'number' ? slide.sortOrder : idx,
+          isActive: slide.isActive !== false,
+        })),
+      };
+    case HomepageSectionType.FEATURED_PRODUCTS:
+      return {
+        productIds: Array.isArray(content.productIds) ? content.productIds : [],
+      };
+    case HomepageSectionType.FEATURED_CATEGORIES:
+      return {
+        categoryIds: Array.isArray(content.categoryIds) ? content.categoryIds : [],
+      };
+    case HomepageSectionType.FEATURED_BRANDS:
+      return {
+        brandIds: Array.isArray(content.brandIds) ? content.brandIds : [],
+      };
+    case HomepageSectionType.PROMO_BANNER:
+      return {
+        heading: content.heading || '',
+        description: content.description ? content.description : null,
+        mediaId: content.mediaId || (content.media?.id ?? ''),
+        ctaLabel: content.ctaLabel ? content.ctaLabel : null,
+        ctaUrl: content.ctaUrl ? content.ctaUrl : null,
+      };
+    default:
+      return content;
   }
 }

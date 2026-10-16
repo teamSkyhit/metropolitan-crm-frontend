@@ -113,8 +113,10 @@ export function ProductImageManager({ product }: { product: Product }) {
           );
         },
       });
-    } catch {
-      toast.error('Failed to load selected media image.');
+    } catch (err: unknown) {
+      console.error('Failed to load selected media image:', err);
+      const msg = err instanceof Error ? err.message : 'Failed to load selected media image.';
+      toast.error(msg);
     }
   };
 

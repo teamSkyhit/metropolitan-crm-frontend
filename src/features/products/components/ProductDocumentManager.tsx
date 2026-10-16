@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useRef, useState } from 'react';
 import { ProductDocument } from '../types';
@@ -63,13 +63,13 @@ export function ProductDocumentManager({
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // Validation: PDF only and 10MB max
+    // Validation: PDF only and 10MB max (aligned with backend storage limits)
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       rejectFile('This document format is not supported. Choose a PDF file.');
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      rejectFile('This PDF is larger than 10 MB. Choose a smaller file.');
+      rejectFile('This PDF is larger than 10 MB. Choose a smaller or compressed file.');
       return;
     }
 
@@ -78,27 +78,45 @@ export function ProductDocumentManager({
       return;
     }
 
-    const titleToUse = pendingTitle.trim() || file.name.replace(/\.[^/.]+$/, '');
-
     if (onUploadAsync) {
       setIsUploading(true);
       try {
-        await onUploadAsync([file], titleToUse);
+        await onUploadAsync([file], pendingTitle.trim() || undefined);
         toast.success('Document uploaded successfully.');
         setPendingTitle('');
       } catch (err: unknown) {
         const anyErr = err as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-        const message =
-          anyErr?.response?.data?.error?.message ||
-          anyErr?.response?.data?.message ||
-          'Failed to upload document.';
+        let message = 'Failed to upload document.';
+        const details = anyErr?.response?.data?.error?.details;
+        if (anyErr?.response?.status === 413) {
+          message =
+            'The upload was rejected by the network proxy (HTTP 413: Payload Too Large). Netlify preview proxy enforces a ~6 MB request limit. To upload files up to 10 MB, please ensure direct backend API access or compress the file.';
+        } else if (Array.isArray(details) && details.length > 0) {
+          message = details
+            .map((d: { message?: string; field?: string }) => d.message || d.field)
+            .filter(Boolean)
+            .join(', ');
+        } else if (anyErr?.response?.data?.error?.message) {
+          message = anyErr.response.data.error.message;
+        } else if (anyErr?.response?.data?.message) {
+          message = anyErr.response.data.message;
+        } else if (
+          typeof anyErr?.response?.data === 'string' &&
+          anyErr.response.data.length > 0 &&
+          anyErr.response.data.length < 200
+        ) {
+          message = anyErr.response.data;
+        } else if (anyErr?.message) {
+          message = anyErr.message;
+        }
         setValidationError(message);
         toast.error(message);
       } finally {
         setIsUploading(false);
       }
     } else if (onLocalFilesChange) {
-      onLocalFilesChange([...localFiles, { file, title: titleToUse }]);
+      const localTitle = pendingTitle.trim() || file.name.replace(/\.[^/.]+$/, '');
+      onLocalFilesChange([...localFiles, { file, title: localTitle }]);
       setPendingTitle('');
     }
 
