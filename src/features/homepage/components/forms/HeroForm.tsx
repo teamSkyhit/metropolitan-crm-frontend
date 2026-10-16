@@ -19,6 +19,7 @@ export function HeroForm({ content, onChange }: Props) {
   const handleAddSlide = () => {
     const newSlide: HeroSlide = {
       heading: 'New Slide',
+      subheading: null,
       mediaId: '',
       sortOrder: slides.length,
       isActive: true,
