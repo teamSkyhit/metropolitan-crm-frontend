@@ -1,4 +1,4 @@
-export type Role = 'SALES_MANAGER' | 'SUPER_ADMIN' | 'CRM_USER';
+export type Role = 'SUPER_ADMIN' | 'CRM_USER';
 
 export interface User {
   id: string;

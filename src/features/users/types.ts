@@ -19,7 +19,7 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password?: string;
-  role: 'SALES_MANAGER' | 'CRM_USER';
+  role: 'CRM_USER';
 }
 
 export interface UpdateUserRequest {

@@ -107,18 +107,20 @@ export function Header({ onMenuClick, isMobileMenuOpen = false }: HeaderProps) {
       </div>
 
       <div className="relative flex items-center gap-2 sm:gap-3">
-        <Link
-          href="/notifications"
-          className="relative grid h-10 w-10 place-items-center rounded-xl border border-transparent text-gray-500 transition-colors hover:border-gray-200 hover:bg-gray-50 hover:text-[#102f57] focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
-          aria-label={`View notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-        >
-          <Bell className="w-5 h-5 text-gray-600" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white leading-none">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </Link>
+        {canAccessRoute(user?.role, ROUTES.NOTIFICATIONS) && (
+          <Link
+            href={ROUTES.NOTIFICATIONS}
+            className="relative grid h-10 w-10 place-items-center rounded-xl border border-transparent text-gray-500 transition-colors hover:border-gray-200 hover:bg-gray-50 hover:text-[#102f57] focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
+            aria-label={`View notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+          >
+            <Bell className="w-5 h-5 text-gray-600" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white leading-none">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </Link>
+        )}
 
         <div className="relative" ref={menuRef}>
           <button

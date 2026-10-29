@@ -44,10 +44,6 @@ const ROLE_BADGES: Record<string, { label: string; className: string }> = {
     label: 'CRM USER',
     className: 'bg-amber-50 text-amber-700 border-amber-200',
   },
-  SALES_MANAGER: {
-    label: 'CRM USER',
-    className: 'bg-amber-50 text-amber-700 border-amber-200',
-  },
 };
 
 export function UserList() {

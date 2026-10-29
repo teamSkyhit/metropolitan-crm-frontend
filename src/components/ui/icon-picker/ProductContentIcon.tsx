@@ -73,8 +73,8 @@ export function ProductContentIcon({
 
   const trimmed = icon.trim();
 
-  // If icon is an HTTPS URL, render as safe image tag
-  if (trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('/')) {
+  // If icon is an HTTPS or relative URL, render as safe image tag
+  if (trimmed.startsWith('https://') || trimmed.startsWith('/')) {
     return (
       /* eslint-disable-next-line @next/next/no-img-element */
       <img

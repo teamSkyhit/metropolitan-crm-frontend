@@ -48,7 +48,12 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
     }
   };
 
-  const roleLabel = user.role === 'SUPER_ADMIN' ? 'SUPER ADMIN' : 'CRM USER';
+  const roleLabel =
+    user.role === 'SUPER_ADMIN'
+      ? 'SUPER ADMIN'
+      : user.role === 'CRM_USER'
+        ? 'CRM USER'
+        : (user.role as string)?.replace(/_/g, ' ') || user.role;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit User">
