@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useRef, useState } from 'react';
 import { ProductVideo } from '../types';
@@ -75,10 +75,17 @@ export function ProductVideoManager({
         setPendingTitle('');
       } catch (err: unknown) {
         const anyErr = err as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-        const message =
-          anyErr?.response?.data?.error?.message ||
-          anyErr?.response?.data?.message ||
-          'Failed to upload video.';
+        let message = 'Failed to upload video.';
+        if (anyErr?.response?.status === 413) {
+          message =
+            'The upload was rejected by the network proxy (HTTP 413: Payload Too Large). Netlify preview proxy enforces a ~6 MB request limit. To upload videos up to 100 MB, please ensure direct backend API access or compress the video.';
+        } else if (anyErr?.response?.data?.error?.message) {
+          message = anyErr.response.data.error.message;
+        } else if (anyErr?.response?.data?.message) {
+          message = anyErr.response.data.message;
+        } else if (anyErr?.message) {
+          message = anyErr.message;
+        }
         setValidationError(message);
         toast.error(message);
       } finally {
