@@ -23,6 +23,7 @@ import {
 import toast from 'react-hot-toast';
 import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
 import { urlToFile } from '@/lib/utils/media';
+import { IconPicker } from '@/components/ui/icon-picker/IconPicker';
 
 interface CategoryFormProps {
   initialData?: Category;
@@ -50,6 +51,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
     name: initialData?.name ?? '',
     slug: initialData?.slug ?? '',
     description: initialData?.description ?? '',
+    icon: initialData?.icon ?? '',
     isActive: initialData?.isActive ?? true,
     sortOrder: initialData?.sortOrder ?? 0,
     parentId: initialData?.parentId ?? '',
@@ -151,6 +153,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
       const payload = {
         ...formData,
         parentId: formData.parentId === '' ? null : formData.parentId,
+        icon: formData.icon ? formData.icon.trim() : null,
       };
 
       let categoryId = initialData?.id;
@@ -294,8 +297,8 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
           </div>
 
           {/* Card 2: Hierarchy & Positioning */}
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
-            <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/70 px-6 py-4">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-xs">
+            <div className="flex items-center gap-3 rounded-t-2xl border-b border-slate-100 bg-slate-50/70 px-6 py-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                 <Layers className="h-4.5 w-4.5" />
               </div>
@@ -347,6 +350,19 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                 />
                 <p className="mt-1 text-[11px] text-slate-400">
                   Lower numbers (0, 1, 2...) appear first in storefront listings.
+                </p>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Category Dynamic Icon
+                </label>
+                <IconPicker
+                  value={formData.icon || ''}
+                  onChange={(iconKey) => setFormData((prev) => ({ ...prev, icon: iconKey }))}
+                />
+                <p className="mt-1 text-[11px] text-slate-400">
+                  Visual symbol displayed in navigation and category highlights.
                 </p>
               </div>
             </div>

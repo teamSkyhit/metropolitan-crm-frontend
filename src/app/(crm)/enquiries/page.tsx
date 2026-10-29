@@ -8,6 +8,7 @@ import { useDebounce } from '@/lib/hooks/useDebounce';
 import { ENQUIRY_STATUSES } from '@/features/enquiries/types';
 import { useUsers } from '@/features/users/hooks/useUsers';
 import { ROLES } from '@/lib/constants/roles';
+import { useAuthStore } from '@/features/auth/auth.store';
 import {
   Table,
   TableBody,
@@ -85,7 +86,9 @@ function EnquiriesList() {
     }
   }, [debouncedSearch, search, localSearch, updateUrl]);
 
-  const { data: usersData } = useUsers({ limit: 100, role: ROLES.SALES_MANAGER });
+  const role = useAuthStore((state) => state.role);
+  const canAssign = role !== ROLES.CRM_USER;
+  const { data: usersData } = useUsers({ limit: 100 }, { enabled: canAssign });
   const { data, isLoading, isError, refetch } = useEnquiries({
     page,
     limit: 20,
@@ -172,20 +175,22 @@ function EnquiriesList() {
             ))}
           </select>
 
-          <select
-            value={assignedTo}
-            onChange={(e) => handleFilterChange('assignedTo', e.target.value)}
-            className={selectClasses}
-            aria-label="Filter by assignee"
-          >
-            <option value="">All Assignees</option>
-            <option value="unassigned">Unassigned</option>
-            {usersData?.data?.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name}
-              </option>
-            ))}
-          </select>
+          {canAssign && (
+            <select
+              value={assignedTo}
+              onChange={(e) => handleFilterChange('assignedTo', e.target.value)}
+              className={selectClasses}
+              aria-label="Filter by assignee"
+            >
+              <option value="">All Assignees</option>
+              <option value="unassigned">Unassigned</option>
+              {usersData?.data?.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+            </select>
+          )}
 
           <Input
             type="date"
@@ -233,6 +238,7 @@ function EnquiriesList() {
                   <TableHead>Contact</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Assigned To</TableHead>
+                  <TableHead>Items</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Action</TableHead>
                 </TableRow>
@@ -254,6 +260,11 @@ function EnquiriesList() {
                     <TableCell>
                       <span className="text-sm text-gray-600">
                         {enq.assignedTo ? enq.assignedTo.name : 'Unassigned'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
+                        {enq.lineItemCount} {enq.lineItemCount === 1 ? 'item' : 'items'}
                       </span>
                     </TableCell>
                     <TableCell>

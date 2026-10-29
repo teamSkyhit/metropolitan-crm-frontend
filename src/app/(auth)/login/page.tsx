@@ -8,6 +8,7 @@ import { authService } from '@/features/auth/auth.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ROUTES } from '@/lib/constants/routes';
+import { ROLES } from '@/lib/constants/roles';
 import { Eye, EyeOff, CheckCircle2, LockKeyhole } from 'lucide-react';
 
 function LoginForm() {
@@ -19,7 +20,7 @@ function LoginForm() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isInitializing, setAuth } = useAuthStore();
+  const { isAuthenticated, isInitializing, setAuth, role } = useAuthStore();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -28,10 +29,11 @@ function LoginForm() {
       if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
         router.replace(redirect);
       } else {
-        router.replace(ROUTES.DASHBOARD);
+        const defaultLanding = role === ROLES.CRM_USER ? ROUTES.ENQUIRIES : ROUTES.DASHBOARD;
+        router.replace(defaultLanding);
       }
     }
-  }, [isAuthenticated, isInitializing, router, searchParams]);
+  }, [isAuthenticated, isInitializing, router, searchParams, role]);
 
   const validate = () => {
     if (!email) return 'Email is required';
@@ -59,7 +61,9 @@ function LoginForm() {
       if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
         router.replace(redirect);
       } else {
-        router.replace(ROUTES.DASHBOARD);
+        const defaultLanding =
+          response.user.role === ROLES.CRM_USER ? ROUTES.ENQUIRIES : ROUTES.DASHBOARD;
+        router.replace(defaultLanding);
       }
     } catch (err: unknown) {
       const error = err as import('axios').AxiosError<import('@/features/auth/types').ApiAuthError>;

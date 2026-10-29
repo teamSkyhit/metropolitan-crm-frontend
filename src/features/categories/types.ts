@@ -5,6 +5,7 @@ export interface Category {
   description: string | null;
   imageUrl?: string | null;
   bannerUrl: string | null;
+  icon?: string | null;
   isActive: boolean;
   sortOrder: number;
   parentId: string | null;
@@ -29,6 +30,9 @@ export interface CreateCategoryRequest {
   name: string;
   slug: string;
   description?: string | null;
+  imageUrl?: string | null;
+  bannerUrl?: string | null;
+  icon?: string | null;
   isActive?: boolean;
   sortOrder?: number;
   parentId?: string | null;
@@ -38,7 +42,14 @@ export interface UpdateCategoryRequest {
   name?: string;
   slug?: string;
   description?: string | null;
+  imageUrl?: string | null;
+  bannerUrl?: string | null;
+  icon?: string | null;
   isActive?: boolean;
   sortOrder?: number;
   parentId?: string | null;
+}
+
+export interface ReorderCategoriesRequest {
+  categoryIds: string[];
 }

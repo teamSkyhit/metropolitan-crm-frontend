@@ -54,6 +54,18 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+    // Handle 403 PASSWORD_CHANGE_REQUIRED
+    const errorData = error.response?.data as { error?: { code?: string } } | undefined;
+    if (errorData?.error?.code === 'PASSWORD_CHANGE_REQUIRED') {
+      try {
+        const { useAuthStore } = await import('@/features/auth/auth.store');
+        useAuthStore.getState().setMustChangePassword(true);
+      } catch (err) {
+        console.error('Failed to trigger PASSWORD_CHANGE_REQUIRED:', err);
+      }
+      return Promise.reject(error);
+    }
+
     // Handle 401 Unauthorized
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       // Exclude auth routes from retry/refresh loop

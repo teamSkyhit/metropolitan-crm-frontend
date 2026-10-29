@@ -58,4 +58,13 @@ describe('categoriesService media operations', () => {
     expect(apiClient.delete).toHaveBeenCalledWith('/categories/cat-1/banner');
     expect(result.bannerUrl).toBeNull();
   });
+
+  it('reorders categories via PATCH /categories/reorder', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValueOnce({ data: { success: true } });
+
+    await categoriesService.reorderCategories(['cat-2', 'cat-1']);
+    expect(apiClient.patch).toHaveBeenCalledWith('/categories/reorder', {
+      categoryIds: ['cat-2', 'cat-1'],
+    });
+  });
 });

@@ -6,8 +6,10 @@ import { useAuthStore } from '../auth.store';
 import { ROUTES } from '@/lib/constants/routes';
 import { canAccessRoute } from '../permissions';
 
+import { MustChangePasswordModal } from './MustChangePasswordModal';
+
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isInitializing, role } = useAuthStore();
+  const { isAuthenticated, isInitializing, role, user } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -21,7 +23,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         router.replace(redirectUrl);
       } else if (!canAccessRoute(role, pathname)) {
         // Logged in but no permission
-        router.replace(ROUTES.FORBIDDEN);
+        // CRM_USER is directed to their dedicated workspace at /enquiries
+        if (role === 'CRM_USER') {
+          router.replace(ROUTES.ENQUIRIES);
+        } else {
+          router.replace(ROUTES.FORBIDDEN);
+        }
       }
     }
   }, [isAuthenticated, isInitializing, router, pathname, role]);
@@ -47,5 +54,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <MustChangePasswordModal />
+      {user?.mustChangePassword ? null : children}
+    </>
+  );
 }

@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 import { User } from '@/features/users/types';
+import { Role } from '@/types/auth';
+import { cn } from '@/lib/utils/cn';
 import {
   Pencil,
   Trash2,
@@ -33,10 +35,26 @@ import { ResetPasswordModal } from './ResetPasswordModal';
 import toast from 'react-hot-toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
+const ROLE_BADGES: Record<string, { label: string; className: string }> = {
+  SUPER_ADMIN: {
+    label: 'SUPER ADMIN',
+    className: 'bg-purple-50 text-purple-700 border-purple-200',
+  },
+  CRM_USER: {
+    label: 'CRM USER',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
+  },
+  SALES_MANAGER: {
+    label: 'CRM USER',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
+  },
+};
+
 export function UserList() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -58,6 +76,7 @@ export function UserList() {
     page,
     limit: 10,
     search: debouncedSearch || undefined,
+    role: roleFilter === 'all' ? undefined : (roleFilter as Role),
   });
 
   const deleteUser = useDeleteUser();
@@ -117,22 +136,36 @@ export function UserList() {
     <div className="space-y-5">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              aria-label="Search users"
-              placeholder="Search name or email"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
+          <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative w-full sm:max-w-sm">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                aria-label="Search users"
+                placeholder="Search name or email"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <select
+              aria-label="Filter by role"
+              value={roleFilter}
+              onChange={(e) => {
+                setRoleFilter(e.target.value);
+                setPage(1);
+              }}
+              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-xs outline-none transition hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-2 focus:ring-[#102f57]/10"
+            >
+              <option value="all">All Roles</option>
+              <option value="CRM_USER">CRM User</option>
+            </select>
           </div>
           <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
-            <UserPlus className="h-4 w-4" /> Add sales manager
+            <UserPlus className="h-4 w-4" /> Add CRM User
           </Button>
         </div>
         <p className="mt-3 text-xs text-slate-500">
-          Sales managers can manage assigned enquiries. Administrators retain full access.
+          Create and manage CRM users, control account access, and reset credentials.
         </p>
       </div>
 
@@ -180,9 +213,7 @@ export function UserList() {
                 <TableCell colSpan={5} className="py-14 text-center text-gray-500">
                   <Users className="mx-auto mb-3 h-9 w-9 text-slate-300" />
                   <p className="font-semibold text-slate-700">No users found</p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Try another search or create a sales manager.
-                  </p>
+                  <p className="mt-1 text-sm text-slate-500">Try another search or add a user.</p>
                 </TableCell>
               </TableRow>
             ) : (
@@ -191,8 +222,14 @@ export function UserList() {
                   <TableCell className="font-semibold text-slate-900">{user.name}</TableCell>
                   <TableCell className="text-slate-600">{user.email}</TableCell>
                   <TableCell>
-                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-                      {user.role.replace('_', ' ')}
+                    <span
+                      className={cn(
+                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border tracking-wider',
+                        ROLE_BADGES[user.role]?.className ||
+                          'bg-slate-100 text-slate-700 border-slate-200'
+                      )}
+                    >
+                      {ROLE_BADGES[user.role]?.label || user.role.replace(/_/g, ' ')}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -203,7 +240,7 @@ export function UserList() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
-                    {user.role === 'SALES_MANAGER' && (
+                    {user.role !== 'SUPER_ADMIN' && (
                       <>
                         <Button
                           variant="ghost"

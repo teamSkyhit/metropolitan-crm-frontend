@@ -28,6 +28,8 @@ import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
 import { DashboardRecentEnquiry } from '@/features/dashboard/types';
+import { useAuthStore } from '@/features/auth/auth.store';
+import { canAccessRoute } from '@/features/auth/permissions';
 
 function StatCard({
   title,
@@ -79,7 +81,14 @@ function DashboardSkeleton() {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const { data, isLoading, isError, refetch } = useDashboardQuery(10);
+
+  React.useEffect(() => {
+    if (user && !canAccessRoute(user.role, ROUTES.DASHBOARD)) {
+      router.replace(ROUTES.ENQUIRIES);
+    }
+  }, [user, router]);
 
   if (isLoading) {
     return (
