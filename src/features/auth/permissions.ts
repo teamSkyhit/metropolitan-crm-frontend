@@ -11,39 +11,33 @@ export function hasAnyRole(userRole: Role | undefined | null, expectedRoles: Rol
   return expectedRoles.includes(userRole);
 }
 
-// Super admin has access to all CRM routes explicitly.
-// Sales Manager has restricted access.
+// Super admin has access to all CRM modules explicitly.
+// CRM_USER has access only to Enquiries.
 export function canAccessRoute(userRole: Role | undefined | null, route: string): boolean {
   if (!userRole) return false;
 
-  const allowedForSalesManager = [
+  const allowedForCrmUser = [ROUTES.ENQUIRIES];
+
+  const allowedForSuperAdmin = [
     ROUTES.DASHBOARD,
     ROUTES.ENQUIRIES,
     ROUTES.PRODUCTS,
     ROUTES.CATEGORIES,
     ROUTES.BRANDS,
+    ROUTES.INDUSTRIAL_CAPABILITIES,
     ROUTES.NOTIFICATIONS,
     ROUTES.SETTINGS,
-  ];
-
-  const allowedForSuperAdmin = [
-    ...allowedForSalesManager,
     ROUTES.USERS,
     ROUTES.HOMEPAGE,
-    ROUTES.SETTINGS,
   ];
 
-  const allowedRoutes =
-    userRole === ROLES.SUPER_ADMIN
-      ? allowedForSuperAdmin
-      : userRole === ROLES.SALES_MANAGER
-        ? allowedForSalesManager
-        : [];
+  const allowedRoutes = userRole === ROLES.SUPER_ADMIN ? allowedForSuperAdmin : allowedForCrmUser;
 
   return allowedRoutes.some((r) => route === r || route.startsWith(r + '/'));
 }
 
 export type Permission =
+  | 'enquiries:read'
   | 'enquiries:update'
   | 'enquiries:assign'
   | 'enquiries:follow-up'
@@ -54,7 +48,11 @@ export type Permission =
   | 'homepage:read'
   | 'homepage:create'
   | 'homepage:update'
-  | 'homepage:delete';
+  | 'homepage:delete'
+  | 'industrial-capabilities:read'
+  | 'industrial-capabilities:create'
+  | 'industrial-capabilities:update'
+  | 'industrial-capabilities:delete';
 
 export function hasPermission(
   user: { role: Role } | undefined | null,
@@ -63,19 +61,12 @@ export function hasPermission(
   if (!user || !user.role) return false;
   if (user.role === ROLES.SUPER_ADMIN) return true;
 
-  if (user.role === ROLES.SALES_MANAGER) {
-    // Sales Managers can do these actions
-    const allowed = [
-      'enquiries:update',
-      'enquiries:follow-up',
-      'enquiries:assign',
-      'products:read',
-      'products:create',
-      'products:update',
-      'products:delete',
-    ];
-    if (allowed.includes(permission)) return true;
-  }
+  // CRM_USER only has permissions on enquiries (excluding assign)
+  const allowedForCrmUser: Permission[] = [
+    'enquiries:read',
+    'enquiries:update',
+    'enquiries:follow-up',
+  ];
 
-  return false;
+  return allowedForCrmUser.includes(permission);
 }

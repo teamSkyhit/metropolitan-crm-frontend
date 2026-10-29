@@ -13,6 +13,7 @@ interface AuthState {
 
   // Actions
   setAuth: (user: User, tokens: AuthTokens) => void;
+  setMustChangePassword: (mustChange: boolean) => void;
   logout: () => void;
   logoutAll: () => Promise<void>;
   initialize: () => Promise<void>;
@@ -32,6 +33,12 @@ export const useAuthStore = create<AuthState>((set) => ({
       isAuthenticated: true,
       isInitializing: false,
     });
+  },
+
+  setMustChangePassword: (mustChange: boolean) => {
+    set((state) => ({
+      user: state.user ? { ...state.user, mustChangePassword: mustChange } : null,
+    }));
   },
 
   logout: async () => {

@@ -37,6 +37,10 @@ export const categoriesService = {
     return data.data;
   },
 
+  async reorderCategories(categoryIds: string[]): Promise<void> {
+    await apiClient.patch('/categories/reorder', { categoryIds });
+  },
+
   async uploadImage(id: string, image: File): Promise<Category> {
     const formData = new FormData();
     formData.append('image', image);

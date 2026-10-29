@@ -48,12 +48,31 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
     }
   };
 
+  const roleLabel =
+    user.role === 'SUPER_ADMIN'
+      ? 'SUPER ADMIN'
+      : user.role === 'CRM_USER'
+        ? 'CRM USER'
+        : (user.role as string)?.replace(/_/g, ' ') || user.role;
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit User">
       <form onSubmit={handleSubmit} className="space-y-4">
         <p className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
           Update the contact details used for this user’s CRM account.
         </p>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-semibold text-slate-700">Account Role</label>
+          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5">
+            <span className="text-sm font-bold text-slate-800">{roleLabel}</span>
+            <span className="text-xs font-medium text-slate-400">Fixed at creation</span>
+          </div>
+          <p className="text-[11px] text-slate-400">
+            Backend schema restricts role mutation after account creation.
+          </p>
+        </div>
+
         <div className="space-y-2">
           <label htmlFor="edit-user-name" className="text-sm font-semibold text-slate-700">
             Full name <span className="text-red-600">*</span>

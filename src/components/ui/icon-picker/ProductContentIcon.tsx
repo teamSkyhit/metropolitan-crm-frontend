@@ -21,6 +21,8 @@ import {
   Award,
   Truck,
   RotateCw,
+  Droplet,
+  Anchor,
   HelpCircle,
   LucideIcon,
 } from 'lucide-react';
@@ -38,6 +40,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   power: Zap,
   zap: Zap,
   tools: Wrench,
+  wrench: Wrench,
   temperature: Thermometer,
   check: CheckCircle2,
   layers: Layers,
@@ -47,6 +50,8 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   award: Award,
   truck: Truck,
   rotate: RotateCw,
+  droplet: Droplet,
+  anchor: Anchor,
 };
 
 export const AVAILABLE_ICON_KEYS = Object.keys(ICON_MAP);
@@ -68,8 +73,8 @@ export function ProductContentIcon({
 
   const trimmed = icon.trim();
 
-  // If icon is an HTTPS URL, render as safe image tag
-  if (trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('/')) {
+  // If icon is an HTTPS or relative URL, render as safe image tag
+  if (trimmed.startsWith('https://') || trimmed.startsWith('/')) {
     return (
       /* eslint-disable-next-line @next/next/no-img-element */
       <img

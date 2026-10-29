@@ -41,7 +41,7 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
         name: name.trim(),
         email: email.trim(),
         password,
-        role: 'SALES_MANAGER',
+        role: 'CRM_USER',
       });
       onClose();
     } catch (error: any) {
@@ -54,10 +54,10 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create Sales Manager">
+    <Modal isOpen={isOpen} onClose={onClose} title="Create CRM User">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-3 text-sm text-blue-900">
-          This account will receive the Sales Manager role and can work with assigned enquiries.
+          Create a new CRM user account with access exclusively to manage enquiries.
         </div>
         {errorMsg && (
           <div
@@ -67,6 +67,19 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
             {errorMsg}
           </div>
         )}
+        <div className="space-y-1.5">
+          <label className="text-sm font-semibold text-slate-700">Account Role</label>
+          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5">
+            <span className="text-sm font-bold text-slate-800">CRM User</span>
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+              Enquiries Only
+            </span>
+          </div>
+          <p className="text-xs text-slate-500">
+            CRM Users have focused access exclusively to the Enquiries module (view, update,
+            follow-up).
+          </p>
+        </div>
         <div className="space-y-2">
           <label htmlFor="create-user-name" className="text-sm font-semibold text-slate-700">
             Full name <span className="text-red-600">*</span>
@@ -115,7 +128,7 @@ export function CreateUserModal({ isOpen, onClose }: Props) {
             Cancel
           </Button>
           <Button type="submit" disabled={create.isPending}>
-            {create.isPending ? 'Creating account…' : 'Create sales manager'}
+            {create.isPending ? 'Creating account…' : 'Create user'}
           </Button>
         </div>
       </form>

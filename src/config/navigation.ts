@@ -1,5 +1,5 @@
 import { ROUTES } from '@/lib/constants/routes';
-import { Home, Users, Package, Inbox, Layers, Tag, Layout, Settings } from 'lucide-react';
+import { Home, Users, Package, Inbox, Layers, Tag, Layout, Settings, Factory } from 'lucide-react';
 
 export interface NavItem {
   name: string;
@@ -13,6 +13,7 @@ export const NAVIGATION_CONFIG: NavItem[] = [
   { name: 'Products', href: ROUTES.PRODUCTS, icon: Package },
   { name: 'Categories', href: ROUTES.CATEGORIES, icon: Layers },
   { name: 'Brands', href: ROUTES.BRANDS, icon: Tag },
+  { name: 'Industrial Capabilities', href: ROUTES.INDUSTRIAL_CAPABILITIES, icon: Factory },
   { name: 'Homepage CMS', href: ROUTES.HOMEPAGE, icon: Layout },
   { name: 'Users', href: ROUTES.USERS, icon: Users },
   { name: 'Settings', href: ROUTES.SETTINGS, icon: Settings },

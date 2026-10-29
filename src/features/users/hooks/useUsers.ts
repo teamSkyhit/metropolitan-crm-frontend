@@ -18,17 +18,21 @@ export const USERS_KEYS = {
   lookup: (filters: string) => [...USERS_KEYS.lookups(), { filters }] as const,
 };
 
-export function useUsers(params?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  role?: Role;
-  isActive?: 'true' | 'false';
-}) {
+export function useUsers(
+  params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: Role;
+    isActive?: 'true' | 'false';
+  },
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: USERS_KEYS.list(JSON.stringify(params)),
     queryFn: () => usersService.getUsers(params),
     placeholderData: (previousData) => previousData,
+    enabled: options?.enabled ?? true,
   });
 }
 

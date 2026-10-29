@@ -9,6 +9,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
 import { NAVIGATION_CONFIG } from '@/config/navigation';
+import { canAccessRoute } from '@/features/auth/permissions';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -55,7 +56,11 @@ export function Header({ onMenuClick, isMobileMenuOpen = false }: HeaderProps) {
   // Subpage title determination for breadcrumb
   let subpageTitle = '';
   if (pathname?.endsWith('/new')) {
-    subpageTitle = 'New ' + (currentPage ? currentPage.name.replace(/s$/, '') : 'Item');
+    const rawName = currentPage?.name || 'Item';
+    const singularName = rawName.endsWith('ies')
+      ? rawName.slice(0, -3) + 'y'
+      : rawName.replace(/s$/, '');
+    subpageTitle = `New ${singularName}`;
   } else if (pathname?.split('/').length > 2 && !pathname?.endsWith('/new')) {
     subpageTitle = 'Details';
   }
@@ -102,18 +107,20 @@ export function Header({ onMenuClick, isMobileMenuOpen = false }: HeaderProps) {
       </div>
 
       <div className="relative flex items-center gap-2 sm:gap-3">
-        <Link
-          href="/notifications"
-          className="relative grid h-10 w-10 place-items-center rounded-xl border border-transparent text-gray-500 transition-colors hover:border-gray-200 hover:bg-gray-50 hover:text-[#102f57] focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
-          aria-label={`View notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-        >
-          <Bell className="w-5 h-5 text-gray-600" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white leading-none">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </Link>
+        {canAccessRoute(user?.role, ROUTES.NOTIFICATIONS) && (
+          <Link
+            href={ROUTES.NOTIFICATIONS}
+            className="relative grid h-10 w-10 place-items-center rounded-xl border border-transparent text-gray-500 transition-colors hover:border-gray-200 hover:bg-gray-50 hover:text-[#102f57] focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-gold)]"
+            aria-label={`View notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+          >
+            <Bell className="w-5 h-5 text-gray-600" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white leading-none">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </Link>
+        )}
 
         <div className="relative" ref={menuRef}>
           <button
@@ -145,14 +152,16 @@ export function Header({ onMenuClick, isMobileMenuOpen = false }: HeaderProps) {
                   {user?.role?.replace('_', ' ')}
                 </p>
               </div>
-              <Link
-                href="/settings"
-                onClick={() => setIsMenuOpen(false)}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors border-b border-gray-100"
-              >
-                <Settings className="w-4 h-4 text-gray-500" />
-                Settings
-              </Link>
+              {canAccessRoute(user?.role, ROUTES.SETTINGS) && (
+                <Link
+                  href={ROUTES.SETTINGS}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors border-b border-gray-100"
+                >
+                  <Settings className="w-4 h-4 text-gray-500" />
+                  Settings
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 transition-colors"

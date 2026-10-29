@@ -18,6 +18,14 @@ test('renders safe img tag when icon is an HTTPS URL', () => {
   expect(img.getAttribute('src')).toBe('https://example.com/icon.svg');
 });
 
+test('does not render insecure http:// URL as image and falls back safely', () => {
+  const { container } = render(
+    <ProductContentIcon icon="http://insecure.com/icon.png" size={20} />
+  );
+  expect(container.querySelector('img')).toBeNull();
+  expect(container.querySelector('svg')).toBeDefined();
+});
+
 test('renders fallback HelpCircle icon when icon key is unknown', () => {
   const { container } = render(<ProductContentIcon icon="non-existent-icon" size={16} />);
   const svg = container.querySelector('svg');

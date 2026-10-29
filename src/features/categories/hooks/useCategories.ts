@@ -105,3 +105,13 @@ export const useDeleteCategoryImage = () => {
     },
   });
 };
+
+export const useReorderCategories = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (categoryIds: string[]) => categoriesService.reorderCategories(categoryIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+};
