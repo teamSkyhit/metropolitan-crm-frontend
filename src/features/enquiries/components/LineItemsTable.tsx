@@ -7,10 +7,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Package } from 'lucide-react';
+import { Package, Mail } from 'lucide-react';
 
 export function LineItemsTable({ items }: { items?: EnquiryLineItem[] }) {
   const lineItems = items || [];
+
+  const isGeneralContactItem = (item: EnquiryLineItem) =>
+    item.sku?.toUpperCase() === 'GENERAL-CONTACT' ||
+    item.productId === 'general-inquiry' ||
+    item.productName?.toLowerCase().includes('general website enquiry');
+
+  const isGeneralContactOnly = lineItems.length > 0 && lineItems.every(isGeneralContactItem);
 
   if (lineItems.length === 0) {
     return (
@@ -28,7 +35,32 @@ export function LineItemsTable({ items }: { items?: EnquiryLineItem[] }) {
     );
   }
 
-  const totalQuantity = lineItems.reduce((acc, item) => acc + (item.quantity || 0), 0);
+  if (isGeneralContactOnly) {
+    return (
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+            <Mail className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">General Website Enquiry</h2>
+            <p className="text-xs text-slate-500">
+              Contact form submission &middot; No specific products requested
+            </p>
+          </div>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+          This enquiry was received from the website contact form without product quote line items.
+          See the customer’s message in the Customer Details section above.
+        </div>
+      </section>
+    );
+  }
+
+  // If there are real product items, filter out any general contact placeholder
+  const productItems = lineItems.filter((item) => !isGeneralContactItem(item));
+  const displayItems = productItems.length > 0 ? productItems : lineItems;
+  const totalQuantity = displayItems.reduce((acc, item) => acc + (item.quantity || 0), 0);
 
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -40,8 +72,8 @@ export function LineItemsTable({ items }: { items?: EnquiryLineItem[] }) {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Requested Products</h2>
             <p className="text-xs text-slate-500">
-              {lineItems.length} {lineItems.length === 1 ? 'item' : 'distinct items'} &middot; Total
-              quantity: {totalQuantity}
+              {displayItems.length} {displayItems.length === 1 ? 'item' : 'distinct items'} &middot;
+              Total quantity: {totalQuantity}
             </p>
           </div>
         </div>
@@ -52,7 +84,7 @@ export function LineItemsTable({ items }: { items?: EnquiryLineItem[] }) {
 
       {/* Mobile view: Stacked card items */}
       <div className="divide-y divide-slate-100 md:hidden">
-        {lineItems.map((item) => (
+        {displayItems.map((item) => (
           <div key={item.id} className="space-y-2 p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -80,7 +112,7 @@ export function LineItemsTable({ items }: { items?: EnquiryLineItem[] }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {lineItems.map((item) => (
+            {displayItems.map((item) => (
               <TableRow key={item.id} className="hover:bg-slate-50/50">
                 <TableCell className="font-mono text-xs font-semibold text-slate-700">
                   {item.sku || '—'}
