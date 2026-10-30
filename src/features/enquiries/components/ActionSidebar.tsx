@@ -23,6 +23,13 @@ export function ActionSidebar({
   const updateStatus = useUpdateEnquiryStatus(enquiry.id);
   const assignEnquiry = useAssignEnquiry(enquiry.id);
   const updateNotes = useUpdateEnquiryNotes(enquiry.id);
+
+  const getErrorMessage = (error: unknown, fallback: string) => {
+    const err = error as {
+      response?: { data?: { error?: { message?: string }; message?: string } };
+    };
+    return err?.response?.data?.error?.message || err?.response?.data?.message || fallback;
+  };
   const { data: usersData } = useUsers({ limit: 100 }, { enabled: canAssign });
   // Sync internal state if enquiry changes (e.g., successful save)
   const [prevNotesProp, setPrevNotesProp] = useState(enquiry.salesNotes || '');
@@ -76,7 +83,9 @@ export function ActionSidebar({
               ))}
             </select>
             {updateStatus.isError && (
-              <p className="mt-1 text-sm text-red-600">Failed to update status.</p>
+              <p className="mt-1 text-sm text-red-600">
+                {getErrorMessage(updateStatus.error, 'Failed to update status.')}
+              </p>
             )}
           </div>
         )}
@@ -104,7 +113,9 @@ export function ActionSidebar({
             <p className="text-sm text-gray-900">{enquiry.assignedTo?.name || 'Unassigned'}</p>
           )}
           {assignEnquiry.isError && (
-            <p className="mt-1 text-sm text-red-600">Failed to reassign.</p>
+            <p className="mt-1 text-sm text-red-600">
+              {getErrorMessage(assignEnquiry.error, 'Failed to reassign.')}
+            </p>
           )}
         </div>
       </section>
@@ -131,7 +142,11 @@ export function ActionSidebar({
             >
               {updateNotes.isPending ? 'Saving...' : 'Save Notes'}
             </Button>
-            {updateNotes.isError && <p className="text-sm text-red-600">Failed to save notes.</p>}
+            {updateNotes.isError && (
+              <p className="text-sm text-red-600">
+                {getErrorMessage(updateNotes.error, 'Failed to save notes.')}
+              </p>
+            )}
           </div>
         ) : (
           <p className="text-sm text-gray-700 whitespace-pre-wrap">

@@ -27,7 +27,7 @@ export const enquiriesService = {
     id: string,
     payload: ChangeEnquiryStatusRequest
   ): Promise<EnquiryDetailResponse> {
-    const response = await apiClient.patch<EnquiryDetailResponse>(
+    const response = await apiClient.post<EnquiryDetailResponse>(
       `/enquiries/${id}/status`,
       payload
     );
