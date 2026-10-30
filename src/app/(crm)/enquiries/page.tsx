@@ -87,17 +87,31 @@ function EnquiriesList() {
   }, [debouncedSearch, search, localSearch, updateUrl]);
 
   const role = useAuthStore((state) => state.role);
-  const canAssign = role !== ROLES.CRM_USER;
+  const user = useAuthStore((state) => state.user);
+  const isCrmUser = role === ROLES.CRM_USER;
+  const canAssign = !isCrmUser;
+
+  // When CRM_USER is logged in, restrict query strictly to enquiries assigned to them
+  const effectiveAssignedTo = isCrmUser ? user?.id : assignedTo || undefined;
+
   const { data: usersData } = useUsers({ limit: 100 }, { enabled: canAssign });
-  const { data, isLoading, isError, refetch } = useEnquiries({
-    page,
-    limit: 20,
-    search: search || undefined,
-    status: status || undefined,
-    assignedTo: assignedTo || undefined,
-    from: from || undefined,
-    to: to || undefined,
-  });
+  const { data, isLoading, isError, refetch } = useEnquiries(
+    {
+      page,
+      limit: 20,
+      search: search || undefined,
+      status: status || undefined,
+      assignedTo: effectiveAssignedTo,
+      from: from || undefined,
+      to: to || undefined,
+    },
+    { enabled: !isCrmUser || Boolean(user?.id) }
+  );
+
+  // Client-side defense-in-depth filter: ensure CRM_USER strictly only sees their assigned leads
+  const rawList = data?.data || [];
+  const enquiriesList =
+    isCrmUser && user?.id ? rawList.filter((enq) => enq.assignedTo?.id === user.id) : rawList;
 
   const handleFilterChange = (key: string, value: string) => {
     updateUrl({ [key]: value, page: 1 });
@@ -138,7 +152,7 @@ function EnquiriesList() {
             <SlidersHorizontal className="h-4 w-4 text-[var(--color-metro-gold)]" /> Search and
             filters
           </div>
-          {(search || status || assignedTo || from || to) && (
+          {(search || status || (canAssign && assignedTo) || from || to) && (
             <Button
               variant="ghost"
               size="sm"
@@ -221,12 +235,16 @@ function EnquiriesList() {
               <div className="h-4 w-32 bg-gray-200 rounded"></div>
             </div>
           </div>
-        ) : !data || data.data.length === 0 ? (
+        ) : !data || enquiriesList.length === 0 ? (
           <div className="p-12 text-center">
             <Inbox className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-            <p className="font-semibold text-slate-800">No enquiries match your filters</p>
+            <p className="font-semibold text-slate-800">
+              {isCrmUser ? 'No assigned enquiries found' : 'No enquiries match your filters'}
+            </p>
             <p className="mt-1 text-sm text-slate-500">
-              Clear filters or broaden the date range to see more results.
+              {isCrmUser
+                ? 'Enquiries assigned to you will appear here once allocated by an administrator.'
+                : 'Clear filters or broaden the date range to see more results.'}
             </p>
           </div>
         ) : (
@@ -244,7 +262,7 @@ function EnquiriesList() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.data.map((enq) => (
+                {enquiriesList.map((enq) => (
                   <TableRow key={enq.id}>
                     <TableCell>
                       <div className="font-medium text-gray-900">{enq.name}</div>
@@ -346,11 +364,18 @@ function EnquiriesList() {
 }
 
 export default function EnquiriesPage() {
+  const role = useAuthStore((state) => state.role);
+  const isCrmUser = role === ROLES.CRM_USER;
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Enquiries"
-        description="Review customer requests, assign ownership, and track every follow-up."
+        title={isCrmUser ? 'My Assigned Enquiries' : 'Enquiries'}
+        description={
+          isCrmUser
+            ? 'Review and manage customer enquiries assigned to you, record notes, and track follow-ups.'
+            : 'Review customer requests, assign ownership, and track every follow-up.'
+        }
       />
       <Suspense
         fallback={

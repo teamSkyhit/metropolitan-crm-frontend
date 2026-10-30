@@ -11,6 +11,7 @@ import { useAuthStore } from '@/features/auth/auth.store';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
+import { ROLES } from '@/lib/constants/roles';
 
 export function EnquiryDetailClient({ id }: { id: string }) {
   const { data: response, isLoading, isError } = useEnquiry(id);
@@ -51,6 +52,24 @@ export function EnquiryDetailClient({ id }: { id: string }) {
   }
 
   const enquiry = response.data;
+  const isCrmUser = user?.role === ROLES.CRM_USER;
+
+  if (isCrmUser && enquiry.assignedTo?.id !== user?.id) {
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-start">
+          <Link
+            href={ROUTES.ENQUIRIES}
+            className="inline-flex h-9 items-center justify-center rounded-md border border-gray-300 px-3 text-sm font-medium transition-colors hover:bg-gray-100"
+          >
+            Back to Enquiries
+          </Link>
+        </div>
+        <EmptyState message="You do not have permission to view this enquiry. Only enquiries assigned to your account are accessible." />
+      </div>
+    );
+  }
+
   const canEdit = user ? hasPermission(user, 'enquiries:update') : false;
   const canAssign = user ? hasPermission(user, 'enquiries:assign') : false;
   const canFollowUp = user ? hasPermission(user, 'enquiries:follow-up') : false;
