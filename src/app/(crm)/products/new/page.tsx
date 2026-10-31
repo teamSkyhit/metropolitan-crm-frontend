@@ -52,7 +52,7 @@ export default function CreateProductPage() {
 
   // Subresource states prepared before creation
   const [specifications, setSpecifications] = useState<ProductSpecification[]>([]);
-  const [features, setFeatures] = useState<ProductFeature[]>([]);
+  const features: ProductFeature[] = [];
   const [benefits, setBenefits] = useState<ProductKeyBenefit[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<RelatedProductSummary[]>([]);
   const [localGalleryFiles, setLocalGalleryFiles] = useState<File[]>([]);

@@ -8,7 +8,16 @@ import { useCategories } from '@/features/categories/hooks/useCategories';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProductSeoSettings } from './ProductSeoSettings';
-import { AlertCircle, CheckCircle2, Package, Save, Image as ImageIcon, Upload, Trash2, Loader2 } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Package,
+  Save,
+  Image as ImageIcon,
+  Upload,
+  Trash2,
+  Loader2,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { mediaService } from '@/features/media/media.service';
 import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
@@ -89,11 +98,13 @@ export function ProductForm({
   const [isOverviewMediaModalOpen, setIsOverviewMediaModalOpen] = useState(false);
   const overviewFileInputRef = useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  const [prevOverviewProp, setPrevOverviewProp] = useState(initialData?.overview);
+  if (initialData?.overview !== prevOverviewProp) {
+    setPrevOverviewProp(initialData?.overview);
     const parsed = parseOverviewField(initialData?.overview);
     setOverviewText(parsed.text);
     setOverviewImageUrl(parsed.imageUrl);
-  }, [initialData?.overview]);
+  }
 
   const handleOverviewImageUpload = async (file?: File) => {
     if (!file) return;
@@ -226,10 +237,10 @@ export function ProductForm({
     const trimmedOverviewText = overviewText.trim();
     const trimmedOverviewImage = overviewImageUrl.trim();
     payload.overview = trimmedOverviewImage
-      ? (trimmedOverviewText
-          ? `${trimmedOverviewText}\n\n<!-- [overview-image: ${trimmedOverviewImage}] -->`
-          : `<!-- [overview-image: ${trimmedOverviewImage}] -->`)
-      : (trimmedOverviewText || null);
+      ? trimmedOverviewText
+        ? `${trimmedOverviewText}\n\n<!-- [overview-image: ${trimmedOverviewImage}] -->`
+        : `<!-- [overview-image: ${trimmedOverviewImage}] -->`
+      : trimmedOverviewText || null;
     payload.metaTitle = payload.metaTitle?.trim() || null;
     payload.metaDescription = payload.metaDescription?.trim() || null;
     payload.metaKeywords = payload.metaKeywords?.trim() || null;
@@ -688,7 +699,8 @@ export function ProductForm({
                   Overview Diagram / Right-Side Image (Optional)
                 </label>
                 <p className="text-[11px] text-slate-500">
-                  Appears exclusively on the right side of the Product Overview section on the storefront.
+                  Appears exclusively on the right side of the Product Overview section on the
+                  storefront.
                 </p>
               </div>
               {overviewImageUrl && (
@@ -714,7 +726,10 @@ export function ProductForm({
                   />
                 </div>
                 <div className="flex-1 min-w-0 space-y-2">
-                  <p className="text-xs font-medium text-slate-700 truncate" title={overviewImageUrl}>
+                  <p
+                    className="text-xs font-medium text-slate-700 truncate"
+                    title={overviewImageUrl}
+                  >
                     {overviewImageUrl}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
@@ -746,9 +761,7 @@ export function ProductForm({
                     <ImageIcon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-800">
-                      No overview diagram selected
-                    </p>
+                    <p className="text-xs font-bold text-slate-800">No overview diagram selected</p>
                     <p className="text-[11px] text-slate-400">
                       Upload a PNG, JPG, WebP, or SVG diagram (Max 5 MB)
                     </p>
