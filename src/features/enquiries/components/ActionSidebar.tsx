@@ -54,6 +54,20 @@ export function ActionSidebar({
     updateNotes.mutate({ salesNotes: salesNotes.trim() || null });
   };
 
+  const isGeneralContactItem = (item: {
+    sku?: string | null;
+    productId?: string | null;
+    productName?: string | null;
+  }) =>
+    item.sku?.toUpperCase() === 'GENERAL-CONTACT' ||
+    item.productId === 'general-inquiry' ||
+    item.productName?.toLowerCase().includes('general website enquiry');
+
+  const realLineItems = enquiry.lineItems?.filter((item) => !isGeneralContactItem(item)) || [];
+  const isGeneralEnquiry = Boolean(
+    enquiry.lineItems && enquiry.lineItems.length > 0 && realLineItems.length === 0
+  );
+
   return (
     <div className="space-y-6">
       {/* Status & Assignment */}
@@ -158,6 +172,12 @@ export function ActionSidebar({
       {/* Meta */}
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-500">
         <div className="flex justify-between">
+          <span>Type:</span>
+          <span className="font-semibold text-slate-900">
+            {isGeneralEnquiry ? 'General Enquiry' : 'Product Quote'}
+          </span>
+        </div>
+        <div className="flex justify-between">
           <span>Created:</span>
           <span className="text-gray-900">{formatDate(enquiry.createdAt)}</span>
         </div>
@@ -165,12 +185,14 @@ export function ActionSidebar({
           <span>Last Updated:</span>
           <span className="text-gray-900">{formatDate(enquiry.updatedAt)}</span>
         </div>
-        {enquiry.lineItemCount > 0 && (
-          <div className="flex justify-between">
-            <span>Items:</span>
-            <span className="text-gray-900">{enquiry.lineItemCount}</span>
-          </div>
-        )}
+        <div className="flex justify-between">
+          <span>Products:</span>
+          <span className="text-gray-900">
+            {isGeneralEnquiry
+              ? 'None (Contact Form)'
+              : `${realLineItems.length} ${realLineItems.length === 1 ? 'item' : 'items'}`}
+          </span>
+        </div>
       </section>
     </div>
   );

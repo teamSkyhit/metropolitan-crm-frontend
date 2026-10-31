@@ -29,8 +29,11 @@ import {
   ChevronRight,
   SlidersHorizontal,
   X,
+  Download,
 } from 'lucide-react';
 import { ROUTES } from '@/lib/constants/routes';
+import { ExportEnquiriesModal } from '@/features/enquiries/components/ExportEnquiriesModal';
+import { EnquiryItemBadge } from '@/features/enquiries/components/EnquiryItemBadge';
 
 function EnquiriesList() {
   const router = useRouter();
@@ -85,6 +88,8 @@ function EnquiriesList() {
       updateUrl({ search: debouncedSearch, page: 1 });
     }
   }, [debouncedSearch, search, localSearch, updateUrl]);
+
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const role = useAuthStore((state) => state.role);
   const user = useAuthStore((state) => state.user);
@@ -144,7 +149,36 @@ function EnquiriesList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Page Header with Export Action */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <PageHeader
+          title={isCrmUser ? 'My Assigned Enquiries' : 'Enquiries'}
+          description={
+            isCrmUser
+              ? 'Review and manage customer enquiries assigned to you, record notes, and track follow-ups.'
+              : 'Review customer requests, assign ownership, and track every follow-up.'
+          }
+        />
+        <Button
+          onClick={() => setIsExportModalOpen(true)}
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--color-metro-navy)] px-4 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(16,47,87,0.18)] transition-all hover:bg-[#173e6e]"
+        >
+          <Download className="h-4 w-4" />
+          Export Enquiries
+        </Button>
+      </div>
+
+      <ExportEnquiriesModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        initialFrom={from}
+        initialTo={to}
+        initialStatus={status}
+        initialAssignedTo={assignedTo}
+        initialSearch={search}
+      />
+
       {/* Filters */}
       <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3">
@@ -152,16 +186,27 @@ function EnquiriesList() {
             <SlidersHorizontal className="h-4 w-4 text-[var(--color-metro-gold)]" /> Search and
             filters
           </div>
-          {(search || status || (canAssign && assignedTo) || from || to) && (
+          <div className="flex items-center gap-2">
+            {(search || status || (canAssign && assignedTo) || from || to) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearFilters}
+                className="gap-1.5 text-slate-600"
+              >
+                <X className="h-4 w-4" /> Clear all
+              </Button>
+            )}
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={handleClearFilters}
-              className="gap-1.5 text-slate-600"
+              onClick={() => setIsExportModalOpen(true)}
+              className="gap-1.5 border-slate-300 text-slate-700 hover:bg-slate-50"
             >
-              <X className="h-4 w-4" /> Clear all
+              <Download className="h-4 w-4 text-[var(--color-metro-navy)]" />
+              Export
             </Button>
-          )}
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="relative">
@@ -281,9 +326,7 @@ function EnquiriesList() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
-                        {enq.lineItemCount} {enq.lineItemCount === 1 ? 'item' : 'items'}
-                      </span>
+                      <EnquiryItemBadge enquiryId={enq.id} fallbackCount={enq.lineItemCount} />
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-gray-600">{formatDate(enq.createdAt)}</span>
@@ -364,29 +407,19 @@ function EnquiriesList() {
 }
 
 export default function EnquiriesPage() {
-  const role = useAuthStore((state) => state.role);
-  const isCrmUser = role === ROLES.CRM_USER;
-
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title={isCrmUser ? 'My Assigned Enquiries' : 'Enquiries'}
-        description={
-          isCrmUser
-            ? 'Review and manage customer enquiries assigned to you, record notes, and track follow-ups.'
-            : 'Review customer requests, assign ownership, and track every follow-up.'
-        }
-      />
-      <Suspense
-        fallback={
+    <Suspense
+      fallback={
+        <div className="space-y-6">
+          <div className="h-10 w-48 animate-pulse rounded-lg bg-slate-200" />
           <div
             className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-white"
             aria-label="Loading enquiries"
           />
-        }
-      >
-        <EnquiriesList />
-      </Suspense>
-    </div>
+        </div>
+      }
+    >
+      <EnquiriesList />
+    </Suspense>
   );
 }
