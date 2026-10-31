@@ -9,7 +9,6 @@ import { ProductForm } from '@/features/products/components/ProductForm';
 import { ProductGalleryManager } from '@/features/products/components/ProductGalleryManager';
 import { ProductVideoManager } from '@/features/products/components/ProductVideoManager';
 import { ProductDocumentManager } from '@/features/products/components/ProductDocumentManager';
-import { ProductFeaturesEditor } from '@/features/products/components/ProductFeaturesEditor';
 import { ProductKeyBenefitsEditor } from '@/features/products/components/ProductKeyBenefitsEditor';
 import { RelatedProductsSelector } from '@/features/products/components/RelatedProductsSelector';
 import { ProductSpecificationsEditor } from '@/features/products/components/ProductSpecificationsEditor';
@@ -336,7 +335,6 @@ export default function CreateProductPage() {
             {[
               ['#product-core', 'Basic Details'],
               ['#product-specifications', 'Specifications'],
-              ['#product-features', 'Features'],
               ['#product-benefits', 'Benefits'],
               ['#product-media', 'Media Gallery'],
               ['#product-videos', 'Videos'],
@@ -457,18 +455,6 @@ export default function CreateProductPage() {
             onChange={setSpecifications}
             disabled={isSubmitting}
           />
-
-          {/* Features Card */}
-          <div
-            id="product-features"
-            className="scroll-mt-28 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
-          >
-            <ProductFeaturesEditor
-              features={features}
-              onChange={setFeatures}
-              disabled={isSubmitting}
-            />
-          </div>
 
           {/* Key Benefits Card */}
           <div
