@@ -78,7 +78,7 @@ export function ProductForm({
     description: initialData?.description || '',
     overview: initialData?.overview || '',
     price: initialData?.price ?? null,
-    priceVisibility: initialData?.priceVisibility ?? true,
+    priceVisibility: Boolean(initialData?.price && initialData?.priceVisibility),
     status: initialData?.status || 'DRAFT',
     hotDeal: initialData?.hotDeal ?? false,
     metaTitle: initialData?.metaTitle || '',
@@ -227,6 +227,7 @@ export function ProductForm({
     if (payload.price === null || payload.price === undefined || String(payload.price) === '') {
       payload.price = null;
     }
+    payload.priceVisibility = payload.price ? Boolean(formData.priceVisibility) : false;
 
     if (payload.sku) payload.sku = payload.sku.trim();
     if (payload.name) payload.name = payload.name.trim();
@@ -628,7 +629,7 @@ export function ProductForm({
                   id="priceVisibility"
                   type="checkbox"
                   name="priceVisibility"
-                  checked={formData.priceVisibility}
+                  checked={Boolean(formData.priceVisibility)}
                   onChange={handleChange}
                   disabled={isPending || readOnly}
                   className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)]"

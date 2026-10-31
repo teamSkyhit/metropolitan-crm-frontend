@@ -130,7 +130,7 @@ export default function CreateProductPage() {
             categoryId: coreData.categoryId!,
             description: coreData.description ?? null,
             price: coreData.price ?? null,
-            priceVisibility: coreData.priceVisibility ?? true,
+            priceVisibility: coreData.priceVisibility ?? false,
             status: coreData.status ?? 'DRAFT',
             hotDeal: coreData.hotDeal ?? false,
           };
