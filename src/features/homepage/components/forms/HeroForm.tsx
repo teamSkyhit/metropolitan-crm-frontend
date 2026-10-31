@@ -145,6 +145,44 @@ export function HeroForm({ content, onChange }: Props) {
 function SlideEditor({ slide, onChange }: { slide: HeroSlide; onChange: (s: HeroSlide) => void }) {
   const [isMediaOpen, setIsMediaOpen] = useState(false);
 
+  const rawSubheading = slide.subheading || '';
+  let subValue = rawSubheading;
+  let descValue = '';
+
+  if (rawSubheading.includes('\n---\n')) {
+    const parts = rawSubheading.split('\n---\n');
+    subValue = parts[0]?.trim() || '';
+    descValue = parts.slice(1).join('\n---\n').trim() || '';
+  }
+
+  const handleSubChange = (newSub: string) => {
+    const cleanSub = newSub;
+    const cleanDesc = descValue.trim();
+    let combined: string | null = null;
+    if (cleanSub && cleanDesc) {
+      combined = `${cleanSub}\n---\n${cleanDesc}`;
+    } else if (cleanSub) {
+      combined = cleanSub;
+    } else if (cleanDesc) {
+      combined = `\n---\n${cleanDesc}`;
+    }
+    onChange({ ...slide, subheading: combined });
+  };
+
+  const handleDescChange = (newDesc: string) => {
+    const cleanSub = subValue.trim();
+    const cleanDesc = newDesc;
+    let combined: string | null = null;
+    if (cleanSub && cleanDesc) {
+      combined = `${cleanSub}\n---\n${cleanDesc}`;
+    } else if (cleanSub) {
+      combined = cleanSub;
+    } else if (cleanDesc) {
+      combined = `\n---\n${cleanDesc}`;
+    }
+    onChange({ ...slide, subheading: combined });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
@@ -169,9 +207,19 @@ function SlideEditor({ slide, onChange }: { slide: HeroSlide; onChange: (s: Hero
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Subheading</label>
         <Input
-          value={slide.subheading || ''}
-          onChange={(e) => onChange({ ...slide, subheading: e.target.value || null })}
+          value={subValue}
+          onChange={(e) => handleSubChange(e.target.value)}
           placeholder="Optional secondary text"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea
+          rows={3}
+          value={descValue}
+          onChange={(e) => handleDescChange(e.target.value)}
+          placeholder="Optional paragraph description for this slide"
+          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-metro-navy)]"
         />
       </div>
 

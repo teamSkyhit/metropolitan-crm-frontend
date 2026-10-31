@@ -23,6 +23,13 @@ export function ActionSidebar({
   const updateStatus = useUpdateEnquiryStatus(enquiry.id);
   const assignEnquiry = useAssignEnquiry(enquiry.id);
   const updateNotes = useUpdateEnquiryNotes(enquiry.id);
+
+  const getErrorMessage = (error: unknown, fallback: string) => {
+    const err = error as {
+      response?: { data?: { error?: { message?: string }; message?: string } };
+    };
+    return err?.response?.data?.error?.message || err?.response?.data?.message || fallback;
+  };
   const { data: usersData } = useUsers({ limit: 100 }, { enabled: canAssign });
   // Sync internal state if enquiry changes (e.g., successful save)
   const [prevNotesProp, setPrevNotesProp] = useState(enquiry.salesNotes || '');
@@ -46,6 +53,20 @@ export function ActionSidebar({
   const handleNotesSave = () => {
     updateNotes.mutate({ salesNotes: salesNotes.trim() || null });
   };
+
+  const isGeneralContactItem = (item: {
+    sku?: string | null;
+    productId?: string | null;
+    productName?: string | null;
+  }) =>
+    item.sku?.toUpperCase() === 'GENERAL-CONTACT' ||
+    item.productId === 'general-inquiry' ||
+    item.productName?.toLowerCase().includes('general website enquiry');
+
+  const realLineItems = enquiry.lineItems?.filter((item) => !isGeneralContactItem(item)) || [];
+  const isGeneralEnquiry = Boolean(
+    enquiry.lineItems && enquiry.lineItems.length > 0 && realLineItems.length === 0
+  );
 
   return (
     <div className="space-y-6">
@@ -76,7 +97,9 @@ export function ActionSidebar({
               ))}
             </select>
             {updateStatus.isError && (
-              <p className="mt-1 text-sm text-red-600">Failed to update status.</p>
+              <p className="mt-1 text-sm text-red-600">
+                {getErrorMessage(updateStatus.error, 'Failed to update status.')}
+              </p>
             )}
           </div>
         )}
@@ -104,7 +127,9 @@ export function ActionSidebar({
             <p className="text-sm text-gray-900">{enquiry.assignedTo?.name || 'Unassigned'}</p>
           )}
           {assignEnquiry.isError && (
-            <p className="mt-1 text-sm text-red-600">Failed to reassign.</p>
+            <p className="mt-1 text-sm text-red-600">
+              {getErrorMessage(assignEnquiry.error, 'Failed to reassign.')}
+            </p>
           )}
         </div>
       </section>
@@ -131,7 +156,11 @@ export function ActionSidebar({
             >
               {updateNotes.isPending ? 'Saving...' : 'Save Notes'}
             </Button>
-            {updateNotes.isError && <p className="text-sm text-red-600">Failed to save notes.</p>}
+            {updateNotes.isError && (
+              <p className="text-sm text-red-600">
+                {getErrorMessage(updateNotes.error, 'Failed to save notes.')}
+              </p>
+            )}
           </div>
         ) : (
           <p className="text-sm text-gray-700 whitespace-pre-wrap">
@@ -143,6 +172,12 @@ export function ActionSidebar({
       {/* Meta */}
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-500">
         <div className="flex justify-between">
+          <span>Type:</span>
+          <span className="font-semibold text-slate-900">
+            {isGeneralEnquiry ? 'General Enquiry' : 'Product Quote'}
+          </span>
+        </div>
+        <div className="flex justify-between">
           <span>Created:</span>
           <span className="text-gray-900">{formatDate(enquiry.createdAt)}</span>
         </div>
@@ -150,12 +185,14 @@ export function ActionSidebar({
           <span>Last Updated:</span>
           <span className="text-gray-900">{formatDate(enquiry.updatedAt)}</span>
         </div>
-        {enquiry.lineItemCount > 0 && (
-          <div className="flex justify-between">
-            <span>Items:</span>
-            <span className="text-gray-900">{enquiry.lineItemCount}</span>
-          </div>
-        )}
+        <div className="flex justify-between">
+          <span>Products:</span>
+          <span className="text-gray-900">
+            {isGeneralEnquiry
+              ? 'None (Contact Form)'
+              : `${realLineItems.length} ${realLineItems.length === 1 ? 'item' : 'items'}`}
+          </span>
+        </div>
       </section>
     </div>
   );

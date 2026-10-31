@@ -13,14 +13,14 @@ export default function NewIndustrialCapabilityPage() {
       <div className="flex items-start gap-3">
         <Link
           href={ROUTES.INDUSTRIAL_CAPABILITIES}
-          className="mt-1 inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+          aria-label="Back to Industrial Capabilities"
+          className="mt-1 grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
         >
-          <ArrowLeft size={14} className="mr-1.5" />
-          Back
+          <ArrowLeft className="h-5 w-5" />
         </Link>
         <PageHeader
           title="Create Industrial Capability"
-          description="Define a new industrial manufacturing capability segment, visual icon, typical products, and specifications."
+          description="Define a new industrial manufacturing capability, visual icon, typical products, and specifications."
         />
       </div>
 

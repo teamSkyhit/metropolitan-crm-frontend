@@ -8,12 +8,35 @@ import { useCategories } from '@/features/categories/hooks/useCategories';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProductSeoSettings } from './ProductSeoSettings';
-import { ProductDescriptionEditor } from './ProductDescriptionEditor';
-import { AlertCircle, CheckCircle2, Package, Save } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Package,
+  Save,
+  Image as ImageIcon,
+  Upload,
+  Trash2,
+  Loader2,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
+import { mediaService } from '@/features/media/media.service';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { Media } from '@/features/media/types';
 
 type FormErrors = Partial<Record<keyof CreateProductRequest, string>>;
 
 const SKU_PATTERN = /^[a-zA-Z0-9][-a-zA-Z0-9._/]*$/;
+
+function parseOverviewField(raw?: string | null): { text: string; imageUrl: string } {
+  if (!raw) return { text: '', imageUrl: '' };
+  const match = raw.match(/<!--\s*\[overview-image:\s*(.*?)\s*\]\s*-->/);
+  if (match) {
+    const imageUrl = match[1]?.trim() || '';
+    const text = raw.replace(/<!--\s*\[overview-image:\s*.*?\s*\]\s*-->/g, '').trim();
+    return { text, imageUrl };
+  }
+  return { text: raw, imageUrl: '' };
+}
 
 function isValidHttpUrl(value: string) {
   try {
@@ -55,7 +78,7 @@ export function ProductForm({
     description: initialData?.description || '',
     overview: initialData?.overview || '',
     price: initialData?.price ?? null,
-    priceVisibility: initialData?.priceVisibility ?? true,
+    priceVisibility: Boolean(initialData?.price && initialData?.priceVisibility),
     status: initialData?.status || 'DRAFT',
     hotDeal: initialData?.hotDeal ?? false,
     metaTitle: initialData?.metaTitle || '',
@@ -67,6 +90,59 @@ export function ProductForm({
 
   const { data: brandsData, isLoading: isLoadingBrands } = useBrands({ limit: 100 });
   const { data: categoriesData, isLoading: isLoadingCategories } = useCategories({ limit: 100 });
+
+  const initialOverview = parseOverviewField(initialData?.overview);
+  const [overviewText, setOverviewText] = useState(initialOverview.text);
+  const [overviewImageUrl, setOverviewImageUrl] = useState(initialOverview.imageUrl);
+  const [isUploadingOverviewImage, setIsUploadingOverviewImage] = useState(false);
+  const [isOverviewMediaModalOpen, setIsOverviewMediaModalOpen] = useState(false);
+  const overviewFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [prevOverviewProp, setPrevOverviewProp] = useState(initialData?.overview);
+  if (initialData?.overview !== prevOverviewProp) {
+    setPrevOverviewProp(initialData?.overview);
+    const parsed = parseOverviewField(initialData?.overview);
+    setOverviewText(parsed.text);
+    setOverviewImageUrl(parsed.imageUrl);
+  }
+
+  const handleOverviewImageUpload = async (file?: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Overview image must be smaller than 5 MB.');
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'].includes(file.type)) {
+      toast.error('Only JPG, PNG, WebP, or SVG images are supported.');
+      return;
+    }
+    setIsUploadingOverviewImage(true);
+    try {
+      const uploaded = await mediaService.uploadMedia(file);
+      const url = uploaded.publicUrl || (uploaded as unknown as { url?: string }).url;
+      if (url) {
+        setOverviewImageUrl(url);
+        toast.success('Overview image uploaded successfully.');
+      } else {
+        toast.error('Failed to get URL for uploaded image.');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to upload overview image.';
+      toast.error(msg);
+    } finally {
+      setIsUploadingOverviewImage(false);
+      if (overviewFileInputRef.current) overviewFileInputRef.current.value = '';
+    }
+  };
+
+  const handleSelectMediaForOverview = (media: Media) => {
+    const url = media.publicUrl || (media as unknown as { url?: string }).url;
+    if (url) {
+      setOverviewImageUrl(url);
+      toast.success('Overview image selected from media library.');
+    }
+    setIsOverviewMediaModalOpen(false);
+  };
 
   const brands = brandsData?.data || [];
   const categories = categoriesData?.data || [];
@@ -91,6 +167,9 @@ export function ProductForm({
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
+      if (name === 'overview') {
+        setOverviewText(value);
+      }
     }
   };
 
@@ -148,13 +227,21 @@ export function ProductForm({
     if (payload.price === null || payload.price === undefined || String(payload.price) === '') {
       payload.price = null;
     }
+    payload.priceVisibility = payload.price ? Boolean(formData.priceVisibility) : false;
 
     if (payload.sku) payload.sku = payload.sku.trim();
     if (payload.name) payload.name = payload.name.trim();
 
     payload.shortDescription = payload.shortDescription?.trim() || null;
     payload.series = payload.series?.trim() || null;
-    payload.overview = payload.overview?.trim() || null;
+
+    const trimmedOverviewText = overviewText.trim();
+    const trimmedOverviewImage = overviewImageUrl.trim();
+    payload.overview = trimmedOverviewImage
+      ? trimmedOverviewText
+        ? `${trimmedOverviewText}\n\n<!-- [overview-image: ${trimmedOverviewImage}] -->`
+        : `<!-- [overview-image: ${trimmedOverviewImage}] -->`
+      : trimmedOverviewText || null;
     payload.metaTitle = payload.metaTitle?.trim() || null;
     payload.metaDescription = payload.metaDescription?.trim() || null;
     payload.metaKeywords = payload.metaKeywords?.trim() || null;
@@ -542,7 +629,7 @@ export function ProductForm({
                   id="priceVisibility"
                   type="checkbox"
                   name="priceVisibility"
-                  checked={formData.priceVisibility}
+                  checked={Boolean(formData.priceVisibility)}
                   onChange={handleChange}
                   disabled={isPending || readOnly}
                   className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)]"
@@ -594,24 +681,139 @@ export function ProductForm({
             id="overview"
             name="overview"
             rows={4}
-            value={formData.overview || ''}
-            onChange={handleChange}
+            value={overviewText}
+            onChange={(e) => {
+              setOverviewText(e.target.value);
+              handleChange(e);
+            }}
             disabled={isPending || readOnly}
             placeholder="Comprehensive technical overview..."
             aria-label="Product overview"
             className="min-h-32 w-full resize-y rounded-xl border border-[#dce3ec] bg-white px-3.5 py-3 text-sm text-[#1e2d41] shadow-[0_1px_2px_rgba(15,38,68,0.03)] outline-none transition placeholder:text-gray-400 hover:border-[#c4cfdd] focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-60"
           />
+
+          {/* Dedicated Product Overview Image (Right-side diagram) */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 space-y-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Overview Diagram / Right-Side Image (Optional)
+                </label>
+                <p className="text-[11px] text-slate-500">
+                  Appears exclusively on the right side of the Product Overview section on the
+                  storefront.
+                </p>
+              </div>
+              {overviewImageUrl && (
+                <button
+                  type="button"
+                  disabled={isPending || readOnly}
+                  onClick={() => setOverviewImageUrl('')}
+                  className="inline-flex items-center gap-1 self-start sm:self-auto text-xs font-semibold text-red-600 hover:text-red-700 transition"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Remove Image
+                </button>
+              )}
+            </div>
+
+            {overviewImageUrl ? (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
+                <div className="relative h-28 w-36 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100/80 p-1 flex items-center justify-center">
+                  <img
+                    src={overviewImageUrl}
+                    alt="Product Overview Diagram"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <p
+                    className="text-xs font-medium text-slate-700 truncate"
+                    title={overviewImageUrl}
+                  >
+                    {overviewImageUrl}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={isPending || readOnly || isUploadingOverviewImage}
+                      onClick={() => overviewFileInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+                    >
+                      <Upload className="h-3.5 w-3.5 text-slate-500" />
+                      Change Image
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isPending || readOnly || isUploadingOverviewImage}
+                      onClick={() => setIsOverviewMediaModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+                    >
+                      <ImageIcon className="h-3.5 w-3.5 text-slate-500" />
+                      Media Library
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-4 shadow-2xs">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+                    <ImageIcon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">No overview diagram selected</p>
+                    <p className="text-[11px] text-slate-400">
+                      Upload a PNG, JPG, WebP, or SVG diagram (Max 5 MB)
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isPending || readOnly || isUploadingOverviewImage}
+                    onClick={() => overviewFileInputRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-metro-navy)] px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#153866] transition disabled:opacity-50"
+                  >
+                    {isUploadingOverviewImage ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-3.5 w-3.5" />
+                        Upload Diagram
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isPending || readOnly || isUploadingOverviewImage}
+                    onClick={() => setIsOverviewMediaModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+                  >
+                    <ImageIcon className="h-3.5 w-3.5 text-slate-500" />
+                    Media Library
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <input
+              ref={overviewFileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleOverviewImageUpload(file);
+              }}
+            />
+          </div>
         </div>
 
-        {/* ── 4. Detailed Description (Markdown) ── */}
-        <ProductDescriptionEditor
-          value={formData.description || ''}
-          onChange={(val) => setFormData((prev) => ({ ...prev, description: val }))}
-          disabled={isPending}
-          readOnly={readOnly}
-        />
-
-        {/* ── 5. SEO Settings Card ── */}
+        {/* ── 4. SEO Settings Card ── */}
         <div className="pt-4 border-t border-gray-200">
           <ProductSeoSettings
             seo={seoData}
@@ -647,6 +849,14 @@ export function ProductForm({
           </div>
         )}
       </div>
+
+      {isOverviewMediaModalOpen && (
+        <MediaSelectorModal
+          isOpen={isOverviewMediaModalOpen}
+          onClose={() => setIsOverviewMediaModalOpen(false)}
+          onSelect={handleSelectMediaForOverview}
+        />
+      )}
     </form>
   );
 }

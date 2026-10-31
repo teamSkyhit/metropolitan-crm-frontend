@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { KeyRound } from 'lucide-react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +13,10 @@ interface Props {
   user: User;
   isOpen: boolean;
   onClose: () => void;
+  onResetPassword?: () => void;
 }
 
-export function EditUserModal({ user, isOpen, onClose }: Props) {
+export function EditUserModal({ user, isOpen, onClose, onResetPassword }: Props) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -98,6 +100,28 @@ export function EditUserModal({ user, isOpen, onClose }: Props) {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
+
+        {onResetPassword && user.role !== 'SUPER_ADMIN' && (
+          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+            <div>
+              <p className="text-xs font-semibold text-slate-800">Password reset</p>
+              <p className="text-[11px] text-slate-500">
+                User forgot their password or needs new credentials?
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onResetPassword}
+              className="gap-1.5 text-xs text-slate-700 hover:text-slate-900"
+            >
+              <KeyRound className="h-3.5 w-3.5 text-slate-500" />
+              Reset password
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel

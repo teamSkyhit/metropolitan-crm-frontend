@@ -150,7 +150,7 @@ function SettingsFormInner({
             maxLength={1000}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Introduce the industrial capabilities segment for storefront visitors..."
+            placeholder="Introduce the industrial capabilities for storefront visitors..."
             className={`w-full resize-y rounded-xl border bg-white p-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 focus:ring-4 ${
               isDescOver
                 ? 'border-red-300 focus:border-red-500 focus:ring-red-100'

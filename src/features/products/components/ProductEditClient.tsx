@@ -9,10 +9,6 @@ import {
   useProduct,
   useUpdateProduct,
   useDeleteProduct,
-  useAddProductFeature,
-  useUpdateProductFeature,
-  useReorderProductFeatures,
-  useDeleteProductFeature,
   useAddProductKeyBenefit,
   useUpdateProductKeyBenefit,
   useReorderProductKeyBenefits,
@@ -33,7 +29,6 @@ import {
 } from '@/features/products/hooks/useProduct';
 import { ProductForm } from '@/features/products/components/ProductForm';
 import { ProductSpecificationsEditor } from '@/features/products/components/ProductSpecificationsEditor';
-import { ProductFeaturesEditor } from '@/features/products/components/ProductFeaturesEditor';
 import { ProductKeyBenefitsEditor } from '@/features/products/components/ProductKeyBenefitsEditor';
 import { RelatedProductsSelector } from '@/features/products/components/RelatedProductsSelector';
 import { ProductGalleryManager } from '@/features/products/components/ProductGalleryManager';
@@ -53,11 +48,6 @@ export function ProductEditClient({ id }: { id: string }) {
   const deleteProduct = useDeleteProduct(id);
 
   // Subresource hooks
-  const addFeature = useAddProductFeature(id);
-  const updateFeature = useUpdateProductFeature(id);
-  const reorderFeatures = useReorderProductFeatures(id);
-  const deleteFeature = useDeleteProductFeature(id);
-
   const addKeyBenefit = useAddProductKeyBenefit(id);
   const updateKeyBenefit = useUpdateProductKeyBenefit(id);
   const reorderKeyBenefits = useReorderProductKeyBenefits(id);
@@ -94,8 +84,12 @@ export function ProductEditClient({ id }: { id: string }) {
   if (isError || !data?.data) {
     return (
       <div className="space-y-6">
-        <Link href={ROUTES.PRODUCTS} className="text-[var(--color-metro-navy)] hover:underline">
-          &larr; Back to Products
+        <Link
+          href={ROUTES.PRODUCTS}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-metro-navy)] hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Products
         </Link>
         <div className="p-8 text-center text-gray-500 bg-white rounded-lg shadow-sm border border-gray-200">
           Product not found.
@@ -197,7 +191,6 @@ export function ProductEditClient({ id }: { id: string }) {
         {[
           ['#product-core', 'Details'],
           ['#product-specifications', 'Specifications'],
-          ['#product-features', 'Features'],
           ['#product-benefits', 'Benefits'],
           ['#product-media', 'Media'],
         ].map(([href, label]) => (
@@ -225,28 +218,6 @@ export function ProductEditClient({ id }: { id: string }) {
 
           {/* Specifications */}
           <ProductSpecificationsEditor product={product} />
-
-          {/* Features */}
-          <div
-            id="product-features"
-            className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-4 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
-          >
-            <ProductFeaturesEditor
-              features={product.features || []}
-              onAddAsync={async (feat) => {
-                await addFeature.mutateAsync(feat);
-              }}
-              onUpdateAsync={async (featureId, feat) => {
-                await updateFeature.mutateAsync({ featureId, payload: feat });
-              }}
-              onReorderAsync={async (ids) => {
-                await reorderFeatures.mutateAsync(ids);
-              }}
-              onDeleteAsync={async (featureId) => {
-                await deleteFeature.mutateAsync(featureId);
-              }}
-            />
-          </div>
 
           {/* Key Benefits */}
           <div
