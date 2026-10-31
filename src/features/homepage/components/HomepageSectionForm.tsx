@@ -133,19 +133,17 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
       const cleanContent = sanitizeContentForBackend(type, content);
 
       if (isEdit) {
-        // PATCH partial update: only send what changed if we wanted to be strictly minimal,
-        // but since we keep full form state, we can send it all or minimal.
-        const payload: UpdateHomepageSectionRequest = {};
+        const payload: UpdateHomepageSectionRequest = {
+          isActive: Boolean(isActive),
+          content: cleanContent,
+        };
         if (isHeroOrPromo) {
           payload.title = null;
           payload.subtitle = null;
         } else {
-          if (title !== (initialData.title ?? '')) payload.title = title || null;
-          if (subtitle !== (initialData.subtitle ?? '')) payload.subtitle = subtitle || null;
+          payload.title = title || null;
+          payload.subtitle = subtitle || null;
         }
-        if (isActive !== initialData.isActive) payload.isActive = isActive;
-
-        payload.content = cleanContent;
 
         await updateMutation.mutateAsync({ id: initialData.id, data: payload });
       } else {
@@ -153,7 +151,7 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
           type,
           title: isHeroOrPromo ? null : title || null,
           subtitle: isHeroOrPromo ? null : subtitle || null,
-          isActive,
+          isActive: Boolean(isActive),
           content: cleanContent,
         };
         await createMutation.mutateAsync(payload);
