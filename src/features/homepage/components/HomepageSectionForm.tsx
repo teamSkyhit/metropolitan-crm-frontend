@@ -69,6 +69,9 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
     ] as HomepageSectionType[]
   ).includes(type);
 
+  const isHeroOrPromo =
+    type === HomepageSectionType.HERO || type === HomepageSectionType.PROMO_BANNER;
+
   const existingActiveSection = allSections?.find(
     (s) => s.type === type && s.isActive && (!isEdit || s.id !== initialData?.id)
   );
@@ -133,8 +136,13 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
         // PATCH partial update: only send what changed if we wanted to be strictly minimal,
         // but since we keep full form state, we can send it all or minimal.
         const payload: UpdateHomepageSectionRequest = {};
-        if (title !== (initialData.title ?? '')) payload.title = title || null;
-        if (subtitle !== (initialData.subtitle ?? '')) payload.subtitle = subtitle || null;
+        if (isHeroOrPromo) {
+          payload.title = null;
+          payload.subtitle = null;
+        } else {
+          if (title !== (initialData.title ?? '')) payload.title = title || null;
+          if (subtitle !== (initialData.subtitle ?? '')) payload.subtitle = subtitle || null;
+        }
         if (isActive !== initialData.isActive) payload.isActive = isActive;
 
         payload.content = cleanContent;
@@ -143,8 +151,8 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
       } else {
         const payload: CreateHomepageSectionRequest = {
           type,
-          title: title || null,
-          subtitle: subtitle || null,
+          title: isHeroOrPromo ? null : title || null,
+          subtitle: isHeroOrPromo ? null : subtitle || null,
           isActive,
           content: cleanContent,
         };
@@ -312,26 +320,28 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Title (Optional)</label>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Featured Products"
-          />
+      {!isHeroOrPromo && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title (Optional)</label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Featured Products"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Subtitle (Optional)
+            </label>
+            <Input
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="e.g. Check out our latest products"
+            />
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Subtitle (Optional)
-          </label>
-          <Input
-            value={subtitle}
-            onChange={(e) => setSubtitle(e.target.value)}
-            placeholder="e.g. Check out our latest products"
-          />
-        </div>
-      </div>
+      )}
 
       <div className="flex items-center gap-2">
         <input
