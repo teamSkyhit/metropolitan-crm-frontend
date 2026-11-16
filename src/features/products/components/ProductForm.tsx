@@ -703,6 +703,11 @@ export function ProductForm({
                   Appears exclusively on the right side of the Product Overview section on the
                   storefront.
                 </p>
+                <p className="mt-0.5 text-[11px] text-slate-600">
+                  <span className="font-semibold text-slate-700">Recommended size:</span> 1200 × 900
+                  px (or 800 × 600 px, 4:3 Landscape). WebP or PNG, blueprint, cutaway, or specs
+                  chart.
+                </p>
               </div>
               {overviewImageUrl && (
                 <button

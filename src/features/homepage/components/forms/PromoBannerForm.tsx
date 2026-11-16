@@ -62,6 +62,10 @@ export function PromoBannerForm({ content, onChange }: Props) {
             {content.mediaId ? 'Change Image' : 'Select Image'}
           </Button>
         </div>
+        <p className="mt-1.5 text-xs text-gray-500">
+          <span className="font-semibold text-gray-700">Recommended size:</span> 1920 × 450 px (~4:1
+          Ultra-wide ratio, 380px–420px height). WebP or JPG, subject placed on right side.
+        </p>
         {!content.mediaId && <p className="text-sm text-red-500 mt-1">Image is required.</p>}
       </div>
 

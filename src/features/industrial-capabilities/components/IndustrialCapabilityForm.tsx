@@ -539,9 +539,15 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
 
           {/* Image Card */}
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
-            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/70 px-6 py-4">
-              <Sparkles className="h-4 w-4 text-amber-500" />
-              <h3 className="text-sm font-bold text-slate-900">Capability Image</h3>
+            <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                <h3 className="text-sm font-bold text-slate-900">Capability Image</h3>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">
+                <span className="font-semibold text-slate-700">Recommended size:</span> 600 × 400 px
+                (3:2 Landscape ratio). WebP or JPG, industrial environment or machinery.
+              </p>
             </div>
 
             <div className="space-y-4 p-6">

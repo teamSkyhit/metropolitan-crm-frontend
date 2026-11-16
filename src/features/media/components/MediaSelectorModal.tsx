@@ -147,6 +147,18 @@ export function MediaSelectorModal({ isOpen, onClose, onSelect }: MediaSelectorM
           </div>
         </div>
 
+        {/* Recommended Upload Sizes Cheat Sheet */}
+        <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-3 py-2 text-[11px] text-slate-600">
+          <span className="font-semibold text-slate-800">💡 Recommended Upload Sizes:</span> Hero
+          Banners: <span className="font-medium text-slate-900">1920×960 px</span> (2:1) • Promo:{' '}
+          <span className="font-medium text-slate-900">1920×450 px</span> (~4:1) • Products:{' '}
+          <span className="font-medium text-slate-900">800×800 px</span> / Gallery:{' '}
+          <span className="font-medium text-slate-900">1000×1000 px</span> (1:1) • Diagrams:{' '}
+          <span className="font-medium text-slate-900">1200×900 px</span> (4:3) • Categories /
+          Capabilities: <span className="font-medium text-slate-900">600×400 px</span> (3:2) • Brand
+          Logos: <span className="font-medium text-slate-900">300×100 px</span>
+        </div>
+
         {/* Media Grid */}
         <div className="flex-1 overflow-y-auto min-h-0 border rounded-lg bg-gray-50 p-4">
           {isLoading ? (

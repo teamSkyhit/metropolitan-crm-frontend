@@ -124,6 +124,10 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
           <p className="text-xs text-gray-500">
             Used on listing grids and navigation cards (JPG, PNG, WebP, Max 5MB).
           </p>
+          <p className="mt-1 text-xs text-gray-600">
+            <span className="font-semibold text-gray-700">Recommended size:</span> 600 × 400 px (3:2
+            Landscape ratio). WebP or JPG, sharp thumbnail photo.
+          </p>
         </div>
 
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
@@ -187,6 +191,10 @@ export function CategoryImageManager({ category }: CategoryImageManagerProps) {
           <h3 className="text-base font-semibold text-gray-900">Category Banner</h3>
           <p className="text-xs text-gray-500">
             Wide hero banner displayed on the Category Header page (JPG, PNG, WebP, Max 5MB).
+          </p>
+          <p className="mt-1 text-xs text-gray-600">
+            <span className="font-semibold text-gray-700">Recommended size:</span> 1920 × 450 px
+            (~4:1 / 5:1 Ultra-wide ratio). WebP or JPG, subdued industrial background.
           </p>
         </div>
 

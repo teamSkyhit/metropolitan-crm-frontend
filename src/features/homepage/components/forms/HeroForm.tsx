@@ -252,6 +252,10 @@ function SlideEditor({ slide, onChange }: { slide: HeroSlide; onChange: (s: Hero
             {slide.mediaId ? 'Change Image' : 'Select Image'}
           </Button>
         </div>
+        <p className="mt-1.5 text-xs text-gray-500">
+          <span className="font-semibold text-gray-700">Recommended size:</span> 1920 × 960 px (2:1
+          / 16:9 ratio, min-height 640px). WebP or JPG, dark industrial background.
+        </p>
         {!slide.mediaId && <p className="text-sm text-red-500 mt-1">Image is required.</p>}
       </div>
 
