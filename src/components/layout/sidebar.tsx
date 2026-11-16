@@ -35,7 +35,7 @@ export function Sidebar({ className, onNavigate, onClose }: SidebarProps) {
       id={onClose ? 'mobile-navigation' : undefined}
       aria-label="Main navigation"
       className={cn(
-        'relative flex h-dvh w-[280px] shrink-0 flex-col overflow-hidden bg-[var(--color-metro-navy)] text-white',
+        'relative flex h-full w-[280px] shrink-0 flex-col overflow-hidden bg-[var(--color-metro-navy)] text-white',
         className
       )}
     >
@@ -100,7 +100,7 @@ export function Sidebar({ className, onNavigate, onClose }: SidebarProps) {
           })}
         </ul>
       </nav>
-      <div className="p-4 border-t border-white/10 shrink-0">
+      <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-white/10 shrink-0">
         <button
           onClick={handleLogout}
           className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm text-white/65 transition-colors outline-none hover:bg-red-400/10 hover:text-red-200 focus-visible:ring-2 focus-visible:ring-[var(--color-metro-gold)]"

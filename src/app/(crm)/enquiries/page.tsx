@@ -29,8 +29,11 @@ import {
   ChevronRight,
   SlidersHorizontal,
   X,
+  Download,
 } from 'lucide-react';
 import { ROUTES } from '@/lib/constants/routes';
+import { ExportEnquiriesModal } from '@/features/enquiries/components/ExportEnquiriesModal';
+import { EnquiryItemBadge } from '@/features/enquiries/components/EnquiryItemBadge';
 
 function EnquiriesList() {
   const router = useRouter();
@@ -86,18 +89,34 @@ function EnquiriesList() {
     }
   }, [debouncedSearch, search, localSearch, updateUrl]);
 
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
   const role = useAuthStore((state) => state.role);
-  const canAssign = role !== ROLES.CRM_USER;
+  const user = useAuthStore((state) => state.user);
+  const isCrmUser = role === ROLES.CRM_USER;
+  const canAssign = !isCrmUser;
+
+  // When CRM_USER is logged in, restrict query strictly to enquiries assigned to them
+  const effectiveAssignedTo = isCrmUser ? user?.id : assignedTo || undefined;
+
   const { data: usersData } = useUsers({ limit: 100 }, { enabled: canAssign });
-  const { data, isLoading, isError, refetch } = useEnquiries({
-    page,
-    limit: 20,
-    search: search || undefined,
-    status: status || undefined,
-    assignedTo: assignedTo || undefined,
-    from: from || undefined,
-    to: to || undefined,
-  });
+  const { data, isLoading, isError, refetch } = useEnquiries(
+    {
+      page,
+      limit: 20,
+      search: search || undefined,
+      status: status || undefined,
+      assignedTo: effectiveAssignedTo,
+      from: from || undefined,
+      to: to || undefined,
+    },
+    { enabled: !isCrmUser || Boolean(user?.id) }
+  );
+
+  // Client-side defense-in-depth filter: ensure CRM_USER strictly only sees their assigned leads
+  const rawList = data?.data || [];
+  const enquiriesList =
+    isCrmUser && user?.id ? rawList.filter((enq) => enq.assignedTo?.id === user.id) : rawList;
 
   const handleFilterChange = (key: string, value: string) => {
     updateUrl({ [key]: value, page: 1 });
@@ -130,7 +149,36 @@ function EnquiriesList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Page Header with Export Action */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <PageHeader
+          title={isCrmUser ? 'My Assigned Enquiries' : 'Enquiries'}
+          description={
+            isCrmUser
+              ? 'Review and manage customer enquiries assigned to you, record notes, and track follow-ups.'
+              : 'Review customer requests, assign ownership, and track every follow-up.'
+          }
+        />
+        <Button
+          onClick={() => setIsExportModalOpen(true)}
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--color-metro-navy)] px-4 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(16,47,87,0.18)] transition-all hover:bg-[#173e6e]"
+        >
+          <Download className="h-4 w-4" />
+          Export Enquiries
+        </Button>
+      </div>
+
+      <ExportEnquiriesModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        initialFrom={from}
+        initialTo={to}
+        initialStatus={status}
+        initialAssignedTo={assignedTo}
+        initialSearch={search}
+      />
+
       {/* Filters */}
       <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3">
@@ -138,16 +186,27 @@ function EnquiriesList() {
             <SlidersHorizontal className="h-4 w-4 text-[var(--color-metro-gold)]" /> Search and
             filters
           </div>
-          {(search || status || assignedTo || from || to) && (
+          <div className="flex items-center gap-2">
+            {(search || status || (canAssign && assignedTo) || from || to) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearFilters}
+                className="gap-1.5 text-slate-600"
+              >
+                <X className="h-4 w-4" /> Clear all
+              </Button>
+            )}
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={handleClearFilters}
-              className="gap-1.5 text-slate-600"
+              onClick={() => setIsExportModalOpen(true)}
+              className="gap-1.5 border-slate-300 text-slate-700 hover:bg-slate-50"
             >
-              <X className="h-4 w-4" /> Clear all
+              <Download className="h-4 w-4 text-[var(--color-metro-navy)]" />
+              Export
             </Button>
-          )}
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="relative">
@@ -221,12 +280,16 @@ function EnquiriesList() {
               <div className="h-4 w-32 bg-gray-200 rounded"></div>
             </div>
           </div>
-        ) : !data || data.data.length === 0 ? (
+        ) : !data || enquiriesList.length === 0 ? (
           <div className="p-12 text-center">
             <Inbox className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-            <p className="font-semibold text-slate-800">No enquiries match your filters</p>
+            <p className="font-semibold text-slate-800">
+              {isCrmUser ? 'No assigned enquiries found' : 'No enquiries match your filters'}
+            </p>
             <p className="mt-1 text-sm text-slate-500">
-              Clear filters or broaden the date range to see more results.
+              {isCrmUser
+                ? 'Enquiries assigned to you will appear here once allocated by an administrator.'
+                : 'Clear filters or broaden the date range to see more results.'}
             </p>
           </div>
         ) : (
@@ -244,7 +307,7 @@ function EnquiriesList() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.data.map((enq) => (
+                {enquiriesList.map((enq) => (
                   <TableRow key={enq.id}>
                     <TableCell>
                       <div className="font-medium text-gray-900">{enq.name}</div>
@@ -263,9 +326,7 @@ function EnquiriesList() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
-                        {enq.lineItemCount} {enq.lineItemCount === 1 ? 'item' : 'items'}
-                      </span>
+                      <EnquiryItemBadge enquiryId={enq.id} fallbackCount={enq.lineItemCount} />
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-gray-600">{formatDate(enq.createdAt)}</span>
@@ -347,21 +408,18 @@ function EnquiriesList() {
 
 export default function EnquiriesPage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Enquiries"
-        description="Review customer requests, assign ownership, and track every follow-up."
-      />
-      <Suspense
-        fallback={
+    <Suspense
+      fallback={
+        <div className="space-y-6">
+          <div className="h-10 w-48 animate-pulse rounded-lg bg-slate-200" />
           <div
             className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-white"
             aria-label="Loading enquiries"
           />
-        }
-      >
-        <EnquiriesList />
-      </Suspense>
-    </div>
+        </div>
+      }
+    >
+      <EnquiriesList />
+    </Suspense>
   );
 }

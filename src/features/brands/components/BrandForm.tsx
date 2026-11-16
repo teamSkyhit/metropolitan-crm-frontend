@@ -247,10 +247,12 @@ export function BrandForm({ initialData }: BrandFormProps) {
                 <div className="mb-2 flex items-center justify-between">
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                      Brand Logo (Square / Icon)
+                      Brand Logo
                     </span>
-                    <p className="text-xs text-slate-400">
-                      Square logo with transparent or white background (Max 5MB).
+                    <p className="text-xs text-slate-500">
+                      <span className="font-semibold text-slate-700">Recommended size:</span> 300 ×
+                      100 px (or 400 × 120 px, ~3:1 / 4:1 wide ratio). Transparent PNG or WebP only
+                      (max height 48px on storefront).
                     </p>
                   </div>
                   {activeLogoUrl && (
@@ -335,8 +337,10 @@ export function BrandForm({ initialData }: BrandFormProps) {
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       Brand Hero Banner (Wide 3:1)
                     </span>
-                    <p className="text-xs text-slate-400">
-                      High-resolution manufacturer banner for dedicated brand landing pages.
+                    <p className="text-xs text-slate-500">
+                      High-resolution manufacturer banner.{' '}
+                      <span className="font-semibold text-slate-700">Recommended size:</span> 1200 ×
+                      400 px (3:1 Landscape ratio, PNG, JPG, or WebP).
                     </p>
                   </div>
                   {activeBannerUrl && (
