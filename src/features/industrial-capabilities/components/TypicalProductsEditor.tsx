@@ -59,6 +59,11 @@ export function TypicalProductsEditor({
 
   return (
     <div className="space-y-3">
+      <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-3.5 py-2 text-xs text-blue-900 flex items-center gap-2">
+        <span className="font-semibold">Website Note:</span>
+        <span>Typical Products may also appear in website navigation.</span>
+      </div>
+
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <input

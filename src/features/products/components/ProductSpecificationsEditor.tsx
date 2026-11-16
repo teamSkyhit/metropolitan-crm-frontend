@@ -128,9 +128,15 @@ export function ProductSpecificationsEditor({
             <Ruler className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#17263b]">Technical specifications</h3>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-base font-bold text-[#17263b]">5. Technical Specifications</h3>
+              <span className="inline-flex items-center rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                Optional
+              </span>
+            </div>
             <p className="mt-1 text-xs leading-5 text-gray-500">
-              Add measurable product data such as weight, power, ratio, speed, or dimensions.
+              Add measurable technical specifications (e.g. weight, power, torque, ratio,
+              dimensions). Optional on the public website.
             </p>
           </div>
         </div>

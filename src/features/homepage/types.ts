@@ -82,3 +82,41 @@ export interface UpdateHomepageSectionRequest {
 export interface ReorderHomepageSectionsRequest {
   items: { id: string; sortOrder: number }[];
 }
+
+export const WEBSITE_HOMEPAGE_STRUCTURE = [
+  { position: 1, name: 'Hero', defaultType: HomepageSectionType.HERO },
+  { position: 2, name: 'Product Categories', defaultType: HomepageSectionType.FEATURED_CATEGORIES },
+  { position: 3, name: 'Technical Product Support', defaultType: HomepageSectionType.PROMO_BANNER },
+  { position: 4, name: 'Featured Products', defaultType: HomepageSectionType.FEATURED_PRODUCTS },
+  { position: 5, name: 'Why Metropolitan', defaultType: HomepageSectionType.PROMO_BANNER },
+  { position: 6, name: 'Brands', defaultType: HomepageSectionType.FEATURED_BRANDS },
+  {
+    position: 7,
+    name: 'Need a Product / Component',
+    defaultType: HomepageSectionType.PROMO_BANNER,
+  },
+  { position: 8, name: 'Footer', defaultType: null },
+] as const;
+
+export function getHomepageSectionDisplayLabel(
+  type: HomepageSectionType,
+  title?: string | null
+): string {
+  if (title && title.trim()) {
+    return title.trim();
+  }
+  switch (type) {
+    case HomepageSectionType.HERO:
+      return 'Hero';
+    case HomepageSectionType.FEATURED_CATEGORIES:
+      return 'Product Categories';
+    case HomepageSectionType.FEATURED_PRODUCTS:
+      return 'Featured Products';
+    case HomepageSectionType.FEATURED_BRANDS:
+      return 'Brands';
+    case HomepageSectionType.PROMO_BANNER:
+      return 'Promo Banner';
+    default:
+      return type;
+  }
+}

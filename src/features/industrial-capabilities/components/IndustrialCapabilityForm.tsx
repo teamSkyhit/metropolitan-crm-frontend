@@ -465,7 +465,8 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
               <div>
                 <h2 className="text-base font-bold text-slate-900">Typical Products</h2>
                 <p className="text-xs text-slate-500">
-                  Sample manufactured products and components in this industrial capability.
+                  Sample manufactured products and components in this industrial capability. Typical
+                  Products may also appear in website navigation.
                 </p>
               </div>
             </div>

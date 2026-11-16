@@ -200,25 +200,31 @@ function SlideEditor({ slide, onChange }: { slide: HeroSlide; onChange: (s: Hero
         <Input
           value={slide.heading}
           onChange={(e) => onChange({ ...slide, heading: e.target.value })}
-          placeholder="Main slide text"
+          placeholder="e.g. Your local Industrial Supplies Partner in Penrith"
           required
         />
+        <p className="mt-1 text-xs text-gray-500">
+          Primary headline displayed on the hero banner (e.g. &ldquo;Your local Industrial Supplies
+          Partner in Penrith&rdquo;).
+        </p>
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Subheading</label>
         <Input
           value={subValue}
           onChange={(e) => handleSubChange(e.target.value)}
-          placeholder="Optional secondary text"
+          placeholder="e.g. Quality Bearings, Power Transmission & Industrial Fasteners"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Supporting Copy / Description
+        </label>
         <textarea
           rows={3}
           value={descValue}
           onChange={(e) => handleDescChange(e.target.value)}
-          placeholder="Optional paragraph description for this slide"
+          placeholder="Supporting narrative or promotional text for this slide..."
           className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-metro-navy)]"
         />
       </div>

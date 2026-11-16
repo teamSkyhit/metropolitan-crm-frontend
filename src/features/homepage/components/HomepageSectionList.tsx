@@ -7,7 +7,11 @@ import {
   useReorderHomepageSections,
   useDeleteHomepageSection,
 } from '../hooks/useHomepage';
-import { HomepageSectionType } from '../types';
+import {
+  HomepageSectionType,
+  WEBSITE_HOMEPAGE_STRUCTURE,
+  getHomepageSectionDisplayLabel,
+} from '../types';
 import { Edit, Trash2, ArrowUp, ArrowDown, LayoutTemplate, AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -126,16 +130,54 @@ export function HomepageSectionList() {
   };
 
   const formatType = (type: string) => {
-    return type
-      .replace(/_/g, ' ')
-      .replace(/\w\S*/g, (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase());
+    switch (type) {
+      case HomepageSectionType.HERO:
+        return 'Hero';
+      case HomepageSectionType.FEATURED_CATEGORIES:
+        return 'Product Categories';
+      case HomepageSectionType.FEATURED_PRODUCTS:
+        return 'Featured Products';
+      case HomepageSectionType.FEATURED_BRANDS:
+        return 'Brands';
+      case HomepageSectionType.PROMO_BANNER:
+        return 'Promo Banner';
+      default:
+        return type
+          .replace(/_/g, ' ')
+          .replace(/\w\S*/g, (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase());
+    }
   };
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-sm text-blue-900">
-        <span className="font-semibold">Homepage order:</span> sections appear publicly from top to
-        bottom. Use the arrows to reorder, then save your changes.
+      {/* Website Homepage Structure Reference Guide */}
+      <div className="rounded-2xl border border-blue-200/80 bg-blue-50/70 p-4 sm:p-5 text-sm text-blue-950">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h3 className="font-bold text-blue-900 flex items-center gap-2">
+              <LayoutTemplate className="w-4 h-4 text-blue-700" />
+              Website Homepage Content Structure
+            </h3>
+            <p className="text-xs text-blue-800/80 mt-0.5">
+              Sections on the public website appear in this top-to-bottom sequence. Use Move Up /
+              Down arrows to adjust CRM order, then click Save Order.
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
+          {WEBSITE_HOMEPAGE_STRUCTURE.map((item, idx) => (
+            <span
+              key={item.position}
+              className="inline-flex items-center gap-1 rounded-lg bg-white/90 border border-blue-200/90 px-2.5 py-1 font-medium text-blue-900 shadow-2xs"
+            >
+              <span className="font-bold text-blue-700">{item.position}.</span>
+              <span>{item.name}</span>
+              {idx < WEBSITE_HOMEPAGE_STRUCTURE.length - 1 && (
+                <span className="text-blue-300 ml-1">→</span>
+              )}
+            </span>
+          ))}
+        </div>
       </div>
       {isOrderChanged && (
         <div className="sticky top-3 z-10 mb-6 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
@@ -188,22 +230,25 @@ export function HomepageSectionList() {
             </div>
 
             <div className="min-w-0">
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-700">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="inline-flex items-center gap-1 rounded-md bg-[var(--color-metro-navy)]/10 px-2 py-0.5 text-xs font-bold text-[var(--color-metro-navy)]">
+                  Order #{index + 1}
+                </span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gray-100 text-gray-700">
                   {formatType(section.type)}
                 </span>
                 {section.isActive ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">
                     Active
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700">
                     Inactive
                   </span>
                 )}
               </div>
               <h4 className="text-lg font-semibold text-gray-900">
-                {section.title || formatType(section.type)}
+                {getHomepageSectionDisplayLabel(section.type, section.title)}
               </h4>
               {section.subtitle && (
                 <p className="text-sm text-gray-500 line-clamp-1">{section.subtitle}</p>

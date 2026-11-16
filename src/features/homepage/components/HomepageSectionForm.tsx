@@ -10,6 +10,7 @@ import {
   CreateHomepageSectionRequest,
   UpdateHomepageSectionRequest,
   HomepageContent,
+  getHomepageSectionDisplayLabel,
 } from '../types';
 import {
   useCreateHomepageSection,
@@ -224,9 +225,15 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
             {[
               {
                 id: HomepageSectionType.HERO,
-                label: 'Hero Carousel',
-                desc: 'Rotating banner slides with background images and CTA buttons',
+                label: 'Hero',
+                desc: 'Rotating banner slides with background images, headlines, and CTA buttons',
                 icon: Layers,
+              },
+              {
+                id: HomepageSectionType.FEATURED_CATEGORIES,
+                label: 'Product Categories',
+                desc: 'Highlight main product categories with banners',
+                icon: FolderTree,
               },
               {
                 id: HomepageSectionType.FEATURED_PRODUCTS,
@@ -235,21 +242,15 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
                 icon: Package,
               },
               {
-                id: HomepageSectionType.FEATURED_CATEGORIES,
-                label: 'Featured Categories',
-                desc: 'Highlight main product categories with banners',
-                icon: FolderTree,
-              },
-              {
                 id: HomepageSectionType.FEATURED_BRANDS,
-                label: 'Featured Brands',
+                label: 'Brands',
                 desc: 'Display partner brands and manufacturer logos',
                 icon: Award,
               },
               {
                 id: HomepageSectionType.PROMO_BANNER,
                 label: 'Promo Banner',
-                desc: 'Full-width promotional callout banner with image & CTA',
+                desc: 'Full-width promotional callout banner (e.g. Technical Support, Why Metropolitan, Need a Product)',
                 icon: Megaphone,
               },
             ].map((option) => {
@@ -313,7 +314,7 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
           <label className="block text-sm font-bold text-gray-900 mb-1">Section Type</label>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-[var(--color-metro-navy)] font-bold text-sm">
             <Layers className="w-4 h-4" />
-            {type.replace(/_/g, ' ')}
+            {getHomepageSectionDisplayLabel(type)}
           </div>
         </div>
       )}

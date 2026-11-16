@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Eye } from 'lucide-react';
 import { ROUTES } from '@/lib/constants/routes';
 import {
   useProduct,
@@ -186,38 +186,122 @@ export function ProductEditClient({ id }: { id: string }) {
 
       <nav
         aria-label="Product editor sections"
-        className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 xl:hidden"
+        className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
       >
         {[
-          ['#product-core', 'Details'],
-          ['#product-specifications', 'Specifications'],
-          ['#product-benefits', 'Benefits'],
-          ['#product-media', 'Media'],
+          ['#product-core', '1. Details & Description'],
+          ['#product-gallery', '4. Gallery & Media'],
+          ['#product-specifications', '5. Specifications'],
+          ['#product-related', '6. Related Products'],
+          ['#product-legacy', '7. Inactive / Supplementary'],
         ].map(([href, label]) => (
           <a
             key={href}
             href={href}
-            className="shrink-0 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm"
+            className="shrink-0 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition"
           >
             {label}
           </a>
         ))}
       </nav>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        {/* Left Column: Core Info & Content Sections */}
-        <div className="space-y-6 xl:col-span-2">
-          <div id="product-core" className="scroll-mt-24">
-            <ProductForm
-              initialData={product}
-              mode="edit"
-              onSubmit={handleUpdate}
-              isPending={updateProduct.isPending}
-            />
+      {/* Sequential Form Sections Matching Website Flow */}
+      <div className="space-y-8">
+        {/* Core Product Form: Basic Info, Description, Brand, SKU, Overview, SEO */}
+        <div id="product-core" className="scroll-mt-24">
+          <ProductForm
+            initialData={product}
+            mode="edit"
+            onSubmit={handleUpdate}
+            isPending={updateProduct.isPending}
+          />
+        </div>
+
+        {/* ── 4. Product Gallery & Media ── */}
+        <section
+          id="product-gallery"
+          className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6 space-y-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">4. Product Gallery</h3>
+              <p className="text-xs text-gray-500">
+                Primary catalog image and additional high-resolution gallery photos.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
           </div>
 
-          {/* Specifications */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1">
+              <ProductImageManager product={product} />
+            </div>
+            <div className="lg:col-span-2">
+              <ProductGalleryManager
+                gallery={product.gallery || []}
+                onUploadAsync={async (files) => {
+                  await uploadGallery.mutateAsync(files);
+                }}
+                onReorderAsync={async (imageIds) => {
+                  await reorderGallery.mutateAsync(imageIds);
+                }}
+                onSetPrimaryAsync={async (galleryImageId) => {
+                  await setPrimaryGallery.mutateAsync(galleryImageId);
+                }}
+                onDeleteAsync={async (galleryImageId) => {
+                  await deleteGallery.mutateAsync(galleryImageId);
+                }}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. Technical Specifications ── */}
+        <div id="product-specifications" className="scroll-mt-24">
           <ProductSpecificationsEditor product={product} />
+        </div>
+
+        {/* ── 6. Related Products ── */}
+        <section
+          id="product-related"
+          className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 mb-4 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">6. Related Products</h3>
+              <p className="text-xs text-gray-500">
+                Select other products from the catalog to recommend on this product&apos;s detail
+                page.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+          <RelatedProductsSelector
+            currentProductId={product.id}
+            selectedProducts={product.relatedProducts || []}
+            onChange={async (newRelated) => {
+              await setRelatedProducts.mutateAsync(newRelated.map((p) => p.id));
+            }}
+            disabled={setRelatedProducts.isPending}
+          />
+        </section>
+
+        {/* ── 7. Inactive / Supplementary Sections ── */}
+        <section id="product-legacy" className="scroll-mt-24 space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <h3 className="text-base font-bold text-slate-900">
+              7. Inactive / Supplementary Sections
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Supplementary media and legacy content preserved in the database.
+            </p>
+          </div>
 
           {/* Key Benefits */}
           <div
@@ -241,86 +325,62 @@ export function ProductEditClient({ id }: { id: string }) {
             />
           </div>
 
-          {/* Related Products */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <h4 className="text-sm font-semibold text-gray-900 mb-1">Related Products</h4>
-            <p className="text-xs text-gray-500 mb-4">
-              Select other products from the catalog to recommend on this product&apos;s detail
-              page.
-            </p>
-            <RelatedProductsSelector
-              currentProductId={product.id}
-              selectedProducts={product.relatedProducts || []}
-              onChange={async (newRelated) => {
-                await setRelatedProducts.mutateAsync(newRelated.map((p) => p.id));
-              }}
-              disabled={setRelatedProducts.isPending}
-            />
-          </div>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Videos */}
+            <div
+              id="product-videos"
+              className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+            >
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">Product Videos</h4>
+              <p className="text-xs text-gray-500 mb-3">
+                Optional video demonstrations (MP4/WebM).
+              </p>
+              <ProductVideoManager
+                videos={product.videos || []}
+                onUploadAsync={async (files, title) => {
+                  await uploadVideos.mutateAsync({ files, title });
+                }}
+                onUpdateTitleAsync={async (videoId, title) => {
+                  await updateVideo.mutateAsync({ videoId, payload: { title } });
+                }}
+                onReorderAsync={async (videoIds) => {
+                  await reorderVideos.mutateAsync(videoIds);
+                }}
+                onDeleteAsync={async (videoId) => {
+                  await deleteVideo.mutateAsync(videoId);
+                }}
+              />
+            </div>
 
-        {/* Right Column: Media Subresources */}
-        <div id="product-media" className="scroll-mt-24 space-y-6">
-          {/* Primary Product Image */}
-          <ProductImageManager product={product} />
-
-          {/* Gallery */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductGalleryManager
-              gallery={product.gallery || []}
-              onUploadAsync={async (files) => {
-                await uploadGallery.mutateAsync(files);
-              }}
-              onReorderAsync={async (imageIds) => {
-                await reorderGallery.mutateAsync(imageIds);
-              }}
-              onSetPrimaryAsync={async (galleryImageId) => {
-                await setPrimaryGallery.mutateAsync(galleryImageId);
-              }}
-              onDeleteAsync={async (galleryImageId) => {
-                await deleteGallery.mutateAsync(galleryImageId);
-              }}
-            />
+            {/* Documents */}
+            <div
+              id="product-documents"
+              className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+            >
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                Technical Documents (PDF)
+              </h4>
+              <p className="text-xs text-gray-500 mb-3">
+                Product brochures, user manuals, and technical spec sheets.
+              </p>
+              <ProductDocumentManager
+                documents={product.documents || []}
+                onUploadAsync={async (files, title) => {
+                  await uploadDocs.mutateAsync({ files, title });
+                }}
+                onUpdateTitleAsync={async (documentId, title) => {
+                  await updateDoc.mutateAsync({ documentId, payload: { title } });
+                }}
+                onReorderAsync={async (documentIds) => {
+                  await reorderDocs.mutateAsync(documentIds);
+                }}
+                onDeleteAsync={async (documentId) => {
+                  await deleteDoc.mutateAsync(documentId);
+                }}
+              />
+            </div>
           </div>
-
-          {/* Videos */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductVideoManager
-              videos={product.videos || []}
-              onUploadAsync={async (files, title) => {
-                await uploadVideos.mutateAsync({ files, title });
-              }}
-              onUpdateTitleAsync={async (videoId, title) => {
-                await updateVideo.mutateAsync({ videoId, payload: { title } });
-              }}
-              onReorderAsync={async (videoIds) => {
-                await reorderVideos.mutateAsync(videoIds);
-              }}
-              onDeleteAsync={async (videoId) => {
-                await deleteVideo.mutateAsync(videoId);
-              }}
-            />
-          </div>
-
-          {/* Documents */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductDocumentManager
-              documents={product.documents || []}
-              onUploadAsync={async (files, title) => {
-                await uploadDocs.mutateAsync({ files, title });
-              }}
-              onUpdateTitleAsync={async (documentId, title) => {
-                await updateDoc.mutateAsync({ documentId, payload: { title } });
-              }}
-              onReorderAsync={async (documentIds) => {
-                await reorderDocs.mutateAsync(documentIds);
-              }}
-              onDeleteAsync={async (documentId) => {
-                await deleteDoc.mutateAsync(documentId);
-              }}
-            />
-          </div>
-        </div>
+        </section>
       </div>
 
       <ConfirmDialog

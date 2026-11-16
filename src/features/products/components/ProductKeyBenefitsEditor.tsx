@@ -5,7 +5,7 @@ import { ProductKeyBenefit } from '../types';
 import { IconPicker } from '@/components/ui/icon-picker/IconPicker';
 import { ProductContentIcon } from '@/components/ui/icon-picker/ProductContentIcon';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Plus, Trash2, Edit2, ArrowUp, ArrowDown, Check, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, ArrowUp, ArrowDown, Check, X, EyeOff } from 'lucide-react';
 
 interface ProductKeyBenefitsEditorProps {
   benefits: ProductKeyBenefit[];
@@ -139,9 +139,18 @@ export function ProductKeyBenefitsEditor({
     <div className="space-y-4">
       <div className="flex flex-col items-start gap-3 min-[420px]:flex-row min-[420px]:justify-between">
         <div>
-          <h4 className="text-sm font-semibold text-gray-900">Key Benefits</h4>
-          <p className="text-xs text-gray-500">
-            Communicate customer advantages, durability ratings, and operational ROI.
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-sm font-semibold text-gray-900">
+              Key Benefits (Optional / Inactive)
+            </h4>
+            <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+              <EyeOff className="w-3 h-3 text-amber-600" />
+              Currently hidden on website
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Key benefits are preserved in the database for future reference, but are currently
+            hidden on the public website.
           </p>
         </div>
         {!isAddingNew && (

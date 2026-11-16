@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Save, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants/routes';
 import { ProductForm } from '@/features/products/components/ProductForm';
@@ -333,13 +333,13 @@ export default function CreateProductPage() {
             className="flex items-center gap-1 overflow-x-auto py-0.5 scrollbar-none order-3 w-full lg:order-2 lg:w-auto lg:flex-1 lg:justify-center"
           >
             {[
-              ['#product-core', 'Basic Details'],
-              ['#product-specifications', 'Specifications'],
-              ['#product-benefits', 'Benefits'],
-              ['#product-media', 'Media Gallery'],
-              ['#product-videos', 'Videos'],
-              ['#product-documents', 'Documents'],
-              ['#product-related', 'Related Products'],
+              ['#product-core', '1. Basic Info'],
+              ['#product-description', '2. Description'],
+              ['#product-brand', '3. Brand'],
+              ['#product-gallery', '4. Gallery'],
+              ['#product-specifications', '5. Specifications'],
+              ['#product-related', '6. Related Products'],
+              ['#product-legacy', '7. Inactive / Legacy'],
             ].map(([href, label]) => (
               <a
                 key={href}
@@ -441,20 +441,82 @@ export default function CreateProductPage() {
         </div>
       )}
 
-      {/* Main Form & Subresources Grid */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        {/* Left Column: Core Info & Content Sections */}
-        <div className="space-y-6 xl:col-span-2">
-          <div id="product-core" className="scroll-mt-24">
-            <ProductForm mode="create" onSubmit={handleSubmit} isPending={isSubmitting} />
-          </div>
+      {/* Sequential Form Sections Matching Website Flow */}
+      <div className="space-y-8">
+        {/* Core Product Form: Basic Info, Description, Brand, SKU, Overview, SEO */}
+        <div id="product-core" className="scroll-mt-24">
+          <ProductForm mode="create" onSubmit={handleSubmit} isPending={isSubmitting} />
+        </div>
 
-          {/* Specifications Card */}
+        {/* 4. Product Gallery */}
+        <section
+          id="product-gallery"
+          className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 mb-4 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">4. Product Gallery</h3>
+              <p className="text-xs text-gray-500">
+                Select and stage gallery images for upload. Files will be uploaded automatically
+                upon product creation.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+          <ProductGalleryManager
+            gallery={[]}
+            localFiles={localGalleryFiles}
+            onLocalFilesChange={setLocalGalleryFiles}
+            disabled={isSubmitting}
+          />
+        </section>
+
+        {/* 5. Specifications */}
+        <div id="product-specifications" className="scroll-mt-24">
           <ProductSpecificationsEditor
             value={specifications}
             onChange={setSpecifications}
             disabled={isSubmitting}
           />
+        </div>
+
+        {/* 6. Related Products */}
+        <section
+          id="product-related"
+          className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 mb-4 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">6. Related Products</h3>
+              <p className="text-xs text-gray-500">
+                Select complementary or alternative products to recommend on the storefront.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+          <RelatedProductsSelector
+            selectedProducts={relatedProducts}
+            onChange={setRelatedProducts}
+            disabled={isSubmitting}
+          />
+        </section>
+
+        {/* 7. Inactive / Supplementary Sections */}
+        <section id="product-legacy" className="scroll-mt-24 space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <h3 className="text-base font-bold text-slate-900">
+              7. Inactive / Supplementary Sections
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Supplementary media and legacy content preserved in the database.
+            </p>
+          </div>
 
           {/* Key Benefits Card */}
           <div
@@ -468,53 +530,44 @@ export default function CreateProductPage() {
             />
           </div>
 
-          {/* Related Products Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <h4 className="text-sm font-semibold text-gray-900 mb-1">Related Products</h4>
-            <p className="text-xs text-gray-500 mb-4">
-              Select other products from the catalog to recommend on this product&apos;s detail
-              page.
-            </p>
-            <RelatedProductsSelector
-              selectedProducts={relatedProducts}
-              onChange={setRelatedProducts}
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Videos Card */}
+            <div
+              id="product-videos"
+              className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+            >
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">Product Videos</h4>
+              <p className="text-xs text-gray-500 mb-3">
+                Optional video demonstrations (MP4/WebM).
+              </p>
+              <ProductVideoManager
+                videos={[]}
+                localFiles={localVideos}
+                onLocalFilesChange={setLocalVideos}
+                disabled={isSubmitting}
+              />
+            </div>
 
-        {/* Right Column: Media Subresources */}
-        <div id="product-media" className="scroll-mt-24 space-y-6">
-          {/* Gallery Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductGalleryManager
-              gallery={[]}
-              localFiles={localGalleryFiles}
-              onLocalFilesChange={setLocalGalleryFiles}
-              disabled={isSubmitting}
-            />
+            {/* Documents Card */}
+            <div
+              id="product-documents"
+              className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+            >
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                Technical Documents (PDF)
+              </h4>
+              <p className="text-xs text-gray-500 mb-3">
+                Product brochures, user manuals, and technical spec sheets.
+              </p>
+              <ProductDocumentManager
+                documents={[]}
+                localFiles={localDocuments}
+                onLocalFilesChange={setLocalDocuments}
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
-
-          {/* Videos Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductVideoManager
-              videos={[]}
-              localFiles={localVideos}
-              onLocalFilesChange={setLocalVideos}
-              disabled={isSubmitting}
-            />
-          </div>
-
-          {/* Documents Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductDocumentManager
-              documents={[]}
-              localFiles={localDocuments}
-              onLocalFilesChange={setLocalDocuments}
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   );
