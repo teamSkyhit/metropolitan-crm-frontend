@@ -101,10 +101,6 @@ export function ProductForm({
   const [isOverviewMediaModalOpen, setIsOverviewMediaModalOpen] = useState(false);
   const overviewFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Website Visibility ON/OFF switches (defaults to inactive/OFF as required)
-  const [isSkuVisible, setIsSkuVisible] = useState(false);
-  const [isOverviewVisible, setIsOverviewVisible] = useState(false);
-
   const [prevOverviewProp, setPrevOverviewProp] = useState(initialData?.overview);
   if (initialData?.overview !== prevOverviewProp) {
     setPrevOverviewProp(initialData?.overview);
@@ -700,78 +696,31 @@ export function ProductForm({
         <section id="product-sku" className="space-y-3 pt-6 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-3">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-sm font-bold text-gray-800">
                   Internal Reference &amp; Inventory
                 </h3>
                 <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
                   Internal Reference Only
                 </span>
+                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                  <EyeOff className="w-3 h-3 text-amber-600" />
+                  Hidden on Website
+                </span>
               </div>
               <p className="text-xs text-gray-500 mt-0.5">
                 Catalog tracking identifier. Required by the backend for product creation.
               </p>
             </div>
-
-            {/* Website Visibility ON/OFF Option */}
-            <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 self-start sm:self-auto">
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                  Website Visibility
-                </span>
-                <span
-                  className={`text-xs font-semibold ${
-                    isSkuVisible ? 'text-emerald-700' : 'text-amber-800'
-                  }`}
-                >
-                  {isSkuVisible ? 'Visible on Website (ON)' : 'Hidden on Website (OFF)'}
-                </span>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isSkuVisible}
-                aria-label="Toggle SKU Website Visibility"
-                onClick={() => setIsSkuVisible(!isSkuVisible)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-navy)] ${
-                  isSkuVisible ? 'bg-emerald-600' : 'bg-slate-300'
-                }`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    isSkuVisible ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            </div>
           </div>
 
-          <div
-            className={`rounded-xl border p-3 text-xs flex items-start gap-2 ${
-              isSkuVisible
-                ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
-                : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
-            }`}
-          >
-            {isSkuVisible ? (
-              <>
-                <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0 mt-1" />
-                <div>
-                  <span className="font-semibold">Section Active on Website:</span> SKU will be
-                  displayed in the product header and specifications table.
-                </div>
-              </>
-            ) : (
-              <>
-                <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold">Section Inactive on Website:</span> Currently
-                  hidden on website. Data is preserved for internal warehouse inventory and database
-                  catalog operations.
-                </div>
-              </>
-            )}
+          <div className="rounded-xl border border-amber-200/70 bg-amber-50/50 p-3 text-xs text-amber-900 flex items-start gap-2">
+            <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold">Section Inactive on Website:</span> Currently hidden
+              on website. Data is preserved for internal warehouse inventory and database catalog
+              operations.
+            </div>
           </div>
 
           <div className="max-w-md space-y-2">
@@ -813,28 +762,13 @@ export function ProductForm({
         <section id="product-overview" className="space-y-4 pt-6 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-3">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base font-semibold text-gray-900">
                   Product Overview (Optional / Inactive)
                 </h3>
-                <span
-                  className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${
-                    isOverviewVisible
-                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-                      : 'bg-amber-50 border border-amber-200 text-amber-800'
-                  }`}
-                >
-                  {isOverviewVisible ? (
-                    <>
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      Visible on Website
-                    </>
-                  ) : (
-                    <>
-                      <EyeOff className="w-3 h-3 text-amber-600" />
-                      Currently hidden on website
-                    </>
-                  )}
+                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                  <EyeOff className="w-3 h-3 text-amber-600" />
+                  Currently hidden on website
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-0.5">
@@ -842,52 +776,11 @@ export function ProductForm({
                 reference.
               </p>
             </div>
-
-            {/* Website Visibility ON/OFF Option */}
-            <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 self-start sm:self-auto">
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                  Website Visibility
-                </span>
-                <span
-                  className={`text-xs font-semibold ${
-                    isOverviewVisible ? 'text-emerald-700' : 'text-amber-800'
-                  }`}
-                >
-                  {isOverviewVisible ? 'Visible on Website (ON)' : 'Hidden on Website (OFF)'}
-                </span>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isOverviewVisible}
-                aria-label="Toggle Product Overview Website Visibility"
-                onClick={() => setIsOverviewVisible(!isOverviewVisible)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-navy)] ${
-                  isOverviewVisible ? 'bg-emerald-600' : 'bg-slate-300'
-                }`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    isOverviewVisible ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            </div>
           </div>
 
-          <div
-            className={`rounded-xl border p-3.5 text-xs ${
-              isOverviewVisible
-                ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
-                : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
-            }`}
-          >
-            <span className="font-semibold">Storefront status:</span>{' '}
-            {isOverviewVisible
-              ? 'Product Overview is ACTIVE and visible on the public storefront.'
-              : 'Product Overview is INACTIVE (Currently hidden on website). Data and schematics remain preserved in the database.'}
+          <div className="rounded-xl border border-amber-200/70 bg-amber-50/50 p-3.5 text-xs text-amber-900">
+            <span className="font-semibold">Storefront status:</span> Product Overview is INACTIVE
+            (Currently hidden on website). Data and schematics remain preserved in the database.
           </div>
 
           <textarea

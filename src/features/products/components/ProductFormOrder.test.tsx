@@ -125,37 +125,29 @@ describe('Product CMS Order & Content Structure Alignment', () => {
     expect(screen.getByText('Optional')).toBeDefined();
   });
 
-  it('renders Key Benefits editor marked with Currently hidden on website and supports ON/OFF toggle', () => {
+  it('renders Key Benefits editor marked with Currently hidden on website badge and message', () => {
     renderWithClient(<ProductKeyBenefitsEditor benefits={[]} onChange={vi.fn()} />);
 
     expect(screen.getByText('Key Benefits (Optional / Inactive)')).toBeDefined();
-    expect(screen.getAllByText(/Hidden on Website \(OFF\)/i).length).toBeGreaterThan(0);
-
-    const toggleBtn = screen.getByRole('switch', {
-      name: /Toggle Key Benefits Website Visibility/i,
-    });
-    expect(toggleBtn.getAttribute('aria-checked')).toBe('false');
-
-    fireEvent.click(toggleBtn);
-    expect(toggleBtn.getAttribute('aria-checked')).toBe('true');
-    expect(screen.getAllByText(/Visible on Website \(ON\)/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Currently hidden on website/i).length).toBeGreaterThan(0);
+    expect(
+      screen.queryByRole('switch', { name: /Toggle Key Benefits Website Visibility/i })
+    ).toBeNull();
   });
 
-  it('supports Website Visibility ON/OFF toggles for SKU and Product Overview in ProductForm', () => {
+  it('marks SKU and Product Overview as inactive on website without false toggle switches', () => {
     renderWithClient(<ProductForm mode="create" onSubmit={vi.fn()} isPending={false} />);
 
-    // SKU toggle
-    const skuToggle = screen.getByRole('switch', { name: /Toggle SKU Website Visibility/i });
-    expect(skuToggle.getAttribute('aria-checked')).toBe('false');
-    fireEvent.click(skuToggle);
-    expect(skuToggle.getAttribute('aria-checked')).toBe('true');
+    // SKU
+    expect(screen.getAllByText(/Internal Reference Only/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Hidden on Website/i).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('switch', { name: /Toggle SKU Website Visibility/i })).toBeNull();
 
-    // Product Overview toggle
-    const overviewToggle = screen.getByRole('switch', {
-      name: /Toggle Product Overview Website Visibility/i,
-    });
-    expect(overviewToggle.getAttribute('aria-checked')).toBe('false');
-    fireEvent.click(overviewToggle);
-    expect(overviewToggle.getAttribute('aria-checked')).toBe('true');
+    // Product Overview
+    expect(screen.getByText('Product Overview (Optional / Inactive)')).toBeDefined();
+    expect(screen.getAllByText(/Currently hidden on website/i).length).toBeGreaterThan(0);
+    expect(
+      screen.queryByRole('switch', { name: /Toggle Product Overview Website Visibility/i })
+    ).toBeNull();
   });
 });

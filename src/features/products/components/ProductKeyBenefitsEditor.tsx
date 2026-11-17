@@ -51,7 +51,6 @@ export function ProductKeyBenefitsEditor({
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationMessage, setValidationMessage] = useState('');
-  const [isKeyBenefitsVisible, setIsKeyBenefitsVisible] = useState(false);
 
   const handleStartAdd = () => {
     setIsAddingNew(true);
@@ -144,24 +143,9 @@ export function ProductKeyBenefitsEditor({
             <h4 className="text-sm font-semibold text-gray-900">
               Key Benefits (Optional / Inactive)
             </h4>
-            <span
-              className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${
-                isKeyBenefitsVisible
-                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-                  : 'bg-amber-50 border border-amber-200 text-amber-800'
-              }`}
-            >
-              {isKeyBenefitsVisible ? (
-                <>
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Visible on Website
-                </>
-              ) : (
-                <>
-                  <EyeOff className="w-3 h-3 text-amber-600" />
-                  Currently hidden on website
-                </>
-              )}
+            <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+              <EyeOff className="w-3 h-3 text-amber-600" />
+              Currently hidden on website
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -170,65 +154,22 @@ export function ProductKeyBenefitsEditor({
           </p>
         </div>
 
-        {/* Website Visibility ON/OFF Option */}
-        <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
-          <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Website Visibility
-              </span>
-              <span
-                className={`text-xs font-semibold ${
-                  isKeyBenefitsVisible ? 'text-emerald-700' : 'text-amber-800'
-                }`}
-              >
-                {isKeyBenefitsVisible ? 'Visible on Website (ON)' : 'Hidden on Website (OFF)'}
-              </span>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isKeyBenefitsVisible}
-              aria-label="Toggle Key Benefits Website Visibility"
-              onClick={() => setIsKeyBenefitsVisible(!isKeyBenefitsVisible)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-metro-navy)] ${
-                isKeyBenefitsVisible ? 'bg-emerald-600' : 'bg-slate-300'
-              }`}
-            >
-              <span
-                aria-hidden="true"
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  isKeyBenefitsVisible ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-
-          {!isAddingNew && (
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={handleStartAdd}
-              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-[#0b2e59] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#0b2e59]/90 min-[420px]:w-auto"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Add Benefit
-            </button>
-          )}
-        </div>
+        {!isAddingNew && (
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={handleStartAdd}
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-[#0b2e59] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#0b2e59]/90 min-[420px]:w-auto self-start sm:self-auto"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Benefit
+          </button>
+        )}
       </div>
 
-      <div
-        className={`rounded-xl border p-3 text-xs ${
-          isKeyBenefitsVisible
-            ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
-            : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
-        }`}
-      >
-        <span className="font-semibold">Storefront status:</span>{' '}
-        {isKeyBenefitsVisible
-          ? 'Key Benefits are ACTIVE and configured to display on the public storefront.'
-          : 'Key Benefits are INACTIVE (Currently hidden on website). Saved records remain preserved in the database.'}
+      <div className="rounded-xl border border-amber-200/70 bg-amber-50/50 p-3 text-xs text-amber-900">
+        <span className="font-semibold">Storefront status:</span> Key Benefits are INACTIVE
+        (Currently hidden on website). Saved records remain preserved in the database.
       </div>
 
       {/* New Benefit Form */}
