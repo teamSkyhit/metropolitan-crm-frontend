@@ -86,16 +86,17 @@ export interface ReorderHomepageSectionsRequest {
 export const WEBSITE_HOMEPAGE_STRUCTURE = [
   { position: 1, name: 'Hero', defaultType: HomepageSectionType.HERO },
   { position: 2, name: 'Product Categories', defaultType: HomepageSectionType.FEATURED_CATEGORIES },
-  { position: 3, name: 'Technical Product Support', defaultType: HomepageSectionType.PROMO_BANNER },
-  { position: 4, name: 'Featured Products', defaultType: HomepageSectionType.FEATURED_PRODUCTS },
-  { position: 5, name: 'Why Metropolitan', defaultType: HomepageSectionType.PROMO_BANNER },
-  { position: 6, name: 'Brands', defaultType: HomepageSectionType.FEATURED_BRANDS },
+  { position: 3, name: 'Featured Products', defaultType: HomepageSectionType.FEATURED_PRODUCTS },
   {
-    position: 7,
-    name: 'Need a Product / Component',
+    position: 4,
+    name: 'Brands (Featured Brands)',
+    defaultType: HomepageSectionType.FEATURED_BRANDS,
+  },
+  {
+    position: 5,
+    name: 'Promo Banner (or any other)',
     defaultType: HomepageSectionType.PROMO_BANNER,
   },
-  { position: 8, name: 'Footer', defaultType: null },
 ] as const;
 
 export function getHomepageSectionDisplayLabel(
@@ -113,7 +114,7 @@ export function getHomepageSectionDisplayLabel(
     case HomepageSectionType.FEATURED_PRODUCTS:
       return 'Featured Products';
     case HomepageSectionType.FEATURED_BRANDS:
-      return 'Brands';
+      return 'Brands (Featured Brands)';
     case HomepageSectionType.PROMO_BANNER:
       return 'Promo Banner';
     default:
