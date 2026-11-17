@@ -154,7 +154,11 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
             {brand.logoUrl ? (
               <img src={brand.logoUrl} alt="Logo" className="object-contain h-full w-full" />
             ) : (
-              <ImageIcon className="text-gray-400 w-8 h-8" />
+              <img
+                src="/logo.png"
+                alt="Metropolitan Logo"
+                className="object-contain h-full w-full opacity-60"
+              />
             )}
           </div>
           <div className="w-full space-y-3">
