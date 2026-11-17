@@ -76,9 +76,9 @@ describe('Product CMS Order & Content Structure Alignment', () => {
     expect(screen.getByText('Internal Reference & Inventory')).toBeDefined();
     expect(screen.getByLabelText(/SKU \(Internal Reference\)/i)).toBeDefined();
 
-    // Product Overview marked as Currently hidden on website
-    expect(screen.getByText('Product Overview (Optional / Inactive)')).toBeDefined();
-    expect(screen.getAllByText('Currently hidden on website').length).toBeGreaterThan(0);
+    // Product Overview marked as Optional
+    expect(screen.getByText('Product Overview (Optional)')).toBeDefined();
+    expect(screen.getAllByText(/Hidden on Website/i).length).toBeGreaterThan(0);
   });
 
   it('includes description in submission payload', () => {
@@ -125,29 +125,51 @@ describe('Product CMS Order & Content Structure Alignment', () => {
     expect(screen.getByText('Optional')).toBeDefined();
   });
 
-  it('renders Key Benefits editor marked with Currently hidden on website badge and message', () => {
-    renderWithClient(<ProductKeyBenefitsEditor benefits={[]} onChange={vi.fn()} />);
+  it('dynamically displays Visible on Website when Key Benefits exist and Hidden on Website when empty', () => {
+    // Empty state
+    const { unmount } = renderWithClient(
+      <ProductKeyBenefitsEditor benefits={[]} onChange={vi.fn()} />
+    );
+    expect(screen.getByText('Key Benefits (Optional)')).toBeDefined();
+    expect(screen.getAllByText(/Hidden on Website/i).length).toBeGreaterThan(0);
+    unmount();
 
-    expect(screen.getByText('Key Benefits (Optional / Inactive)')).toBeDefined();
-    expect(screen.getAllByText(/Currently hidden on website/i).length).toBeGreaterThan(0);
-    expect(
-      screen.queryByRole('switch', { name: /Toggle Key Benefits Website Visibility/i })
-    ).toBeNull();
+    // With benefits added
+    renderWithClient(
+      <ProductKeyBenefitsEditor
+        benefits={[
+          { id: 'b1', icon: 'shield', title: 'Quality', description: 'Certified', sortOrder: 0 },
+        ]}
+        onChange={vi.fn()}
+      />
+    );
+    expect(screen.getAllByText(/Visible on Website/i).length).toBeGreaterThan(0);
   });
 
-  it('marks SKU and Product Overview as inactive on website without false toggle switches', () => {
-    renderWithClient(<ProductForm mode="create" onSubmit={vi.fn()} isPending={false} />);
-
-    // SKU
-    expect(screen.getAllByText(/Internal Reference Only/i).length).toBeGreaterThan(0);
+  it('dynamically displays Visible on Website when SKU and Overview have data, and Hidden on Website when empty', () => {
+    // Empty state (create mode with no initial data)
+    const { unmount } = renderWithClient(
+      <ProductForm mode="create" onSubmit={vi.fn()} isPending={false} />
+    );
     expect(screen.getAllByText(/Hidden on Website/i).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('switch', { name: /Toggle SKU Website Visibility/i })).toBeNull();
+    unmount();
 
-    // Product Overview
-    expect(screen.getByText('Product Overview (Optional / Inactive)')).toBeDefined();
-    expect(screen.getAllByText(/Currently hidden on website/i).length).toBeGreaterThan(0);
-    expect(
-      screen.queryByRole('switch', { name: /Toggle Product Overview Website Visibility/i })
-    ).toBeNull();
+    // Populated state (edit mode with SKU and overview data)
+    renderWithClient(
+      <ProductForm
+        mode="edit"
+        initialData={{
+          name: 'Test Product',
+          sku: 'TEST-SKU-100',
+          overview: 'Comprehensive technical overview text.',
+          brandId: 'b1',
+          categoryId: 'c1',
+        }}
+        onSubmit={vi.fn()}
+        isPending={false}
+      />
+    );
+
+    expect(screen.getAllByText(/Visible on Website/i).length).toBeGreaterThan(0);
   });
 });

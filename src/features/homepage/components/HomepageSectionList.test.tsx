@@ -71,19 +71,6 @@ vi.mock('../hooks/useHomepage', () => ({
 afterEach(cleanup);
 
 describe('HomepageSectionList', () => {
-  it('renders the website homepage content structure sequence banner', () => {
-    render(<HomepageSectionList />);
-
-    expect(screen.getByText(/Website Homepage Content Structure/i)).toBeDefined();
-    expect(screen.getByText('1.')).toBeDefined();
-    expect(screen.getAllByText('Hero').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Product Categories').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Featured Products').length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Brands \(Featured Brands\)/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Promo Banner \(or any other\)/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: /Apply Website Order/i })).toBeDefined();
-  });
-
   it('displays sections with visible sort order, human-readable labels, and status badges', () => {
     render(<HomepageSectionList />);
 

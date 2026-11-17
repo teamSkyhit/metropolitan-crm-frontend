@@ -703,10 +703,17 @@ export function ProductForm({
                 <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
                   Internal Reference Only
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
-                  <EyeOff className="w-3 h-3 text-amber-600" />
-                  Hidden on Website
-                </span>
+                {formData.sku && formData.sku.trim().length > 0 ? (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                    <Eye className="w-3 h-3 text-emerald-600" />
+                    Visible on Website
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                    <EyeOff className="w-3 h-3 text-amber-600" />
+                    Hidden on Website
+                  </span>
+                )}
               </div>
               <p className="text-xs text-gray-500 mt-0.5">
                 Catalog tracking identifier. Required by the backend for product creation.
@@ -714,13 +721,30 @@ export function ProductForm({
             </div>
           </div>
 
-          <div className="rounded-xl border border-amber-200/70 bg-amber-50/50 p-3 text-xs text-amber-900 flex items-start gap-2">
-            <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold">Section Inactive on Website:</span> Currently hidden
-              on website. Data is preserved for internal warehouse inventory and database catalog
-              operations.
-            </div>
+          <div
+            className={`rounded-xl border p-3 text-xs flex items-start gap-2 ${
+              formData.sku && formData.sku.trim().length > 0
+                ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
+                : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
+            }`}
+          >
+            {formData.sku && formData.sku.trim().length > 0 ? (
+              <>
+                <Eye className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Section Active on Website:</span> SKU data is
+                  entered and visible on the website product details.
+                </div>
+              </>
+            ) : (
+              <>
+                <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Section Inactive on Website:</span> No SKU
+                  entered. Section remains hidden on website until data is provided.
+                </div>
+              </>
+            )}
           </div>
 
           <div className="max-w-md space-y-2">
@@ -758,18 +782,25 @@ export function ProductForm({
           </div>
         </section>
 
-        {/* ── Inactive Section: Product Overview ── */}
+        {/* ── Product Overview ── */}
         <section id="product-overview" className="space-y-4 pt-6 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-3">
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base font-semibold text-gray-900">
-                  Product Overview (Optional / Inactive)
+                  Product Overview (Optional)
                 </h3>
-                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
-                  <EyeOff className="w-3 h-3 text-amber-600" />
-                  Currently hidden on website
-                </span>
+                {(overviewText && overviewText.trim().length > 0) || overviewImageUrl ? (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                    <Eye className="w-3 h-3 text-emerald-600" />
+                    Visible on Website
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                    <EyeOff className="w-3 h-3 text-amber-600" />
+                    Hidden on Website
+                  </span>
+                )}
               </div>
               <p className="text-xs text-gray-500 mt-0.5">
                 Comprehensive technical overview text and diagram. Preserved in the database for
@@ -778,9 +809,30 @@ export function ProductForm({
             </div>
           </div>
 
-          <div className="rounded-xl border border-amber-200/70 bg-amber-50/50 p-3.5 text-xs text-amber-900">
-            <span className="font-semibold">Storefront status:</span> Product Overview is INACTIVE
-            (Currently hidden on website). Data and schematics remain preserved in the database.
+          <div
+            className={`rounded-xl border p-3.5 text-xs flex items-start gap-2 ${
+              (overviewText && overviewText.trim().length > 0) || overviewImageUrl
+                ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
+                : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
+            }`}
+          >
+            {(overviewText && overviewText.trim().length > 0) || overviewImageUrl ? (
+              <>
+                <Eye className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Storefront status:</span> Product Overview has
+                  content and is visible on the public website.
+                </div>
+              </>
+            ) : (
+              <>
+                <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Storefront status:</span> No overview data
+                  entered. Section remains hidden on website until content is added.
+                </div>
+              </>
+            )}
           </div>
 
           <textarea

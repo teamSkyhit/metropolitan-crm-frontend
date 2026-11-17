@@ -7,11 +7,7 @@ import {
   useReorderHomepageSections,
   useDeleteHomepageSection,
 } from '../hooks/useHomepage';
-import {
-  HomepageSectionType,
-  WEBSITE_HOMEPAGE_STRUCTURE,
-  getHomepageSectionDisplayLabel,
-} from '../types';
+import { HomepageSectionType, getHomepageSectionDisplayLabel } from '../types';
 import { Edit, Trash2, ArrowUp, ArrowDown, LayoutTemplate, AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -83,28 +79,6 @@ export function HomepageSectionList() {
     setIsOrderChanged(true);
   };
 
-  const handleAlignToWebsiteStructure = () => {
-    const typeOrder = [
-      HomepageSectionType.HERO,
-      HomepageSectionType.FEATURED_CATEGORIES,
-      HomepageSectionType.FEATURED_PRODUCTS,
-      HomepageSectionType.FEATURED_BRANDS,
-      HomepageSectionType.PROMO_BANNER,
-    ];
-
-    const sorted = [...localSections].sort((a, b) => {
-      const idxA = typeOrder.indexOf(a.type);
-      const idxB = typeOrder.indexOf(b.type);
-      const orderA = idxA === -1 ? 999 : idxA;
-      const orderB = idxB === -1 ? 999 : idxB;
-      return orderA - orderB;
-    });
-
-    setLocalSections(sorted);
-    setIsOrderChanged(true);
-    toast.success('Sections arranged to match website order. Click "Save Order" to persist.');
-  };
-
   const handleSaveOrder = async () => {
     const items = localSections.map((sec, i) => ({ id: sec.id, sortOrder: i }));
     try {
@@ -172,43 +146,6 @@ export function HomepageSectionList() {
 
   return (
     <div className="space-y-4">
-      {/* Website Homepage Structure Reference Guide */}
-      <div className="rounded-2xl border border-blue-200/80 bg-blue-50/70 p-4 sm:p-5 text-sm text-blue-950">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h3 className="font-bold text-blue-900 flex items-center gap-2">
-              <LayoutTemplate className="w-4 h-4 text-blue-700" />
-              Website Homepage Content Structure
-            </h3>
-            <p className="text-xs text-blue-800/80 mt-0.5">
-              Sections on the public website appear in this top-to-bottom sequence. Click
-              &quot;Apply Website Order&quot; or use the Move Up / Down arrows to adjust CRM order,
-              then click Save Order.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleAlignToWebsiteStructure}
-            className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-xl bg-[var(--color-metro-navy)] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#153866] active:scale-98"
-          >
-            Apply Website Order
-          </button>
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
-          {WEBSITE_HOMEPAGE_STRUCTURE.map((item, idx) => (
-            <span
-              key={item.position}
-              className="inline-flex items-center gap-1 rounded-lg bg-white/90 border border-blue-200/90 px-2.5 py-1 font-medium text-blue-900 shadow-2xs"
-            >
-              <span className="font-bold text-blue-700">{item.position}.</span>
-              <span>{item.name}</span>
-              {idx < WEBSITE_HOMEPAGE_STRUCTURE.length - 1 && (
-                <span className="text-blue-300 ml-1">→</span>
-              )}
-            </span>
-          ))}
-        </div>
-      </div>
       {isOrderChanged && (
         <div className="sticky top-3 z-10 mb-6 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-yellow-800 font-medium">You have unsaved order changes.</p>
