@@ -185,11 +185,14 @@ export function ProductForm({
     else if (name.length < 2) nextErrors.name = 'Product name must be at least 2 characters.';
     else if (name.length > 200) nextErrors.name = 'Product name cannot exceed 200 characters.';
 
-    if (!sku) nextErrors.sku = 'Enter a unique SKU.';
-    else if (!SKU_PATTERN.test(sku)) {
-      nextErrors.sku =
-        'Use letters or numbers first; only dots, dashes, underscores, and slashes are allowed.';
-    } else if (sku.length > 100) nextErrors.sku = 'SKU cannot exceed 100 characters.';
+    if (sku) {
+      if (!SKU_PATTERN.test(sku)) {
+        nextErrors.sku =
+          'Use letters or numbers first; only dots, dashes, underscores, and slashes are allowed.';
+      } else if (sku.length > 100) {
+        nextErrors.sku = 'SKU cannot exceed 100 characters.';
+      }
+    }
 
     if (!data.brandId) nextErrors.brandId = 'Select a brand.';
     if (!data.categoryId) nextErrors.categoryId = 'Select a category.';
@@ -301,7 +304,7 @@ export function ProductForm({
         </div>
         <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50/80 px-3 py-1.5 text-xs font-semibold text-[var(--color-metro-navy)]">
           <CheckCircle2 className="h-3.5 w-3.5 text-[var(--color-metro-navy)]" aria-hidden="true" />
-          4 required fields
+          3 required fields
         </span>
       </div>
 
@@ -749,12 +752,11 @@ export function ProductForm({
 
           <div className="max-w-md space-y-2">
             <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
-              SKU (Internal Reference) *
+              SKU (Internal Reference) (Optional)
             </label>
             <Input
               id="sku"
               name="sku"
-              required
               maxLength={100}
               pattern="^[a-zA-Z0-9][-a-zA-Z0-9._/]*$"
               title="Alphanumeric, can contain . _ / -"
@@ -767,7 +769,7 @@ export function ProductForm({
               className={fieldClass('sku')}
             />
             <p id="sku-help" className="text-xs text-gray-500">
-              Unique internal code for inventory tracking and catalog database operations.
+              Optional internal code for inventory tracking and catalog database operations.
             </p>
             {errors.sku && (
               <p

@@ -112,7 +112,7 @@ export interface Product {
 
 export interface CreateProductRequest {
   name: string;
-  sku: string;
+  sku?: string;
   brandId: string;
   categoryId: string;
   shortDescription?: string | null;
