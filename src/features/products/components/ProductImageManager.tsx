@@ -136,6 +136,10 @@ export function ProductImageManager({ product }: { product: Product }) {
           <p className="mt-1 text-xs leading-5 text-slate-500">
             This is the main hero image displayed across the public catalog and search cards.
           </p>
+          <p className="mt-0.5 text-xs text-slate-600">
+            <span className="font-semibold text-slate-700">Recommended size:</span> 800 × 800 px (or
+            1000 × 1000 px, 1:1 Square). WebP or PNG with solid white or transparent background.
+          </p>
         </div>
       </div>
 

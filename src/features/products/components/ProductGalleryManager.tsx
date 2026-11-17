@@ -158,6 +158,10 @@ export function ProductGalleryManager({
           <p className="mt-1 text-xs leading-5 text-gray-500">
             Add clear product angles and detail shots. The primary image appears first to customers.
           </p>
+          <p className="mt-0.5 text-xs text-gray-600">
+            <span className="font-semibold text-gray-700">Recommended size:</span> 1000 × 1000 px
+            (or 1200 × 1200 px, 1:1 Square). WebP, PNG, or JPG. High resolution for zoom lightbox.
+          </p>
         </div>
         <span className="shrink-0 rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
           {totalCount} of 5 images

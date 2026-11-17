@@ -154,7 +154,11 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
             {brand.logoUrl ? (
               <img src={brand.logoUrl} alt="Logo" className="object-contain h-full w-full" />
             ) : (
-              <ImageIcon className="text-gray-400 w-8 h-8" />
+              <img
+                src="/logo.png"
+                alt="Metropolitan Logo"
+                className="object-contain h-full w-full opacity-60"
+              />
             )}
           </div>
           <div className="w-full space-y-3">
@@ -191,7 +195,11 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
                 </button>
               )}
             </div>
-            <p className="text-xs text-gray-500">Recommended size: 512x512px. PNG or JPG.</p>
+            <p className="text-xs text-gray-500">
+              <span className="font-semibold text-gray-700">Recommended size:</span> 300 × 100 px
+              (or 400 × 120 px, ~3:1 / 4:1 wide ratio). Transparent PNG or WebP only (max height
+              48px on storefront).
+            </p>
           </div>
         </div>
       </div>
@@ -208,7 +216,10 @@ export function BrandImageManager({ brand }: { brand: Brand }) {
             )}
           </div>
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-gray-500">Recommended size: 1200x400px. PNG or JPG.</p>
+            <p className="text-xs text-gray-500">
+              <span className="font-semibold text-gray-700">Recommended size:</span> 1200 × 400 px
+              (3:1 Landscape ratio). High-resolution manufacturer banner (PNG, JPG, or WebP).
+            </p>
             <div className="grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:flex sm:w-auto sm:flex-wrap">
               <label className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 <Upload className="w-4 h-4 mr-2" />

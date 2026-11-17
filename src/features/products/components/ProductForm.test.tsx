@@ -27,9 +27,9 @@ describe('ProductForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Create Product' }));
 
     expect(screen.getByText('Enter a product name.')).toBeTruthy();
-    expect(screen.getByText('Enter a unique SKU.')).toBeTruthy();
     expect(screen.getByText('Select a brand.')).toBeTruthy();
     expect(screen.getByText('Select a category.')).toBeTruthy();
+    expect(screen.queryByText('Enter a unique SKU.')).toBeNull();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 

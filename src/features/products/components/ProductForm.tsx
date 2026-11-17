@@ -9,11 +9,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProductSeoSettings } from './ProductSeoSettings';
 import { ProductDescriptionEditor } from './ProductDescriptionEditor';
-import { AlertCircle, CheckCircle2, Package, Save } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Package,
+  Save,
+  Image as ImageIcon,
+  Upload,
+  Trash2,
+  Loader2,
+  EyeOff,
+  Eye,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
+import { mediaService } from '@/features/media/media.service';
+import { MediaSelectorModal } from '@/features/media/components/MediaSelectorModal';
+import { Media } from '@/features/media/types';
 
 type FormErrors = Partial<Record<keyof CreateProductRequest, string>>;
 
 const SKU_PATTERN = /^[a-zA-Z0-9][-a-zA-Z0-9._/]*$/;
+
+function parseOverviewField(raw?: string | null): { text: string; imageUrl: string } {
+  if (!raw) return { text: '', imageUrl: '' };
+  const match = raw.match(/<!--\s*\[overview-image:\s*(.*?)\s*\]\s*-->/);
+  if (match) {
+    const imageUrl = match[1]?.trim() || '';
+    const text = raw.replace(/<!--\s*\[overview-image:\s*.*?\s*\]\s*-->/g, '').trim();
+    return { text, imageUrl };
+  }
+  return { text: raw, imageUrl: '' };
+}
 
 function isValidHttpUrl(value: string) {
   try {
@@ -55,7 +81,7 @@ export function ProductForm({
     description: initialData?.description || '',
     overview: initialData?.overview || '',
     price: initialData?.price ?? null,
-    priceVisibility: initialData?.priceVisibility ?? true,
+    priceVisibility: Boolean(initialData?.price && initialData?.priceVisibility),
     status: initialData?.status || 'DRAFT',
     hotDeal: initialData?.hotDeal ?? false,
     metaTitle: initialData?.metaTitle || '',
@@ -67,6 +93,59 @@ export function ProductForm({
 
   const { data: brandsData, isLoading: isLoadingBrands } = useBrands({ limit: 100 });
   const { data: categoriesData, isLoading: isLoadingCategories } = useCategories({ limit: 100 });
+
+  const initialOverview = parseOverviewField(initialData?.overview);
+  const [overviewText, setOverviewText] = useState(initialOverview.text);
+  const [overviewImageUrl, setOverviewImageUrl] = useState(initialOverview.imageUrl);
+  const [isUploadingOverviewImage, setIsUploadingOverviewImage] = useState(false);
+  const [isOverviewMediaModalOpen, setIsOverviewMediaModalOpen] = useState(false);
+  const overviewFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [prevOverviewProp, setPrevOverviewProp] = useState(initialData?.overview);
+  if (initialData?.overview !== prevOverviewProp) {
+    setPrevOverviewProp(initialData?.overview);
+    const parsed = parseOverviewField(initialData?.overview);
+    setOverviewText(parsed.text);
+    setOverviewImageUrl(parsed.imageUrl);
+  }
+
+  const handleOverviewImageUpload = async (file?: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Overview image must be smaller than 5 MB.');
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'].includes(file.type)) {
+      toast.error('Only JPG, PNG, WebP, or SVG images are supported.');
+      return;
+    }
+    setIsUploadingOverviewImage(true);
+    try {
+      const uploaded = await mediaService.uploadMedia(file);
+      const url = uploaded.publicUrl || (uploaded as unknown as { url?: string }).url;
+      if (url) {
+        setOverviewImageUrl(url);
+        toast.success('Overview image uploaded successfully.');
+      } else {
+        toast.error('Failed to get URL for uploaded image.');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to upload overview image.';
+      toast.error(msg);
+    } finally {
+      setIsUploadingOverviewImage(false);
+      if (overviewFileInputRef.current) overviewFileInputRef.current.value = '';
+    }
+  };
+
+  const handleSelectMediaForOverview = (media: Media) => {
+    const url = media.publicUrl || (media as unknown as { url?: string }).url;
+    if (url) {
+      setOverviewImageUrl(url);
+      toast.success('Overview image selected from media library.');
+    }
+    setIsOverviewMediaModalOpen(false);
+  };
 
   const brands = brandsData?.data || [];
   const categories = categoriesData?.data || [];
@@ -91,6 +170,9 @@ export function ProductForm({
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
+      if (name === 'overview') {
+        setOverviewText(value);
+      }
     }
   };
 
@@ -103,11 +185,14 @@ export function ProductForm({
     else if (name.length < 2) nextErrors.name = 'Product name must be at least 2 characters.';
     else if (name.length > 200) nextErrors.name = 'Product name cannot exceed 200 characters.';
 
-    if (!sku) nextErrors.sku = 'Enter a unique SKU.';
-    else if (!SKU_PATTERN.test(sku)) {
-      nextErrors.sku =
-        'Use letters or numbers first; only dots, dashes, underscores, and slashes are allowed.';
-    } else if (sku.length > 100) nextErrors.sku = 'SKU cannot exceed 100 characters.';
+    if (sku) {
+      if (!SKU_PATTERN.test(sku)) {
+        nextErrors.sku =
+          'Use letters or numbers first; only dots, dashes, underscores, and slashes are allowed.';
+      } else if (sku.length > 100) {
+        nextErrors.sku = 'SKU cannot exceed 100 characters.';
+      }
+    }
 
     if (!data.brandId) nextErrors.brandId = 'Select a brand.';
     if (!data.categoryId) nextErrors.categoryId = 'Select a category.';
@@ -148,13 +233,22 @@ export function ProductForm({
     if (payload.price === null || payload.price === undefined || String(payload.price) === '') {
       payload.price = null;
     }
+    payload.priceVisibility = payload.price ? Boolean(formData.priceVisibility) : false;
 
     if (payload.sku) payload.sku = payload.sku.trim();
     if (payload.name) payload.name = payload.name.trim();
 
     payload.shortDescription = payload.shortDescription?.trim() || null;
+    payload.description = formData.description?.trim() || null;
     payload.series = payload.series?.trim() || null;
-    payload.overview = payload.overview?.trim() || null;
+
+    const trimmedOverviewText = overviewText.trim();
+    const trimmedOverviewImage = overviewImageUrl.trim();
+    payload.overview = trimmedOverviewImage
+      ? trimmedOverviewText
+        ? `${trimmedOverviewText}\n\n<!-- [overview-image: ${trimmedOverviewImage}] -->`
+        : `<!-- [overview-image: ${trimmedOverviewImage}] -->`
+      : trimmedOverviewText || null;
     payload.metaTitle = payload.metaTitle?.trim() || null;
     payload.metaDescription = payload.metaDescription?.trim() || null;
     payload.metaKeywords = payload.metaKeywords?.trim() || null;
@@ -210,7 +304,7 @@ export function ProductForm({
         </div>
         <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50/80 px-3 py-1.5 text-xs font-semibold text-[var(--color-metro-navy)]">
           <CheckCircle2 className="h-3.5 w-3.5 text-[var(--color-metro-navy)]" aria-hidden="true" />
-          4 required fields
+          3 required fields
         </span>
       </div>
 
@@ -236,8 +330,22 @@ export function ProductForm({
 
       <div className="space-y-8 p-4 sm:p-6">
         {/* ── 1. Basic Product Information ── */}
-        <div className="space-y-4">
-          <h3 className="text-base font-semibold text-gray-900 border-b pb-2">Basic Information</h3>
+        <section id="product-basic-info" className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-2 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">
+                1. Basic Product Information
+              </h3>
+              <p className="text-xs text-gray-500">
+                Core product attributes displayed at the top of the storefront product page.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -267,94 +375,6 @@ export function ProductForm({
                 >
                   <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   {errors.name}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
-                SKU *
-              </label>
-              <Input
-                id="sku"
-                name="sku"
-                required
-                maxLength={100}
-                pattern="^[a-zA-Z0-9][-a-zA-Z0-9._/]*$"
-                title="Alphanumeric, can contain . _ / -"
-                value={formData.sku || ''}
-                onChange={handleChange}
-                disabled={isPending || readOnly}
-                placeholder="e.g. BON-HDO-100"
-                aria-invalid={!!errors.sku}
-                aria-describedby={errors.sku ? 'sku-error' : 'sku-help'}
-                className={fieldClass('sku')}
-              />
-              <p id="sku-help" className="text-xs text-gray-500">
-                Letters, numbers, dots, dashes, underscores and slashes only.
-              </p>
-              {errors.sku && (
-                <p
-                  id="sku-error"
-                  className="flex items-center gap-1.5 text-xs font-medium text-red-600"
-                  role="alert"
-                >
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                  {errors.sku}
-                </p>
-              )}
-            </div>
-
-            {/* Brand with Logo Preview */}
-            <div className="space-y-2">
-              <label htmlFor="brandId" className="block text-sm font-medium text-gray-700">
-                Brand *
-              </label>
-              <div className="flex items-center gap-3">
-                <select
-                  id="brandId"
-                  name="brandId"
-                  required
-                  value={formData.brandId || ''}
-                  onChange={handleChange}
-                  disabled={isPending || readOnly || isLoadingBrands}
-                  aria-invalid={!!errors.brandId}
-                  aria-describedby={errors.brandId ? 'brandId-error' : undefined}
-                  className={`block h-11 w-full rounded-xl border border-[#dce3ec] bg-white px-3.5 text-sm text-[#1e2d41] outline-none transition hover:border-[#c4cfdd] focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10 ${fieldClass('brandId')}`}
-                >
-                  <option value="">{isLoadingBrands ? 'Loading brands…' : 'Select a brand'}</option>
-                  {brands.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-                {selectedBrand?.logoUrl && (
-                  <div
-                    className="w-10 h-10 rounded border border-gray-200 bg-gray-50 flex items-center justify-center p-1 flex-shrink-0"
-                    title="Selected Brand Logo"
-                  >
-                    <img
-                      src={selectedBrand.logoUrl}
-                      alt="Brand Logo"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                )}
-              </div>
-              {!errors.brandId && (
-                <p className="text-xs text-gray-500">
-                  Controls the brand shown on the product page.
-                </p>
-              )}
-              {errors.brandId && (
-                <p
-                  id="brandId-error"
-                  className="flex items-center gap-1.5 text-xs font-medium text-red-600"
-                  role="alert"
-                >
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                  {errors.brandId}
                 </p>
               )}
             </div>
@@ -492,134 +512,480 @@ export function ProductForm({
               Write one or two customer-friendly sentences explaining what the product does.
             </p>
           </div>
-        </div>
 
-        {/* ── 2. Pricing & Visibility ── */}
-        <div className="space-y-4">
-          <h3 className="text-base font-semibold text-gray-900 border-b pb-2">
-            Pricing & Visibility
-          </h3>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div className="space-y-2">
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                Price (Optional)
-              </label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.price ?? ''}
-                onChange={handleChange}
-                disabled={isPending || readOnly}
-                placeholder="Leave empty for quote inquiry"
-                aria-invalid={!!errors.price}
-                aria-describedby={errors.price ? 'price-error' : 'price-help'}
-                className={fieldClass('price')}
-              />
-              <p id="price-help" className="text-xs text-gray-500">
-                Leave blank when customers should request a quote.
-              </p>
-              {errors.price && (
-                <p
-                  id="price-error"
-                  className="flex items-center gap-1.5 text-xs font-medium text-red-600"
-                  role="alert"
-                >
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                  {errors.price}
+          {/* Pricing & Visibility */}
+          <div className="pt-4 border-t border-slate-100">
+            <h4 className="text-sm font-semibold text-gray-900 mb-3">
+              Pricing &amp; Promotional Highlights
+            </h4>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="space-y-2">
+                <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                  Price (Optional)
+                </label>
+                <Input
+                  id="price"
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price ?? ''}
+                  onChange={handleChange}
+                  disabled={isPending || readOnly}
+                  placeholder="Leave empty for quote inquiry"
+                  aria-invalid={!!errors.price}
+                  aria-describedby={errors.price ? 'price-error' : 'price-help'}
+                  className={fieldClass('price')}
+                />
+                <p id="price-help" className="text-xs text-gray-500">
+                  Leave blank when customers should request a quote.
                 </p>
+                {errors.price && (
+                  <p
+                    id="price-error"
+                    className="flex items-center gap-1.5 text-xs font-medium text-red-600"
+                    role="alert"
+                  >
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                    {errors.price}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label
+                  htmlFor="priceVisibility"
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#e1e7ef] bg-[#f8fafc] p-3.5 transition hover:border-[#c4cfdd]"
+                >
+                  <input
+                    id="priceVisibility"
+                    type="checkbox"
+                    name="priceVisibility"
+                    checked={Boolean(formData.priceVisibility)}
+                    onChange={handleChange}
+                    disabled={isPending || readOnly}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)]"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-[#34445a]">Show price</span>
+                    <span className="mt-0.5 block text-xs font-normal leading-5 text-gray-500">
+                      Only applies when a price is entered.
+                    </span>
+                  </span>
+                </label>
+
+                <label
+                  htmlFor="hotDeal"
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#e1e7ef] bg-[#f8fafc] p-3.5 transition hover:border-[#c4cfdd]"
+                >
+                  <input
+                    id="hotDeal"
+                    type="checkbox"
+                    name="hotDeal"
+                    checked={formData.hotDeal}
+                    onChange={handleChange}
+                    disabled={isPending || readOnly}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)]"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-[#34445a]">
+                      Mark as hot deal
+                    </span>
+                    <span className="mt-0.5 block text-xs font-normal leading-5 text-gray-500">
+                      Highlights this product in promotions.
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 2. Product Description ── */}
+        <section id="product-description" className="space-y-3 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">2. Product Description</h3>
+              <p className="text-xs text-gray-500">
+                Detailed technical description and product overview. On the public storefront, the
+                Brand logo is positioned directly below this section.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white p-1">
+            <ProductDescriptionEditor
+              value={formData.description || ''}
+              onChange={(val) => setFormData((prev) => ({ ...prev, description: val }))}
+              disabled={isPending}
+              readOnly={readOnly}
+            />
+          </div>
+        </section>
+
+        {/* ── 3. Brand ── */}
+        <section id="product-brand" className="space-y-4 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">3. Brand</h3>
+              <p className="text-xs text-gray-500">
+                Manufacturer or supplier brand. The brand logo automatically renders below the
+                Product Description on the storefront.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+
+          <div className="space-y-2 max-w-xl">
+            <label htmlFor="brandId" className="block text-sm font-medium text-gray-700">
+              Brand *
+            </label>
+            <div className="flex items-center gap-3">
+              <select
+                id="brandId"
+                name="brandId"
+                required
+                value={formData.brandId || ''}
+                onChange={handleChange}
+                disabled={isPending || readOnly || isLoadingBrands}
+                aria-invalid={!!errors.brandId}
+                aria-describedby={errors.brandId ? 'brandId-error' : undefined}
+                className={`block h-11 w-full rounded-xl border border-[#dce3ec] bg-white px-3.5 text-sm text-[#1e2d41] outline-none transition hover:border-[#c4cfdd] focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10 ${fieldClass('brandId')}`}
+              >
+                <option value="">{isLoadingBrands ? 'Loading brands…' : 'Select a brand'}</option>
+                {brands.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+              {selectedBrand?.logoUrl && (
+                <div
+                  className="w-14 h-11 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center p-1.5 flex-shrink-0 shadow-2xs"
+                  title="Selected Brand Logo"
+                >
+                  <img
+                    src={selectedBrand.logoUrl}
+                    alt="Brand Logo"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
               )}
             </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label
-                htmlFor="priceVisibility"
-                className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#e1e7ef] bg-[#f8fafc] p-3.5 transition hover:border-[#c4cfdd]"
+            <p className="text-xs text-gray-500">
+              Brand logos are maintained in Brand Management and automatically linked here.
+            </p>
+            {errors.brandId && (
+              <p
+                id="brandId-error"
+                className="flex items-center gap-1.5 text-xs font-medium text-red-600"
+                role="alert"
               >
-                <input
-                  id="priceVisibility"
-                  type="checkbox"
-                  name="priceVisibility"
-                  checked={formData.priceVisibility}
-                  onChange={handleChange}
-                  disabled={isPending || readOnly}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)]"
-                />
-                <span>
-                  <span className="block text-sm font-semibold text-[#34445a]">Show price</span>
-                  <span className="mt-0.5 block text-xs font-normal leading-5 text-gray-500">
-                    Only applies when a price is entered.
-                  </span>
-                </span>
-              </label>
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {errors.brandId}
+              </p>
+            )}
+          </div>
+        </section>
 
-              <label
-                htmlFor="hotDeal"
-                className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#e1e7ef] bg-[#f8fafc] p-3.5 transition hover:border-[#c4cfdd]"
-              >
-                <input
-                  id="hotDeal"
-                  type="checkbox"
-                  name="hotDeal"
-                  checked={formData.hotDeal}
-                  onChange={handleChange}
-                  disabled={isPending || readOnly}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-metro-navy)] focus:ring-[var(--color-metro-navy)]"
-                />
-                <span>
-                  <span className="block text-sm font-semibold text-[#34445a]">
-                    Mark as hot deal
-                  </span>
-                  <span className="mt-0.5 block text-xs font-normal leading-5 text-gray-500">
-                    Highlights this product in promotions.
-                  </span>
+        {/* ── Internal Reference & Inventory (SKU) ── */}
+        <section id="product-sku" className="space-y-3 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-3">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-bold text-gray-800">
+                  Internal Reference &amp; Inventory
+                </h3>
+                <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                  Internal Reference Only
                 </span>
-              </label>
+                {formData.sku && formData.sku.trim().length > 0 ? (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                    <Eye className="w-3 h-3 text-emerald-600" />
+                    Visible on Website
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                    <EyeOff className="w-3 h-3 text-amber-600" />
+                    Hidden on Website
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Catalog tracking identifier. Required by the backend for product creation.
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* ── 3. Product Overview ── */}
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-base font-semibold text-gray-900">Product Overview</h3>
-            <p className="text-xs text-gray-500">
-              Comprehensive long-form overview for technical buyers, plant engineers, and
-              maintenance directors.
-            </p>
+          <div
+            className={`rounded-xl border p-3 text-xs flex items-start gap-2 ${
+              formData.sku && formData.sku.trim().length > 0
+                ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
+                : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
+            }`}
+          >
+            {formData.sku && formData.sku.trim().length > 0 ? (
+              <>
+                <Eye className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Section Active on Website:</span> SKU data is
+                  entered and visible on the website product details.
+                </div>
+              </>
+            ) : (
+              <>
+                <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Section Inactive on Website:</span> No SKU
+                  entered. Section remains hidden on website until data is provided.
+                </div>
+              </>
+            )}
           </div>
+
+          <div className="max-w-md space-y-2">
+            <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
+              SKU (Internal Reference) (Optional)
+            </label>
+            <Input
+              id="sku"
+              name="sku"
+              maxLength={100}
+              pattern="^[a-zA-Z0-9][-a-zA-Z0-9._/]*$"
+              title="Alphanumeric, can contain . _ / -"
+              value={formData.sku || ''}
+              onChange={handleChange}
+              disabled={isPending || readOnly}
+              placeholder="e.g. BON-HDO-100"
+              aria-invalid={!!errors.sku}
+              aria-describedby={errors.sku ? 'sku-error' : 'sku-help'}
+              className={fieldClass('sku')}
+            />
+            <p id="sku-help" className="text-xs text-gray-500">
+              Optional internal code for inventory tracking and catalog database operations.
+            </p>
+            {errors.sku && (
+              <p
+                id="sku-error"
+                className="flex items-center gap-1.5 text-xs font-medium text-red-600"
+                role="alert"
+              >
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {errors.sku}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* ── Product Overview ── */}
+        <section id="product-overview" className="space-y-4 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-3">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base font-semibold text-gray-900">
+                  Product Overview (Optional)
+                </h3>
+                {(overviewText && overviewText.trim().length > 0) || overviewImageUrl ? (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                    <Eye className="w-3 h-3 text-emerald-600" />
+                    Visible on Website
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                    <EyeOff className="w-3 h-3 text-amber-600" />
+                    Hidden on Website
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Comprehensive technical overview text and diagram. Preserved in the database for
+                reference.
+              </p>
+            </div>
+          </div>
+
+          <div
+            className={`rounded-xl border p-3.5 text-xs flex items-start gap-2 ${
+              (overviewText && overviewText.trim().length > 0) || overviewImageUrl
+                ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
+                : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
+            }`}
+          >
+            {(overviewText && overviewText.trim().length > 0) || overviewImageUrl ? (
+              <>
+                <Eye className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Storefront status:</span> Product Overview has
+                  content and is visible on the public website.
+                </div>
+              </>
+            ) : (
+              <>
+                <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Storefront status:</span> No overview data
+                  entered. Section remains hidden on website until content is added.
+                </div>
+              </>
+            )}
+          </div>
+
           <textarea
             id="overview"
             name="overview"
             rows={4}
-            value={formData.overview || ''}
-            onChange={handleChange}
+            value={overviewText}
+            onChange={(e) => {
+              setOverviewText(e.target.value);
+              handleChange(e);
+            }}
             disabled={isPending || readOnly}
             placeholder="Comprehensive technical overview..."
             aria-label="Product overview"
             className="min-h-32 w-full resize-y rounded-xl border border-[#dce3ec] bg-white px-3.5 py-3 text-sm text-[#1e2d41] shadow-[0_1px_2px_rgba(15,38,68,0.03)] outline-none transition placeholder:text-gray-400 hover:border-[#c4cfdd] focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-60"
           />
-        </div>
 
-        {/* ── 4. Detailed Description (Markdown) ── */}
-        <ProductDescriptionEditor
-          value={formData.description || ''}
-          onChange={(val) => setFormData((prev) => ({ ...prev, description: val }))}
-          disabled={isPending}
-          readOnly={readOnly}
-        />
+          {/* Dedicated Product Overview Image (Right-side diagram) */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 space-y-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Overview Diagram / Right-Side Image (Optional)
+                </label>
+                <p className="text-[11px] text-slate-500">
+                  Right-side visual blueprint or diagram for the Product Overview section.
+                </p>
+                <p className="mt-0.5 text-[11px] text-slate-600">
+                  <span className="font-semibold text-slate-700">Recommended size:</span> 1200 × 900
+                  px (or 800 × 600 px, 4:3 Landscape). WebP or PNG, blueprint, cutaway, or specs
+                  chart.
+                </p>
+              </div>
+              {overviewImageUrl && (
+                <button
+                  type="button"
+                  disabled={isPending || readOnly}
+                  onClick={() => setOverviewImageUrl('')}
+                  className="inline-flex items-center gap-1 self-start sm:self-auto text-xs font-semibold text-red-600 hover:text-red-700 transition"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Remove Image
+                </button>
+              )}
+            </div>
 
-        {/* ── 5. SEO Settings Card ── */}
-        <div className="pt-4 border-t border-gray-200">
+            {overviewImageUrl ? (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
+                <div className="relative h-28 w-36 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100/80 p-1 flex items-center justify-center">
+                  <img
+                    src={overviewImageUrl}
+                    alt="Product Overview Diagram"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <p
+                    className="text-xs font-medium text-slate-700 truncate"
+                    title={overviewImageUrl}
+                  >
+                    {overviewImageUrl}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={isPending || readOnly || isUploadingOverviewImage}
+                      onClick={() => overviewFileInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+                    >
+                      <Upload className="h-3.5 w-3.5 text-slate-500" />
+                      Change Image
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isPending || readOnly || isUploadingOverviewImage}
+                      onClick={() => setIsOverviewMediaModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+                    >
+                      <ImageIcon className="h-3.5 w-3.5 text-slate-500" />
+                      Media Library
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-4 shadow-2xs">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+                    <ImageIcon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">No overview diagram selected</p>
+                    <p className="text-[11px] text-slate-400">
+                      Upload a PNG, JPG, WebP, or SVG diagram (Max 5 MB)
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isPending || readOnly || isUploadingOverviewImage}
+                    onClick={() => overviewFileInputRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-metro-navy)] px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#153866] transition disabled:opacity-50"
+                  >
+                    {isUploadingOverviewImage ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-3.5 w-3.5" />
+                        Upload Diagram
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isPending || readOnly || isUploadingOverviewImage}
+                    onClick={() => setIsOverviewMediaModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+                  >
+                    <ImageIcon className="h-3.5 w-3.5 text-slate-500" />
+                    Media Library
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <input
+              ref={overviewFileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleOverviewImageUpload(file);
+              }}
+            />
+          </div>
+        </section>
+
+        {/* ── SEO Settings Card ── */}
+        <section id="product-seo" className="pt-6 border-t border-gray-200">
           <ProductSeoSettings
             seo={seoData}
             onChange={handleSeoChange}
             disabled={isPending || readOnly}
             errors={{ canonicalUrl: errors.canonicalUrl, ogImageUrl: errors.ogImageUrl }}
           />
-        </div>
+        </section>
 
         {!readOnly && (
           <div className="sticky bottom-0 -mx-4 -mb-4 flex flex-col gap-3 border-t border-gray-200 bg-white/95 px-4 py-4 shadow-[0_-8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm sm:-mx-6 sm:-mb-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -647,6 +1013,14 @@ export function ProductForm({
           </div>
         )}
       </div>
+
+      {isOverviewMediaModalOpen && (
+        <MediaSelectorModal
+          isOpen={isOverviewMediaModalOpen}
+          onClose={() => setIsOverviewMediaModalOpen(false)}
+          onSelect={handleSelectMediaForOverview}
+        />
+      )}
     </form>
   );
 }

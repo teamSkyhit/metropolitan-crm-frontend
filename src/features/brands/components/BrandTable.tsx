@@ -124,7 +124,11 @@ export function BrandTable() {
                             alt={brand.name}
                           />
                         ) : (
-                          <ImageIcon className="h-5 w-5 text-slate-400" />
+                          <img
+                            className="h-full w-full object-contain opacity-50"
+                            src="/logo.png"
+                            alt="Metropolitan Logo"
+                          />
                         )}
                       </div>
                       <div>

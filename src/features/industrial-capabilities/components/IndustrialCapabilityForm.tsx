@@ -44,7 +44,7 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<CreateIndustrialCapabilityRequest>({
-    number: initialData?.number ?? '',
+    number: null,
     title: initialData?.title ?? '',
     slug: initialData?.slug ?? '',
     icon: initialData?.icon ?? '',
@@ -156,7 +156,7 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
 
     try {
       const payload: CreateIndustrialCapabilityRequest = {
-        number: formData.number?.trim() || null,
+        number: null,
         title: formData.title.trim(),
         slug: formData.slug.trim(),
         icon: formData.icon ? formData.icon.trim() : null,
@@ -236,7 +236,7 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
 
       // 2. Overwrite with current form state
       const payload: CreateIndustrialCapabilityRequest = {
-        number: formData.number?.trim() || null,
+        number: null,
         title: formData.title.trim(),
         slug: formData.slug.trim(),
         icon: formData.icon ? formData.icon.trim() : null,
@@ -349,41 +349,23 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
             </div>
 
             <div className="space-y-5 p-6">
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-                <div className="md:col-span-3">
-                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                    Segment No.
-                  </label>
-                  <input
-                    type="text"
-                    name="number"
-                    value={formData.number ?? ''}
-                    placeholder="e.g. 01"
-                    maxLength={20}
-                    onChange={handleChange}
-                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
-                  />
-                  <p className="mt-1 text-[11px] text-slate-400">Badge/numeral prefix.</p>
-                </div>
-
-                <div className="md:col-span-9">
-                  <label className="mb-1.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-700">
-                    <span>
-                      Capability Title <span className="text-red-500">*</span>
-                    </span>
-                    <span className="text-[11px] font-normal text-slate-400">Required</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    required
-                    value={formData.title}
-                    placeholder="e.g. Precision Gears & Transmission"
-                    maxLength={200}
-                    onChange={handleChange}
-                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
-                  />
-                </div>
+              <div>
+                <label className="mb-1.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <span>
+                    Capability Title <span className="text-red-500">*</span>
+                  </span>
+                  <span className="text-[11px] font-normal text-slate-400">Required</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  required
+                  value={formData.title}
+                  placeholder="e.g. Precision Gears & Transmission"
+                  maxLength={200}
+                  onChange={handleChange}
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-metro-navy)] focus:ring-4 focus:ring-[#102f57]/10"
+                />
               </div>
 
               <div>
@@ -483,7 +465,8 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
               <div>
                 <h2 className="text-base font-bold text-slate-900">Typical Products</h2>
                 <p className="text-xs text-slate-500">
-                  Sample manufactured products and components in this industrial segment.
+                  Sample manufactured products and components in this industrial capability. Typical
+                  Products may also appear in website navigation.
                 </p>
               </div>
             </div>
@@ -542,7 +525,7 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
 
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Segment Icon
+                  Capability Icon
                 </label>
                 <IconPicker
                   value={formData.icon || ''}
@@ -557,9 +540,15 @@ export function IndustrialCapabilityForm({ initialData }: IndustrialCapabilityFo
 
           {/* Image Card */}
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
-            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/70 px-6 py-4">
-              <Sparkles className="h-4 w-4 text-amber-500" />
-              <h3 className="text-sm font-bold text-slate-900">Capability Image</h3>
+            <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                <h3 className="text-sm font-bold text-slate-900">Capability Image</h3>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">
+                <span className="font-semibold text-slate-700">Recommended size:</span> 600 × 400 px
+                (3:2 Landscape ratio). WebP or JPG, industrial environment or machinery.
+              </p>
             </div>
 
             <div className="space-y-4 p-6">

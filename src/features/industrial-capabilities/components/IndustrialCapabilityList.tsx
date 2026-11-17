@@ -184,7 +184,7 @@ export function IndustrialCapabilityList() {
           <p className="mt-1 max-w-sm text-xs text-slate-500">
             {search || activeFilter !== 'all'
               ? 'No capabilities match your search criteria. Try clearing filters.'
-              : 'Add your first core capability segment to highlight specialized manufacturing capacity.'}
+              : 'Add your first core capability to highlight specialized manufacturing capacity.'}
           </p>
           <Link
             href={`${ROUTES.INDUSTRIAL_CAPABILITIES}/new`}
@@ -217,11 +217,6 @@ export function IndustrialCapabilityList() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      {cap.number && (
-                        <span className="font-mono text-xs font-bold text-[var(--color-metro-gold)]">
-                          {cap.number}
-                        </span>
-                      )}
                       <Link
                         href={`${ROUTES.INDUSTRIAL_CAPABILITIES}/${cap.id}`}
                         className="font-bold text-slate-900 truncate hover:text-[var(--color-metro-navy)]"
@@ -323,9 +318,6 @@ export function IndustrialCapabilityList() {
               <TableHeader>
                 <TableRow className="border-b border-slate-100 bg-slate-50/75">
                   <TableHead className="py-3.5 pl-6 text-xs font-bold uppercase tracking-wider text-slate-500">
-                    No.
-                  </TableHead>
-                  <TableHead className="py-3.5 text-xs font-bold uppercase tracking-wider text-slate-500">
                     Capability
                   </TableHead>
                   <TableHead className="py-3.5 text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -352,12 +344,6 @@ export function IndustrialCapabilityList() {
                     className="group border-b border-slate-100 transition-colors hover:bg-slate-50/60"
                   >
                     <TableCell className="py-3.5 pl-6">
-                      <span className="font-mono text-xs font-bold text-slate-500">
-                        {cap.number || '—'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="py-3.5">
                       <div className="flex items-center gap-3.5">
                         {cap.imageUrl ? (
                           <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-2xs">

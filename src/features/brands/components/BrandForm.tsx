@@ -78,6 +78,22 @@ export function BrandForm({ initialData }: BrandFormProps) {
     }
   };
 
+  const handleUseMetropolitanLogo = async () => {
+    try {
+      const res = await fetch('/logo.png');
+      const blob = await res.blob();
+      const file = new File([blob], 'metropolitan-logo.png', { type: 'image/png' });
+      setSelectedLogo(file);
+      if (logoPreview) {
+        URL.revokeObjectURL(logoPreview);
+      }
+      setLogoPreview(URL.createObjectURL(file));
+      toast.success('Metropolitan logo selected');
+    } catch {
+      toast.error('Failed to load Metropolitan logo.');
+    }
+  };
+
   const handleBannerSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -247,10 +263,12 @@ export function BrandForm({ initialData }: BrandFormProps) {
                 <div className="mb-2 flex items-center justify-between">
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                      Brand Logo (Square / Icon)
+                      Brand Logo
                     </span>
-                    <p className="text-xs text-slate-400">
-                      Square logo with transparent or white background (Max 5MB).
+                    <p className="text-xs text-slate-500">
+                      <span className="font-semibold text-slate-700">Recommended size:</span> 300 ×
+                      100 px (or 400 × 120 px, ~3:1 / 4:1 wide ratio). Transparent PNG or WebP only
+                      (max height 48px on storefront).
                     </p>
                   </div>
                   {activeLogoUrl && (
@@ -292,10 +310,17 @@ export function BrandForm({ initialData }: BrandFormProps) {
                   ) : (
                     <div
                       onClick={() => logoInputRef.current?.click()}
-                      className="flex aspect-square w-28 shrink-0 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white text-slate-400 transition hover:border-[var(--color-metro-navy)] hover:text-[var(--color-metro-navy)]"
+                      className="group/placeholder relative flex aspect-square w-28 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-white p-2 text-slate-400 transition hover:border-[var(--color-metro-navy)] hover:text-[var(--color-metro-navy)]"
+                      title="Click to upload brand logo"
                     >
-                      <ImageIcon className="mb-1 h-6 w-6" />
-                      <span className="text-[11px] font-semibold">Upload Logo</span>
+                      <img
+                        src="/logo.png"
+                        alt="Metropolitan Logo Placeholder"
+                        className="max-h-10 w-auto object-contain opacity-50 transition group-hover/placeholder:opacity-80"
+                      />
+                      <span className="mt-1.5 text-[10px] font-semibold text-slate-500">
+                        Upload Logo
+                      </span>
                     </div>
                   )}
 
@@ -323,6 +348,16 @@ export function BrandForm({ initialData }: BrandFormProps) {
                         <FileImage className="h-3.5 w-3.5 text-blue-600" />
                         Media Library
                       </button>
+                      <button
+                        type="button"
+                        onClick={handleUseMetropolitanLogo}
+                        disabled={isPending}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-98"
+                        title="Use default Metropolitan logo"
+                      >
+                        <img src="/logo.png" alt="" className="h-3.5 w-auto object-contain" />
+                        Metropolitan Logo
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -335,8 +370,10 @@ export function BrandForm({ initialData }: BrandFormProps) {
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       Brand Hero Banner (Wide 3:1)
                     </span>
-                    <p className="text-xs text-slate-400">
-                      High-resolution manufacturer banner for dedicated brand landing pages.
+                    <p className="text-xs text-slate-500">
+                      High-resolution manufacturer banner.{' '}
+                      <span className="font-semibold text-slate-700">Recommended size:</span> 1200 ×
+                      400 px (3:1 Landscape ratio, PNG, JPG, or WebP).
                     </p>
                   </div>
                   {activeBannerUrl && (
@@ -518,7 +555,13 @@ export function BrandForm({ initialData }: BrandFormProps) {
             </div>
 
             <div className="group overflow-hidden rounded-xl border border-slate-200 bg-white p-4 text-center shadow-xs transition hover:shadow-md">
-              <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-2 shadow-2xs">
+              <div
+                onClick={() => !activeLogoUrl && logoInputRef.current?.click()}
+                className={`mx-auto mb-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-2 shadow-2xs ${
+                  !activeLogoUrl ? 'cursor-pointer transition hover:border-slate-300' : ''
+                }`}
+                title={!activeLogoUrl ? 'Click to upload brand logo' : undefined}
+              >
                 {activeLogoUrl ? (
                   <img
                     src={activeLogoUrl}
@@ -526,7 +569,11 @@ export function BrandForm({ initialData }: BrandFormProps) {
                     className="h-full w-full object-contain"
                   />
                 ) : (
-                  <Tag className="h-8 w-8 text-slate-300" />
+                  <img
+                    src="/logo.png"
+                    alt="Metropolitan Logo Placeholder"
+                    className="h-full w-full object-contain"
+                  />
                 )}
               </div>
               <h4 className="truncate text-sm font-bold text-slate-900">{name || 'Brand Name'}</h4>

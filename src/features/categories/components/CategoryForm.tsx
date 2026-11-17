@@ -390,8 +390,10 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       Category Thumbnail / Card Image
                     </span>
-                    <p className="text-xs text-slate-400">
-                      Square listing card image (Max 5MB: PNG, JPEG, WebP). Recommended 600×600px.
+                    <p className="text-xs text-slate-500">
+                      Card header & listing thumbnail (Max 5MB).{' '}
+                      <span className="font-semibold text-slate-700">Recommended size:</span> 600 ×
+                      400 px (3:2 Landscape ratio). WebP or JPG, sharp thumbnail photo.
                     </p>
                   </div>
                   {activeThumbnailUrl && (
@@ -476,9 +478,11 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       Category Banner Image
                     </span>
-                    <p className="text-xs text-slate-400">
-                      High-resolution wide header banner (Max 5MB: PNG, JPEG, WebP). Recommended
-                      1920×640px.
+                    <p className="text-xs text-slate-500">
+                      Top category hero banner (Max 5MB).{' '}
+                      <span className="font-semibold text-slate-700">Recommended size:</span> 1920 ×
+                      450 px (~4:1 / 5:1 Ultra-wide ratio). WebP or JPG, subdued industrial
+                      background.
                     </p>
                   </div>
                   {activeBannerUrl && (

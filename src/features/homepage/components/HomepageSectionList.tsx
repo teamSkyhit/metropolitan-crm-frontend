@@ -7,7 +7,7 @@ import {
   useReorderHomepageSections,
   useDeleteHomepageSection,
 } from '../hooks/useHomepage';
-import { HomepageSectionType } from '../types';
+import { HomepageSectionType, getHomepageSectionDisplayLabel } from '../types';
 import { Edit, Trash2, ArrowUp, ArrowDown, LayoutTemplate, AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -126,17 +126,26 @@ export function HomepageSectionList() {
   };
 
   const formatType = (type: string) => {
-    return type
-      .replace(/_/g, ' ')
-      .replace(/\w\S*/g, (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase());
+    switch (type) {
+      case HomepageSectionType.HERO:
+        return 'Hero';
+      case HomepageSectionType.FEATURED_CATEGORIES:
+        return 'Product Categories';
+      case HomepageSectionType.FEATURED_PRODUCTS:
+        return 'Featured Products';
+      case HomepageSectionType.FEATURED_BRANDS:
+        return 'Brands (Featured Brands)';
+      case HomepageSectionType.PROMO_BANNER:
+        return 'Promo Banner';
+      default:
+        return type
+          .replace(/_/g, ' ')
+          .replace(/\w\S*/g, (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase());
+    }
   };
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-sm text-blue-900">
-        <span className="font-semibold">Homepage order:</span> sections appear publicly from top to
-        bottom. Use the arrows to reorder, then save your changes.
-      </div>
       {isOrderChanged && (
         <div className="sticky top-3 z-10 mb-6 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-yellow-800 font-medium">You have unsaved order changes.</p>
@@ -188,22 +197,25 @@ export function HomepageSectionList() {
             </div>
 
             <div className="min-w-0">
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-700">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="inline-flex items-center gap-1 rounded-md bg-[var(--color-metro-navy)]/10 px-2 py-0.5 text-xs font-bold text-[var(--color-metro-navy)]">
+                  Order #{index + 1}
+                </span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gray-100 text-gray-700">
                   {formatType(section.type)}
                 </span>
                 {section.isActive ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">
                     Active
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700">
                     Inactive
                   </span>
                 )}
               </div>
               <h4 className="text-lg font-semibold text-gray-900">
-                {section.title || formatType(section.type)}
+                {getHomepageSectionDisplayLabel(section.type, section.title)}
               </h4>
               {section.subtitle && (
                 <p className="text-sm text-gray-500 line-clamp-1">{section.subtitle}</p>

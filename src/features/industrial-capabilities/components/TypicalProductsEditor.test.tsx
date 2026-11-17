@@ -13,6 +13,9 @@ describe('TypicalProductsEditor', () => {
     expect(screen.getByText('Gears')).toBeDefined();
     expect(screen.getByText('Shafts')).toBeDefined();
     expect(screen.getByText('2 of 50 products added.')).toBeDefined();
+    expect(
+      screen.getByText(/Typical Products may also appear in website navigation\./i)
+    ).toBeDefined();
   });
 
   it('adds a new product on button click', () => {

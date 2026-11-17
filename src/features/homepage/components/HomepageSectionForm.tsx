@@ -10,6 +10,7 @@ import {
   CreateHomepageSectionRequest,
   UpdateHomepageSectionRequest,
   HomepageContent,
+  getHomepageSectionDisplayLabel,
 } from '../types';
 import {
   useCreateHomepageSection,
@@ -68,6 +69,9 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
       HomepageSectionType.FEATURED_BRANDS,
     ] as HomepageSectionType[]
   ).includes(type);
+
+  const isHeroOrPromo =
+    type === HomepageSectionType.HERO || type === HomepageSectionType.PROMO_BANNER;
 
   const existingActiveSection = allSections?.find(
     (s) => s.type === type && s.isActive && (!isEdit || s.id !== initialData?.id)
@@ -130,22 +134,25 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
       const cleanContent = sanitizeContentForBackend(type, content);
 
       if (isEdit) {
-        // PATCH partial update: only send what changed if we wanted to be strictly minimal,
-        // but since we keep full form state, we can send it all or minimal.
-        const payload: UpdateHomepageSectionRequest = {};
-        if (title !== (initialData.title ?? '')) payload.title = title || null;
-        if (subtitle !== (initialData.subtitle ?? '')) payload.subtitle = subtitle || null;
-        if (isActive !== initialData.isActive) payload.isActive = isActive;
-
-        payload.content = cleanContent;
+        const payload: UpdateHomepageSectionRequest = {
+          isActive: Boolean(isActive),
+          content: cleanContent,
+        };
+        if (isHeroOrPromo) {
+          payload.title = null;
+          payload.subtitle = null;
+        } else {
+          payload.title = title || null;
+          payload.subtitle = subtitle || null;
+        }
 
         await updateMutation.mutateAsync({ id: initialData.id, data: payload });
       } else {
         const payload: CreateHomepageSectionRequest = {
           type,
-          title: title || null,
-          subtitle: subtitle || null,
-          isActive,
+          title: isHeroOrPromo ? null : title || null,
+          subtitle: isHeroOrPromo ? null : subtitle || null,
+          isActive: Boolean(isActive),
           content: cleanContent,
         };
         await createMutation.mutateAsync(payload);
@@ -218,9 +225,15 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
             {[
               {
                 id: HomepageSectionType.HERO,
-                label: 'Hero Carousel',
-                desc: 'Rotating banner slides with background images and CTA buttons',
+                label: 'Hero',
+                desc: 'Rotating banner slides with background images, headlines, and CTA buttons',
                 icon: Layers,
+              },
+              {
+                id: HomepageSectionType.FEATURED_CATEGORIES,
+                label: 'Product Categories',
+                desc: 'Highlight main product categories with banners',
+                icon: FolderTree,
               },
               {
                 id: HomepageSectionType.FEATURED_PRODUCTS,
@@ -229,21 +242,15 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
                 icon: Package,
               },
               {
-                id: HomepageSectionType.FEATURED_CATEGORIES,
-                label: 'Featured Categories',
-                desc: 'Highlight main product categories with banners',
-                icon: FolderTree,
-              },
-              {
                 id: HomepageSectionType.FEATURED_BRANDS,
-                label: 'Featured Brands',
+                label: 'Brands',
                 desc: 'Display partner brands and manufacturer logos',
                 icon: Award,
               },
               {
                 id: HomepageSectionType.PROMO_BANNER,
                 label: 'Promo Banner',
-                desc: 'Full-width promotional callout banner with image & CTA',
+                desc: 'Full-width promotional callout banner (e.g. Technical Support, Why Metropolitan, Need a Product)',
                 icon: Megaphone,
               },
             ].map((option) => {
@@ -307,31 +314,33 @@ export function HomepageSectionForm({ initialData }: HomepageSectionFormProps) {
           <label className="block text-sm font-bold text-gray-900 mb-1">Section Type</label>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-[var(--color-metro-navy)] font-bold text-sm">
             <Layers className="w-4 h-4" />
-            {type.replace(/_/g, ' ')}
+            {getHomepageSectionDisplayLabel(type)}
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Title (Optional)</label>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Featured Products"
-          />
+      {!isHeroOrPromo && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title (Optional)</label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Featured Products"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Subtitle (Optional)
+            </label>
+            <Input
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="e.g. Check out our latest products"
+            />
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Subtitle (Optional)
-          </label>
-          <Input
-            value={subtitle}
-            onChange={(e) => setSubtitle(e.target.value)}
-            placeholder="e.g. Check out our latest products"
-          />
-        </div>
-      </div>
+      )}
 
       <div className="flex items-center gap-2">
         <input

@@ -14,7 +14,7 @@ export default function IndustrialCapabilitiesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeader
           title="Industrial Capabilities"
-          description="Manage core industrial manufacturing segments, typical products, and storefront hero section content."
+          description="Manage core industrial manufacturing capabilities, typical products, and storefront hero section content."
         />
 
         {/* Tab Navigation */}

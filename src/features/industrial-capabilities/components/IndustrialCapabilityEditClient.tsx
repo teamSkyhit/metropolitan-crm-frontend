@@ -37,10 +37,9 @@ export function IndustrialCapabilityEditClient({ id }: { id: string }) {
         <Link
           href={ROUTES.INDUSTRIAL_CAPABILITIES}
           aria-label="Back to industrial capabilities"
-          className="mt-1 inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+          className="mt-1 grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
         >
-          <ArrowLeft size={14} className="mr-1.5" />
-          Back
+          <ArrowLeft className="h-5 w-5" />
         </Link>
         <PageHeader
           title={`Edit ${capability.title}`}

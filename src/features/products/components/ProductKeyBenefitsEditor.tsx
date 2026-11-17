@@ -5,7 +5,7 @@ import { ProductKeyBenefit } from '../types';
 import { IconPicker } from '@/components/ui/icon-picker/IconPicker';
 import { ProductContentIcon } from '@/components/ui/icon-picker/ProductContentIcon';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Plus, Trash2, Edit2, ArrowUp, ArrowDown, Check, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, ArrowUp, ArrowDown, Check, X, Eye, EyeOff } from 'lucide-react';
 
 interface ProductKeyBenefitsEditorProps {
   benefits: ProductKeyBenefit[];
@@ -135,25 +135,69 @@ export function ProductKeyBenefitsEditor({
     }
   };
 
+  const hasBenefits = Boolean(benefits && benefits.length > 0);
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-col items-start gap-3 min-[420px]:flex-row min-[420px]:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h4 className="text-sm font-semibold text-gray-900">Key Benefits</h4>
-          <p className="text-xs text-gray-500">
-            Communicate customer advantages, durability ratings, and operational ROI.
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-sm font-semibold text-gray-900">Key Benefits (Optional)</h4>
+            {hasBenefits ? (
+              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                <Eye className="w-3 h-3 text-emerald-600" />
+                Visible on Website
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                <EyeOff className="w-3 h-3 text-amber-600" />
+                Hidden on Website
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Key benefits are preserved in the database for future reference, and appear on the
+            website when added.
           </p>
         </div>
+
         {!isAddingNew && (
           <button
             type="button"
             disabled={disabled}
             onClick={handleStartAdd}
-            className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-[#0b2e59] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#0b2e59]/90 min-[420px]:w-auto"
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-[#0b2e59] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#0b2e59]/90 min-[420px]:w-auto self-start sm:self-auto"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Benefit
           </button>
+        )}
+      </div>
+
+      <div
+        className={`rounded-xl border p-3 text-xs flex items-start gap-2 ${
+          hasBenefits
+            ? 'border-emerald-200/70 bg-emerald-50/50 text-emerald-900'
+            : 'border-amber-200/70 bg-amber-50/50 text-amber-900'
+        }`}
+      >
+        {hasBenefits ? (
+          <>
+            <Eye className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold">Storefront status:</span> Key Benefits are configured
+              ({benefits.length} item{benefits.length === 1 ? '' : 's'}) and visible on the public
+              website.
+            </div>
+          </>
+        ) : (
+          <>
+            <EyeOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold">Storefront status:</span> No key benefits added.
+              Section remains hidden on website until benefits are created.
+            </div>
+          </>
         )}
       </div>
 

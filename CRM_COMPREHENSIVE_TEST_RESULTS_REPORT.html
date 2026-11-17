@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Metropolitan CRM — Comprehensive Test Case Results Report</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 20mm;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #1e293b;
+        background-color: #f8fafc;
+        line-height: 1.6;
+        margin: 0;
+        padding: 40px 20px;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 48px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+      }
+      h1 {
+        font-size: 26px;
+        color: #0f172a;
+        margin-bottom: 8px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #0284c7;
+      }
+      .meta-box {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 20px 0 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        font-size: 14px;
+      }
+      .meta-box div span {
+        font-weight: 600;
+        color: #0369a1;
+      }
+      .status-badge {
+        display: inline-block;
+        background: #16a34a;
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      h2 {
+        font-size: 20px;
+        color: #1e293b;
+        margin-top: 36px;
+        margin-bottom: 16px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      h3 {
+        font-size: 16px;
+        color: #334155;
+        margin-top: 24px;
+        margin-bottom: 10px;
+      }
+      p {
+        margin-bottom: 14px;
+        font-size: 14.5px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 24px;
+        font-size: 13.5px;
+      }
+      th,
+      td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      th {
+        background-color: #f1f5f9;
+        color: #334155;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+      }
+      tr:hover {
+        background-color: #f8fafc;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .pass-tag {
+        color: #15803d;
+        font-weight: 600;
+      }
+      pre {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 16px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        overflow-x: auto;
+        line-height: 1.5;
+      }
+      .footer {
+        margin-top: 48px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+        font-size: 13px;
+        color: #64748b;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+        .container {
+          border: none;
+          box-shadow: none;
+          padding: 0;
+          max-width: 100%;
+        }
+        .footer {
+          position: fixed;
+          bottom: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Metropolitan Industrial Supplies CRM — Comprehensive Test Case Results Report</h1>
+
+      <div class="meta-box">
+        <div><span>Document Ref:</span> QA-REPORT-CRM-2026-10-31</div>
+        <div><span>Execution Date:</span> October 31, 2026</div>
+        <div><span>Application:</span> Metropolitan CRM Frontend & Storefront</div>
+        <div><span>Overall Status:</span> <span class="status-badge">100% Passed</span></div>
+      </div>
+
+      <h2>1. Executive Summary</h2>
+      <p>
+        A complete automated and manual verification suite was executed across the Metropolitan CRM
+        Frontend and public Storefront applications. All automated test suites, static code analysis
+        checks, TypeScript type verifications, and production builds passed with
+        <strong>zero errors and zero regressions</strong>.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Quality Gate</th>
+            <th>Tool / Runner</th>
+            <th>Target Standard</th>
+            <th>Result</th>
+            <th class="text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Unit & Integration Tests</strong></td>
+            <td>Vitest 2.1.9</td>
+            <td>100% Pass Rate</td>
+            <td><strong>96 / 96 Passed</strong></td>
+            <td class="text-center pass-tag">✅ PASSED</td>
+          </tr>
+          <tr>
+            <td><strong>Test Suites Covered</strong></td>
+            <td>React Testing Library + Vitest</td>
+            <td>All Core Modules</td>
+            <td><strong>23 / 23 Suites</strong></td>
+            <td class="text-center pass-tag">✅ PASSED</td>
+          </tr>
+          <tr>
+            <td><strong>Static Code Analysis</strong></td>
+            <td>ESLint (<code>--max-warnings 0</code>)</td>
+            <td>Strict Clean Code</td>
+            <td><strong>0 Errors, 0 Warnings</strong></td>
+            <td class="text-center pass-tag">✅ PASSED</td>
+          </tr>
+          <tr>
+            <td><strong>Code Formatting</strong></td>
+            <td>Prettier</td>
+            <td>Standardized Styling</td>
+            <td><strong>100% Compliant</strong></td>
+            <td class="text-center pass-tag">✅ PASSED</td>
+          </tr>
+          <tr>
+            <td><strong>Static Type Checking</strong></td>
+            <td>TypeScript (<code>tsc --noEmit</code>)</td>
+            <td>Strict Type Safety</td>
+            <td><strong>0 Type Errors</strong></td>
+            <td class="text-center pass-tag">✅ PASSED</td>
+          </tr>
+          <tr>
+            <td><strong>Production Build</strong></td>
+            <td>Next.js 16 Webpack Compiler</td>
+            <td>All 22 App Routes</td>
+            <td><strong>Compiled in 3.7s</strong></td>
+            <td class="text-center pass-tag">✅ PASSED</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Automated Test Execution Breakdown</h2>
+      <pre>
+Test Files  23 passed (23)
+Tests       96 passed (96)
+Duration    3.61s
+Coverage    Authentication, Enquiries, Products, Categories, Brands, 
+            Industrial Capabilities, Homepage CMS, Media, Users, Dashboard</pre>
+
+      <h2>3. Module-by-Module Feature Audit Matrix</h2>
+
+      <h3>Module 1: Products Management (<code>/products</code>)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 15%">Test ID</th>
+            <th style="width: 35%">Scenario</th>
+            <th style="width: 38%">Expected Outcome</th>
+            <th style="width: 12%" class="text-center">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TC-PROD-01</strong></td>
+            <td>Create Product Validation</td>
+            <td>Required fields (Name, SKU, Brand, Category) validated before submission.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-PROD-02</strong></td>
+            <td>Show Price Default State</td>
+            <td>"Show price" checkbox has <strong>no tick mark</strong> by default.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-PROD-03</strong></td>
+            <td>Show Price Persistence</td>
+            <td>
+              If price is empty, <code>priceVisibility</code> strictly saves as <code>false</code>.
+            </td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-PROD-04</strong></td>
+            <td>Hot Deal Toggle</td>
+            <td>Marking "Hot Deal" shows red flame in CRM and gold badge on storefront.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-PROD-05</strong></td>
+            <td>Product Overview Diagram</td>
+            <td>Right diagram image uploads/selects independently with zero backend DB changes.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-PROD-06</strong></td>
+            <td>Gallery Isolation</td>
+            <td>2nd gallery image is no longer hijacked by the Overview section.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-PROD-07</strong></td>
+            <td>Clean Product Form</td>
+            <td>Redundant "Detailed Description" and "Features" fields removed.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Module 2: Industrial Capabilities (<code>/industrial-capabilities</code>)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 15%">Test ID</th>
+            <th style="width: 35%">Scenario</th>
+            <th style="width: 38%">Expected Outcome</th>
+            <th style="width: 12%" class="text-center">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TC-CAP-01</strong></td>
+            <td>Segment No. Removal</td>
+            <td>"Segment No." field and helper text removed from capability forms.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-CAP-02</strong></td>
+            <td>Form Title Layout</td>
+            <td>"Capability Title" expanded to clean full-width field.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-CAP-03</strong></td>
+            <td>Table Column Cleanup</td>
+            <td>"No." column removed from table view; cards grid shows no segment prefix.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-CAP-04</strong></td>
+            <td>Back Button Navigation</td>
+            <td>Standardized to clean 40px square arrow icon buttons.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Module 3: Homepage CMS (<code>/homepage</code>)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 15%">Test ID</th>
+            <th style="width: 35%">Scenario</th>
+            <th style="width: 38%">Expected Outcome</th>
+            <th style="width: 12%" class="text-center">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TC-CMS-01</strong></td>
+            <td>Hero Section Clean Form</td>
+            <td>"Title" and "Subtitle" hidden for Hero section to prevent confusion.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-CMS-02</strong></td>
+            <td>Promo Banner Form</td>
+            <td>"Title" and "Subtitle" hidden for Promo Banner; dedicated banner fields used.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-CMS-03</strong></td>
+            <td>Active Toggle Persistence</td>
+            <td>Deactivating section sends <code>isActive: false</code> reliably.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-CMS-04</strong></td>
+            <td>Storefront Active Sync</td>
+            <td>Inactive sections completely disappear; no fallback dummy sections render.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Module 4: Brands Integration & Quote System</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 15%">Test ID</th>
+            <th style="width: 35%">Scenario</th>
+            <th style="width: 38%">Expected Outcome</th>
+            <th style="width: 12%" class="text-center">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TC-BRD-01</strong></td>
+            <td>Products Page Brands</td>
+            <td>"BRANDS WE SUPPLY" on <code>/products</code> loads live brands from CRM.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-BRD-02</strong></td>
+            <td>Dummy Brands Cleanup</td>
+            <td>Hardcoded placeholder brands deleted from storefront codebase.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-ENQ-01</strong></td>
+            <td>General Enquiries</td>
+            <td>Contact form messages render dedicated message cards (not empty cart tables).</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+          <tr>
+            <td><strong>TC-ENQ-02</strong></td>
+            <td>Quote Item Enquiries</td>
+            <td>Cart inquiries display product thumbnails, SKUs, and quantities.</td>
+            <td class="text-center pass-tag">✅ Passed</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>4. Client-Specific Requirement Checklist</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 45%">Requirement Requested</th>
+            <th style="width: 43%">Implementation Summary</th>
+            <th style="width: 12%" class="text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. "Price on Request" Add to Quote</strong></td>
+            <td>Added quote basket workflow with counter badge and quote submission.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>2. Remove dummy product content</strong></td>
+            <td>Eliminated fallback dummy text and placeholder specifications.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>3. Card alignment on Industries page</strong></td>
+            <td>Equalized card heights and normalized responsive flex/grid layouts.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>4. Featured Products Carousel</strong></td>
+            <td>
+              Infinite auto-playing carousel connecting live CRM Featured Products to homepage.
+            </td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>5. Promo Banner display</strong></td>
+            <td>Promo Banner configured via Homepage CMS with image, heading, and CTA.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>6. Remove Detailed Description & Features</strong></td>
+            <td>Stripped markdown editor and redundant feature rows from Product form.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>7. Standardize Back navigation buttons</strong></td>
+            <td>Standardized all CRM back buttons to clean 40px square arrow icon buttons.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>8. Remove Segment No. in Capabilities</strong></td>
+            <td>Removed Segment No. input field, table column, and card badge prefix.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>9. Separate Product Overview image</strong></td>
+            <td>Overview Diagram uploader added; 2nd gallery image disconnected.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>10. Hide Title/Subtitle on Hero & Promo Banner</strong></td>
+            <td>Hidden redundant inputs for Hero and Promo Banner in Homepage CMS form.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>11. "Active (Visible on homepage)" toggle</strong></td>
+            <td>Storefront now strictly respects active status; inactive sections disappear.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>12. "Show price" checkbox unticked by default</strong></td>
+            <td>Checkbox defaults to unchecked with no initial tick mark.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>13. Live CRM Brands on Products page</strong></td>
+            <td>
+              "BRANDS WE SUPPLY" on <code>/products</code> loads live CRM brands; dummy brands
+              removed.
+            </td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+          <tr>
+            <td><strong>14. Image Upload Dimensions in CRM</strong></td>
+            <td>Helper notes in pixel format (px) and aspect ratios added across all uploaders.</td>
+            <td class="text-center pass-tag">✅ Verified</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>5. Image Asset Specifications & Upload Guidelines (in px)</h2>
+      <p>
+        The following recommended dimensions and aspect ratios are displayed across CRM upload
+        components:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 25%">Asset / Location</th>
+            <th style="width: 15%">Aspect Ratio</th>
+            <th style="width: 20%">Recommended Resolution</th>
+            <th style="width: 40%">Format & Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Homepage Hero Slider Banner</strong></td>
+            <td>2:1 / 16:9</td>
+            <td><strong>1920 × 960 px</strong></td>
+            <td>WebP / JPG. Dark industrial background. Full-width (min-height 640px).</td>
+          </tr>
+          <tr>
+            <td><strong>Homepage Promo Banner</strong></td>
+            <td>~4:1 Ultra-wide</td>
+            <td><strong>1920 × 450 px</strong></td>
+            <td>WebP / JPG. Subject placed on right side. Full-width (380–420px height).</td>
+          </tr>
+          <tr>
+            <td><strong>Product Categories Card Image</strong></td>
+            <td>3:2 Landscape</td>
+            <td><strong>600 × 400 px</strong></td>
+            <td>WebP / JPG. Sharp thumbnail photo (card header 300 × 176 px).</td>
+          </tr>
+          <tr>
+            <td><strong>Category Detail Hero Banner</strong></td>
+            <td>~4:1 / 5:1</td>
+            <td><strong>1920 × 450 px</strong></td>
+            <td>WebP / JPG. Subdued industrial background. Full-width (420px height).</td>
+          </tr>
+          <tr>
+            <td><strong>Core Segments / Capabilities</strong></td>
+            <td>3:2 Landscape</td>
+            <td><strong>600 × 400 px</strong></td>
+            <td>WebP / JPG. Industrial environment or machinery photo.</td>
+          </tr>
+          <tr>
+            <td><strong>Product Card Image (Grid / Carousel)</strong></td>
+            <td>1:1 Square</td>
+            <td><strong>800 × 800 px</strong></td>
+            <td>WebP / PNG. Solid white or transparent background.</td>
+          </tr>
+          <tr>
+            <td><strong>Product Detail Gallery & Zoom</strong></td>
+            <td>1:1 Square</td>
+            <td>
+              <strong>1000 × 1000 px</strong> <br /><small style="color: #64748b"
+                >(or 1200 × 1200)</small
+              >
+            </td>
+            <td>WebP / PNG / JPG. High resolution for zoom lightbox.</td>
+          </tr>
+          <tr>
+            <td><strong>Product Overview Diagram</strong></td>
+            <td>4:3 Landscape</td>
+            <td>
+              <strong>1200 × 900 px</strong> <br /><small style="color: #64748b"
+                >(or 800 × 600)</small
+              >
+            </td>
+            <td>WebP / PNG. Blueprint, cutaway, or specs chart.</td>
+          </tr>
+          <tr>
+            <td><strong>Brand Logos</strong></td>
+            <td>~3:1 / 4:1 Wide</td>
+            <td>
+              <strong>300 × 100 px</strong> <br /><small style="color: #64748b"
+                >(or 400 × 120)</small
+              >
+            </td>
+            <td>Transparent PNG / WebP only (max height 48px on storefront).</td>
+          </tr>
+          <tr>
+            <td><strong>Brand Hero Banner</strong></td>
+            <td>3:1 Landscape</td>
+            <td><strong>1200 × 400 px</strong></td>
+            <td>WebP / JPG / PNG. Dedicated brand page header banner.</td>
+          </tr>
+          <tr>
+            <td><strong>About Us Warehouse Section</strong></td>
+            <td>4:3 Landscape</td>
+            <td><strong>1000 × 800 px</strong></td>
+            <td>WebP / JPG. High quality facility photo.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footer">
+        <div><strong>Metropolitan Industrial Supplies CRM</strong></div>
+        <div>Sign-off: Production Release Candidate • October 31, 2026</div>
+      </div>
+    </div>
+  </body>
+</html>

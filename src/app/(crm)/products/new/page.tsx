@@ -2,14 +2,13 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Save, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants/routes';
 import { ProductForm } from '@/features/products/components/ProductForm';
 import { ProductGalleryManager } from '@/features/products/components/ProductGalleryManager';
 import { ProductVideoManager } from '@/features/products/components/ProductVideoManager';
 import { ProductDocumentManager } from '@/features/products/components/ProductDocumentManager';
-import { ProductFeaturesEditor } from '@/features/products/components/ProductFeaturesEditor';
 import { ProductKeyBenefitsEditor } from '@/features/products/components/ProductKeyBenefitsEditor';
 import { RelatedProductsSelector } from '@/features/products/components/RelatedProductsSelector';
 import { ProductSpecificationsEditor } from '@/features/products/components/ProductSpecificationsEditor';
@@ -53,7 +52,7 @@ export default function CreateProductPage() {
 
   // Subresource states prepared before creation
   const [specifications, setSpecifications] = useState<ProductSpecification[]>([]);
-  const [features, setFeatures] = useState<ProductFeature[]>([]);
+  const features: ProductFeature[] = [];
   const [benefits, setBenefits] = useState<ProductKeyBenefit[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<RelatedProductSummary[]>([]);
   const [localGalleryFiles, setLocalGalleryFiles] = useState<File[]>([]);
@@ -131,7 +130,7 @@ export default function CreateProductPage() {
             categoryId: coreData.categoryId!,
             description: coreData.description ?? null,
             price: coreData.price ?? null,
-            priceVisibility: coreData.priceVisibility ?? true,
+            priceVisibility: coreData.priceVisibility ?? false,
             status: coreData.status ?? 'DRAFT',
             hotDeal: coreData.hotDeal ?? false,
           };
@@ -299,8 +298,8 @@ export default function CreateProductPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Unified Compact Action Header Bar */}
-      <div className="sticky top-0 z-30 -mx-3 -mt-4 mb-4 border-b border-slate-200/80 bg-white/95 px-3 py-2.5 shadow-xs backdrop-blur-md min-[380px]:-mx-4 sm:-mx-6 sm:-mt-5 sm:px-6 md:-mx-8 md:-mt-7 md:px-8 xl:-mx-10 xl:px-10">
+      {/* Sticky Action Header Bar */}
+      <div className="sticky top-0 z-40 mb-6 rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-md">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Left: Back Button, Title & Status */}
           <div className="flex items-center gap-3 shrink-0">
@@ -328,25 +327,24 @@ export default function CreateProductPage() {
             </div>
           </div>
 
-          {/* Center: Jump To Navigation Tabs (occupies the center space) */}
+          {/* Center: Jump To Navigation Tabs */}
           <nav
             aria-label="Product form sections"
-            className="flex items-center gap-1 overflow-x-auto py-0.5 scrollbar-none order-3 w-full lg:order-2 lg:w-auto lg:flex-1 lg:justify-center"
+            className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-none order-3 w-full lg:order-2 lg:w-auto lg:flex-1 lg:justify-center"
           >
             {[
-              ['#product-core', 'Basic Details'],
-              ['#product-specifications', 'Specifications'],
-              ['#product-features', 'Features'],
-              ['#product-benefits', 'Benefits'],
-              ['#product-media', 'Media Gallery'],
-              ['#product-videos', 'Videos'],
-              ['#product-documents', 'Documents'],
-              ['#product-related', 'Related Products'],
+              ['#product-core', '1. Basic Info'],
+              ['#product-description', '2. Description'],
+              ['#product-brand', '3. Brand'],
+              ['#product-gallery', '4. Gallery'],
+              ['#product-specifications', '5. Specifications'],
+              ['#product-related', '6. Related Products'],
+              ['#product-legacy', '7. Inactive / Legacy'],
             ].map(([href, label]) => (
               <a
                 key={href}
                 href={href}
-                className="shrink-0 rounded-lg border border-slate-200/60 bg-slate-50/70 px-2.5 py-1 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
               >
                 {label}
               </a>
@@ -443,31 +441,81 @@ export default function CreateProductPage() {
         </div>
       )}
 
-      {/* Main Form & Subresources Grid */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        {/* Left Column: Core Info & Content Sections */}
-        <div className="space-y-6 xl:col-span-2">
-          <div id="product-core" className="scroll-mt-24">
-            <ProductForm mode="create" onSubmit={handleSubmit} isPending={isSubmitting} />
-          </div>
+      {/* Sequential Form Sections Matching Website Flow */}
+      <div className="space-y-8">
+        {/* Core Product Form: Basic Info, Description, Brand, SKU, Overview, SEO */}
+        <div id="product-core" className="scroll-mt-24">
+          <ProductForm mode="create" onSubmit={handleSubmit} isPending={isSubmitting} />
+        </div>
 
-          {/* Specifications Card */}
+        {/* 4. Product Gallery */}
+        <section
+          id="product-gallery"
+          className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 mb-4 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">4. Product Gallery</h3>
+              <p className="text-xs text-gray-500">
+                Select and stage gallery images for upload. Files will be uploaded automatically
+                upon product creation.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+          <ProductGalleryManager
+            gallery={[]}
+            localFiles={localGalleryFiles}
+            onLocalFilesChange={setLocalGalleryFiles}
+            disabled={isSubmitting}
+          />
+        </section>
+
+        {/* 5. Specifications */}
+        <div id="product-specifications" className="scroll-mt-24">
           <ProductSpecificationsEditor
             value={specifications}
             onChange={setSpecifications}
             disabled={isSubmitting}
           />
+        </div>
 
-          {/* Features Card */}
-          <div
-            id="product-features"
-            className="scroll-mt-28 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
-          >
-            <ProductFeaturesEditor
-              features={features}
-              onChange={setFeatures}
-              disabled={isSubmitting}
-            />
+        {/* 6. Related Products */}
+        <section
+          id="product-related"
+          className="scroll-mt-24 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 mb-4 gap-2">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">6. Related Products</h3>
+              <p className="text-xs text-gray-500">
+                Select complementary or alternative products to recommend on the storefront.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 self-start sm:self-auto rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+              <Eye className="w-3 h-3 text-emerald-600" />
+              Visible on Website
+            </span>
+          </div>
+          <RelatedProductsSelector
+            selectedProducts={relatedProducts}
+            onChange={setRelatedProducts}
+            disabled={isSubmitting}
+          />
+        </section>
+
+        {/* 7. Inactive / Supplementary Sections */}
+        <section id="product-legacy" className="scroll-mt-24 space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <h3 className="text-base font-bold text-slate-900">
+              7. Inactive / Supplementary Sections
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Supplementary media and legacy content preserved in the database.
+            </p>
           </div>
 
           {/* Key Benefits Card */}
@@ -482,53 +530,44 @@ export default function CreateProductPage() {
             />
           </div>
 
-          {/* Related Products Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <h4 className="text-sm font-semibold text-gray-900 mb-1">Related Products</h4>
-            <p className="text-xs text-gray-500 mb-4">
-              Select other products from the catalog to recommend on this product&apos;s detail
-              page.
-            </p>
-            <RelatedProductsSelector
-              selectedProducts={relatedProducts}
-              onChange={setRelatedProducts}
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Videos Card */}
+            <div
+              id="product-videos"
+              className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+            >
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">Product Videos</h4>
+              <p className="text-xs text-gray-500 mb-3">
+                Optional video demonstrations (MP4/WebM).
+              </p>
+              <ProductVideoManager
+                videos={[]}
+                localFiles={localVideos}
+                onLocalFilesChange={setLocalVideos}
+                disabled={isSubmitting}
+              />
+            </div>
 
-        {/* Right Column: Media Subresources */}
-        <div id="product-media" className="scroll-mt-24 space-y-6">
-          {/* Gallery Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductGalleryManager
-              gallery={[]}
-              localFiles={localGalleryFiles}
-              onLocalFilesChange={setLocalGalleryFiles}
-              disabled={isSubmitting}
-            />
+            {/* Documents Card */}
+            <div
+              id="product-documents"
+              className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6"
+            >
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                Technical Documents (PDF)
+              </h4>
+              <p className="text-xs text-gray-500 mb-3">
+                Product brochures, user manuals, and technical spec sheets.
+              </p>
+              <ProductDocumentManager
+                documents={[]}
+                localFiles={localDocuments}
+                onLocalFilesChange={setLocalDocuments}
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
-
-          {/* Videos Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductVideoManager
-              videos={[]}
-              localFiles={localVideos}
-              onLocalFilesChange={setLocalVideos}
-              disabled={isSubmitting}
-            />
-          </div>
-
-          {/* Documents Card */}
-          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_5px_22px_rgba(15,38,68,0.04)] sm:p-6">
-            <ProductDocumentManager
-              documents={[]}
-              localFiles={localDocuments}
-              onLocalFilesChange={setLocalDocuments}
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   );

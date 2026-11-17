@@ -321,6 +321,11 @@ export function UserList() {
           user={editingUser}
           isOpen={!!editingUser}
           onClose={() => setEditingUser(null)}
+          onResetPassword={() => {
+            const u = editingUser;
+            setEditingUser(null);
+            setResetPasswordUser(u);
+          }}
         />
       )}
 

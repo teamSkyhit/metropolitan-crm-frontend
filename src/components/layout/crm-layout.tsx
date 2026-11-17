@@ -25,7 +25,7 @@ export function CrmLayout({ children }: CrmLayoutProps) {
   }, [isMobileMenuOpen]);
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-[#f4f7fb]">
+    <div className="fixed inset-0 flex overflow-hidden bg-[#f4f7fb]">
       {/* Desktop Sidebar */}
       <Sidebar className="hidden md:flex" />
 
@@ -54,7 +54,7 @@ export function CrmLayout({ children }: CrmLayoutProps) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header onMenuClick={() => setIsMobileMenuOpen(true)} isMobileMenuOpen={isMobileMenuOpen} />
         <main className="flex-1 overflow-y-auto px-3 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] min-[380px]:px-4 sm:px-6 sm:py-5 md:px-8 md:py-7 xl:px-10">
-          <div className="mx-auto h-full max-w-[1440px]">{children}</div>
+          <div className="mx-auto min-h-full max-w-[1440px]">{children}</div>
         </main>
       </div>
     </div>
