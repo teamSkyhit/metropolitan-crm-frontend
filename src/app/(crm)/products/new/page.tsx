@@ -298,8 +298,8 @@ export default function CreateProductPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Unified Compact Action Header Bar */}
-      <div className="sticky top-0 z-30 -mx-3 -mt-4 mb-4 border-b border-slate-200/80 bg-white/95 px-3 py-2.5 shadow-xs backdrop-blur-md min-[380px]:-mx-4 sm:-mx-6 sm:-mt-5 sm:px-6 md:-mx-8 md:-mt-7 md:px-8 xl:-mx-10 xl:px-10">
+      {/* Sticky Action Header Bar */}
+      <div className="sticky top-0 z-40 mb-6 rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-md">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Left: Back Button, Title & Status */}
           <div className="flex items-center gap-3 shrink-0">
@@ -327,10 +327,10 @@ export default function CreateProductPage() {
             </div>
           </div>
 
-          {/* Center: Jump To Navigation Tabs (occupies the center space) */}
+          {/* Center: Jump To Navigation Tabs */}
           <nav
             aria-label="Product form sections"
-            className="flex items-center gap-1 overflow-x-auto py-0.5 scrollbar-none order-3 w-full lg:order-2 lg:w-auto lg:flex-1 lg:justify-center"
+            className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-none order-3 w-full lg:order-2 lg:w-auto lg:flex-1 lg:justify-center"
           >
             {[
               ['#product-core', '1. Basic Info'],
@@ -344,7 +344,7 @@ export default function CreateProductPage() {
               <a
                 key={href}
                 href={href}
-                className="shrink-0 rounded-lg border border-slate-200/60 bg-slate-50/70 px-2.5 py-1 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
               >
                 {label}
               </a>
